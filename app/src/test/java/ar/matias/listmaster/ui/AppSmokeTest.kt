@@ -5,7 +5,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import ar.matias.listmaster.ui.theme.ListMasterTheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,9 +20,7 @@ class AppSmokeTest {
     @Test
     fun arrancaEnProyectosYPermiteCambiarDeSeccion() {
         composeRule.setContent {
-            ListMasterTheme(darkTheme = false) {
-                ListMasterApp()
-            }
+            ListMasterApp()
         }
 
         composeRule.onNodeWithText("Mis Proyectos").assertIsDisplayed()
@@ -31,8 +28,11 @@ class AppSmokeTest {
 
         composeRule.onNodeWithText("Listas").performClick()
         composeRule.onNodeWithText("Mis Listas").assertIsDisplayed()
+        composeRule.onNodeWithText("Todavía no tenés listas.").assertIsDisplayed()
 
         composeRule.onNodeWithText("Ajustes").performClick()
-        composeRule.onNodeWithText("Tus preferencias, en un solo lugar.").assertIsDisplayed()
+        composeRule.onNodeWithText("Tema").assertIsDisplayed()
+        composeRule.onNodeWithText("Tus Datos").assertExists()
+        composeRule.onNodeWithText("Acerca De").assertExists()
     }
 }

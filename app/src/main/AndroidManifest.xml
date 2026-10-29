@@ -4,6 +4,7 @@
     <!-- Sin INTERNET ni permisos de almacenamiento: los datos quedan en el
          celular y el export/import usa el selector de archivos del sistema. -->
     <application
+        android:name=".ListMasterApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"

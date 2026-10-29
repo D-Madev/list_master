@@ -6,7 +6,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
@@ -73,6 +76,52 @@ private val DarkColors = darkColorScheme(
     scrim = Color.Black,
 )
 
+/** Tokens que Material 3 no nombra y que la identidad de List Master sí usa. */
+@Immutable
+data class ExtendedColors(
+    val surfaceAlt: Color,
+    val surfaceSunken: Color,
+    val textTertiary: Color,
+    val success: Color,
+    val successSoft: Color,
+    val warning: Color,
+    val warningSoft: Color,
+    val danger: Color,
+    val dangerSoft: Color,
+    val neutral: Color,
+    val neutralSoft: Color,
+)
+
+private val LightExtended = ExtendedColors(
+    surfaceAlt = SurfaceAltLight,
+    surfaceSunken = SurfaceSunkenLight,
+    textTertiary = TextTertiaryLight,
+    success = SuccessLight,
+    successSoft = SuccessSoftLight,
+    warning = WarningLight,
+    warningSoft = WarningSoftLight,
+    danger = DangerLight,
+    dangerSoft = DangerSoftLight,
+    neutral = NeutralLight,
+    neutralSoft = NeutralSoftLight,
+)
+
+private val DarkExtended = ExtendedColors(
+    surfaceAlt = SurfaceAltDark,
+    surfaceSunken = SurfaceSunkenDark,
+    textTertiary = TextTertiaryDark,
+    success = SuccessDark,
+    successSoft = SuccessSoftDark,
+    warning = WarningDark,
+    warningSoft = WarningSoftDark,
+    danger = DangerDark,
+    dangerSoft = DangerSoftDark,
+    neutral = NeutralDark,
+    neutralSoft = NeutralSoftDark,
+)
+
+val LocalExtendedColors = staticCompositionLocalOf { LightExtended }
+
 @Composable
 fun ListMasterTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -94,9 +143,13 @@ fun ListMasterTheme(
         }
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = ListMasterTypography,
-        content = content,
-    )
+    CompositionLocalProvider(
+        LocalExtendedColors provides if (darkTheme) DarkExtended else LightExtended,
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = ListMasterTypography,
+            content = content,
+        )
+    }
 }
