@@ -260,6 +260,7 @@ La decisión de excluir subárboles cancelados es una propuesta: si se prefiere 
 | 18 | **Orden de proyectos** | Secciones por estado (activos, pausa/postergados, terminados/cancelados); sin orden manual |
 | 19 | **Límites de texto** | Proyecto/tarea/lista 120; ítem 200; se valida, no se trunca en silencio |
 | 20 | **“Urgente” vs “Alta”** | `Alta` ocupa el lugar de “Urgente” de la referencia; mismo color rojo suave |
+| 21 | **Respaldo del sistema** | `allowBackup="false"`: el respaldo automático de Android subiría datos a la nube. El único respaldo es el export manual |
 
 ## Lo que no se agrega
 

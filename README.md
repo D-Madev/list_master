@@ -6,7 +6,29 @@ Es una app Android propia. Los datos quedan en el celular, sin cuenta ni servido
 
 ## Estado
 
-Fase 0 completa: stack, metodología y sistema de diseño propuestos, esperando aprobación. Todavía no hay código de la app.
+Fase 1, corte 1: esqueleto compilable e instalable, con tema claro/oscuro/sistema y navegación base entre Proyectos, Listas y Ajustes. Todavía no hay pantallas de producto.
+
+## Cómo compilar
+
+No hace falta Android Studio: alcanza con el JDK 17, Gradle 8.9 y el SDK de Android que ya están en esta PC.
+
+```bash
+JAVA_HOME=/d/src/tools/jdk-17.0.20.1+1 \
+/d/src/tools/gradle-8.9/bin/gradle.bat assembleDebug
+```
+
+El APK queda en `app/build/outputs/apk/debug/app-debug.apk` y se instala con:
+
+```bash
+/d/src/tools/android-sdk/platform-tools/adb.exe install -r app/build/outputs/apk/debug/app-debug.apk
+```
+
+Los tests corren con:
+
+```bash
+JAVA_HOME=/d/src/tools/jdk-17.0.20.1+1 \
+/d/src/tools/gradle-8.9/bin/gradle.bat testDebugUnitTest
+```
 
 ## Documentación
 

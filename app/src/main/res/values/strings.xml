@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">List Master</string>
+
+    <string name="nav_projects">Proyectos</string>
+    <string name="nav_lists">Listas</string>
+    <string name="nav_settings">Ajustes</string>
+
+    <string name="projects_title">Mis Proyectos</string>
+    <string name="projects_empty_title">Todavía no tenés proyectos.</string>
+    <string name="projects_empty_body">Acá van a vivir tus proyectos, subproyectos y tareas.</string>
+
+    <string name="lists_title">Mis Listas</string>
+    <string name="lists_empty_title">Todavía no tenés listas.</string>
+    <string name="lists_empty_body">Armá una para las compras, las películas o lo que se te ocurra.</string>
+
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_placeholder_title">Tus preferencias, en un solo lugar.</string>
+    <string name="settings_placeholder_body">Acá vas a elegir el tema y exportar o importar tus datos.</string>
+</resources>
