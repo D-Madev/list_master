@@ -1,9 +1,9 @@
 # Prompt de inicio
 
-Pegalo completo al abrir Claude Code en `D:\src\list-master`.
+Pegalo completo al abrir Claude Code en `D:\src\2b\list_master`.
 
 ```text
-Vas a arrancar List Master, una app Android propia para gestionar proyectos con subproyectos, tareas y listas. El repo ya existe en D:\src\list-master con README y docs/. Antes de tocar nada, leé docs/decisiones/0000-alcance.md y docs/referencias/tarjeta-progreso.png.
+Vas a arrancar List Master, una app Android propia para gestionar proyectos con subproyectos, tareas y listas. El repo ya existe en D:\src\2b\list_master con README y docs/. Antes de tocar nada, leé docs/decisiones/0000-alcance.md y docs/referencias/tarjeta-progreso.png.
 
 Más adelante la app se va a integrar con un sistema mayor (A.R.G.O.S), pero hoy NO construyas esa integración. Sí dejá los datos en un formato que la haga posible.
 
