@@ -1,7 +1,28 @@
-build/
+# Android / Gradle
 .gradle/
-.idea/
-.kotlin/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
 local.properties
 *.apk
 *.aab
+*.iml
+*.hprof
+
+# Firmas y secretos: nunca se commitean
+*.jks
+*.keystore
+
+# IDE y sistema
+.idea/
+.DS_Store
+Thumbs.db
+
+# Kotlin
+.kotlin/
+
+# Logs y entornos locales
+*.log
+.env
+.env.*
