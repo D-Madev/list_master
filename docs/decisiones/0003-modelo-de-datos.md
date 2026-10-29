@@ -1,6 +1,6 @@
 # 0003: Modelo de datos y decisiones abiertas
 
-- **Estado:** propuesta. Hay decisiones que el prompt no cubre y que conviene aprobar antes de la fase 1.
+- **Estado:** aprobada e implementada. Las seis decisiones bloqueantes se adoptaron y están en el código y en los tests.
 - **Fecha:** 29 de octubre de 2026.
 - **Relación:** implementa el modelo de `0000-alcance.md` y el export que pide el prompt. No construye A.R.G.O.S.
 
@@ -83,13 +83,13 @@ El progreso se calcula en el dominio, desde las tareas. **Nunca se escribe en la
 | Tareas en un subproyecto | Suman al padre |
 | Tarea en el tercer nivel de subproyectos | Suma al proyecto raíz |
 | Subproyecto `Terminado` con tareas pendientes | Sus pendientes siguen contando; el detalle avisa |
-| Subproyecto `Cancelado` | **Propuesta:** se excluye todo su subárbol del progreso del padre |
+| Subproyecto `Cancelado` | Se excluye todo su subárbol del progreso del padre |
 | Lista vinculada | **No** suma al progreso del proyecto |
 | Proyecto con 0 tareas pero un subproyecto terminado sin tareas | Sin progreso; no se inventa 1 de 1 |
 | 199 de 200 | 99%, no 100% |
 | 0 de 4 | “0 de 4”, 0% (dato real) |
 
-La decisión de excluir subárboles cancelados es una propuesta: si se prefiere que cuenten como pendientes para siempre, se cambia acá y en los tests. Ver decisión 3.
+La exclusión de subárboles cancelados está implementada en `ProgressCalculator` y cubierta por tests. Ver decisión 3.
 
 ## Profundidad y ciclos
 
@@ -102,7 +102,7 @@ La decisión de excluir subárboles cancelados es una propuesta: si se prefiere 
 - En el MVP, el `proyecto_padre` se elige **al crear** y no se puede mover después. Mover un proyecto cambiaría la profundidad y podría crear ciclos; si hace falta, es una decisión nueva.
 - El detalle muestra un breadcrumb (“Mis Proyectos / Diseño Web / Identidad”) para que el nivel 3 de subproyectos no se pierda.
 
-**Interpretación a confirmar:** el prompt dice “subproyectos hasta 3 niveles de profundidad”. Se interpreta como **3 niveles de subproyectos debajo de la raíz** (raíz + 3 = 4 nodos en una cadena), no como 3 nodos totales. Si la intención era raíz + 2, se cambia acá y en los tests antes de la fase 1.
+**Interpretación confirmada:** el prompt dice “subproyectos hasta 3 niveles de profundidad”. Se interpreta como **3 niveles de subproyectos debajo de la raíz** (raíz + 3 = 4 nodos en una cadena), no como 3 nodos totales. Está validado en el dominio, en el repositorio y en el import.
 
 ## Estados y transiciones
 
@@ -110,7 +110,7 @@ La decisión de excluir subárboles cancelados es una propuesta: si se prefiere 
 - **“Cerrar” un proyecto = estado `Terminado`.** No hay un flag de “archivado” separado.
 - Marcar `Terminado` con tareas pendientes está permitido, pero la app avisa: “Te quedan 2 tareas sin hacer.” **No** se marcan solas.
 - Llegar a 100% **no** cambia el estado a `Terminado`. La app sugiere: “Todo hecho. ¿Lo marcás como Terminado?”
-- `Cancelado` es terminal en la práctica, pero se puede reabrir. Su subárbol no suma al padre (propuesta).
+- `Cancelado` es terminal en la práctica, pero se puede reabrir. Su subárbol no suma al padre.
 - `Pausa` y `Postergado` siguen sumando al progreso: el trabajo está pendiente, no abandonado.
 
 ## Borrado y vínculos
@@ -229,9 +229,9 @@ La decisión de excluir subárboles cancelados es una propuesta: si se prefiere 
 - Los repositorios exponen `Flow`; la UI observa. Para el volumen de una app personal, se carga todo el árbol y se calcula en memoria. No hay paginación.
 - No hay sincronización, ni conflictos, ni relojes distribuidos. El único escritor es la app.
 
-## Decisiones abiertas (para aprobar antes de la fase 1)
+## Decisiones adoptadas
 
-### Bloqueantes
+### Bloqueantes (aprobadas)
 
 | # | Decisión | Propuesta | Por qué | Si no se aprueba |
 |---|---|---|---|---|
@@ -242,7 +242,7 @@ La decisión de excluir subárboles cancelados es una propuesta: si se prefiere 
 | 5 | **Profundidad** | Raíz = 0; máximo 3 niveles de subproyectos (4 nodos); padre inmutable en el MVP | Simple, predecible, sin ciclos | Se permite mover proyectos y hay que validar ciclos al editar |
 | 6 | **Import** | Reemplazo total, validado y atómico, con confirmación | Es el flujo más simple y seguro para un archivo completo | Merge con conflictos: mucho más complejo |
 
-### Menores (se adoptan salvo que digas lo contrario)
+### Menores (adoptadas)
 
 | # | Decisión | Propuesta |
 |---|---|---|
@@ -253,7 +253,7 @@ La decisión de excluir subárboles cancelados es una propuesta: si se prefiere 
 | 11 | **Prioridad en tareas** | No existe en el MVP; la prioridad es del proyecto |
 | 12 | **Listas en subproyectos** | Se pueden vincular a cualquier nodo del árbol, no solo a raíces |
 | 13 | **Fechas** | Solo vencimiento (`YYYY-MM-DD`), sin hora, sin recordatorios |
-| 14 | **Tema** | Se guarda con DataStore Preferences; claro/oscuro/sistema; sin color dinámico |
+| 14 | **Tema** | Se guarda con SharedPreferences; claro/oscuro/sistema; sin color dinámico. Se usó SharedPreferences porque `androidx.datastore-preferences` no estaba en la caché local y la regla era no descargar dependencias nuevas |
 | 15 | **Archivos** | Storage Access Framework; sin permisos de almacenamiento; sin “compartir” |
 | 16 | **Idioma** | Español es-AR solamente; textos centralizados para traducir después |
 | 17 | **Respaldo automático** | No en el MVP; export manual y explícito |

@@ -1,6 +1,6 @@
 # 0002: Metodología de trabajo
 
-- **Estado:** propuesta, esperando aprobación junto con el stack.
+- **Estado:** aprobada y aplicada.
 - **Fecha:** 29 de octubre de 2026.
 - **Decide:** cómo se corta, se prueba y se commitea el trabajo de la fase 1.
 

@@ -1,6 +1,6 @@
 # 0001: Plataforma y stack
 
-- **Estado:** propuesta, esperando aprobación.
+- **Estado:** aprobada e implementada.
 - **Fecha:** 29 de octubre de 2026.
 - **Decide:** con qué tecnología se construye List Master.
 - **No decide todavía:** nombre del paquete, versión mínima definitiva ni detalles de implementación.

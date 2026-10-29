@@ -6,7 +6,27 @@ Es una app Android propia. Los datos quedan en el celular, sin cuenta ni servido
 
 ## Estado
 
-Fase 1, corte 1: esqueleto compilable e instalable, con tema claro/oscuro/sistema y navegación base entre Proyectos, Listas y Ajustes. Todavía no hay pantallas de producto.
+**Versión 1.0.0.** La app está completa según el alcance acordado:
+
+- Proyectos con subproyectos hasta tres niveles, estados y prioridad opcional.
+- Tareas con fecha opcional dentro de cada proyecto.
+- Listas simples, vinculadas o no a un proyecto.
+- Progreso calculado sobre el árbol de proyectos, sin contar listas.
+- Export e import JSON con nombres de campo en español, validado y atómico.
+- Tema claro, oscuro o del sistema, guardado en el celular.
+- Sin cuenta, sin nube, sin analytics, sin permisos de red ni de almacenamiento.
+
+El APK listo para instalar está en la raíz del repositorio: **`ListMaster.apk`**.
+
+## Cómo instalar
+
+Copiá `ListMaster.apk` al celular y abrilo. Android va a pedir permiso para instalar apps de esa fuente; después se instala como cualquier APK. No requiere Android Studio ni conexión.
+
+También se puede instalar por cable con `adb`:
+
+```bash
+/d/src/tools/android-sdk/platform-tools/adb.exe install -r ListMaster.apk
+```
 
 ## Cómo compilar
 
@@ -17,25 +37,38 @@ JAVA_HOME=/d/src/tools/jdk-17.0.20.1+1 \
 /d/src/tools/gradle-8.9/bin/gradle.bat assembleDebug
 ```
 
-El APK queda en `app/build/outputs/apk/debug/app-debug.apk` y se instala con:
+El APK de debug queda en `app/build/outputs/apk/debug/app-debug.apk`.
+
+Para generar el APK de release (firmado con la clave de debug, porque la app no va a Play Store):
 
 ```bash
-/d/src/tools/android-sdk/platform-tools/adb.exe install -r app/build/outputs/apk/debug/app-debug.apk
+JAVA_HOME=/d/src/tools/jdk-17.0.20.1+1 \
+/d/src/tools/gradle-8.9/bin/gradle.bat assembleRelease
 ```
 
-Los tests corren con:
+El resultado queda en `app/build/outputs/apk/release/app-release.apk`.
+
+## Tests
 
 ```bash
 JAVA_HOME=/d/src/tools/jdk-17.0.20.1+1 \
 /d/src/tools/gradle-8.9/bin/gradle.bat testDebugUnitTest
 ```
 
+Cubren el cálculo de progreso, las reglas del árbol, la validación del export/import (incluidos archivos dañados, ciclos, profundidad e ids repetidos) y un smoke test de la navegación con Robolectric.
+
+## Respaldo
+
+El único respaldo es el export manual desde **Ajustes → Exportar Todo**. Genera un JSON con proyectos, tareas y listas. **Importar JSON** reemplaza todo el contenido después de validar el archivo; la app pide confirmación y ofrece exportar primero.
+
+El respaldo automático de Android está desactivado (`allowBackup="false"`) para que los datos no salgan del celular.
+
 ## Documentación
 
 - [Alcance y decisiones](docs/decisiones/0000-alcance.md): qué entra, qué no, y qué está abierto.
-- [Plataforma y stack](docs/decisiones/0001-plataforma-y-stack.md): comparación de Kotlin + Compose, React Native con Expo y Flutter, con recomendación.
+- [Plataforma y stack](docs/decisiones/0001-plataforma-y-stack.md): la tecnología elegida y por qué.
 - [Metodología](docs/decisiones/0002-metodologia.md): cortes verticales, tests y commits.
-- [Modelo de datos](docs/decisiones/0003-modelo-de-datos.md): entidades, progreso, export/import y decisiones abiertas.
+- [Modelo de datos](docs/decisiones/0003-modelo-de-datos.md): entidades, progreso, export/import y decisiones adoptadas.
 - [Diseño](DESIGN.md): identidad visual, componentes, pantallas y criterios de UX/UI.
 - [Prompt de inicio](docs/prompt-inicial.md): el prompt con el que arranca cada sesión de trabajo.
 - [Tarjeta de progreso](docs/referencias/tarjeta-progreso.png): referencia visual de la tarjeta de proyecto.

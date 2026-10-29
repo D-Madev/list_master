@@ -1,6 +1,6 @@
 # DESIGN.md — List Master
 
-- **Estado:** fase 0, propuesta. Se aprueba junto con el stack antes de escribir la app.
+- **Estado:** aprobado e implementado en la versión 1.0.0.
 - **Alcance:** proyectos, subproyectos, tareas y listas simples. Nada más.
 - **Referencia visual:** `docs/referencias/tarjeta-progreso.png`.
 - **Familia:** la misma que `registro_sueno`, sin copiar su código.
@@ -209,7 +209,7 @@ No: “Proyectos activos: 3”, “Tareas completadas: 4/7”, “Error de impor
 | `Terminado` | **Terminado** | `success` / `successSoft` | `check` |
 | `Cancelado` | **Cancelado** | `danger` / `dangerSoft` | `x` |
 
-**Prioridad (propuesta, a confirmar):**
+**Prioridad:**
 
 | Valor | Etiqueta | Color | Icono |
 |---|---|---|---|
