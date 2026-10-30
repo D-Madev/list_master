@@ -6,7 +6,7 @@ Es una app Android propia. Los datos quedan en el celular, sin cuenta ni servido
 
 ## Estado
 
-**Versión 1.1.0.** La app está completa según el alcance acordado:
+**Versión 1.1.1.** La app está completa según el alcance acordado:
 
 - Proyectos con subproyectos hasta tres niveles, estados y prioridad opcional.
 - Tareas con fecha opcional dentro de cada proyecto.
