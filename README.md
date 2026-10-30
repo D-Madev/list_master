@@ -6,7 +6,7 @@ Es una app Android propia. Los datos quedan en el celular, sin cuenta ni servido
 
 ## Estado
 
-**Versión 1.0.0.** La app está completa según el alcance acordado:
+**Versión 1.1.0.** La app está completa según el alcance acordado:
 
 - Proyectos con subproyectos hasta tres niveles, estados y prioridad opcional.
 - Tareas con fecha opcional dentro de cada proyecto.
@@ -14,9 +14,12 @@ Es una app Android propia. Los datos quedan en el celular, sin cuenta ni servido
 - Progreso calculado sobre el árbol de proyectos, sin contar listas.
 - Export e import JSON con nombres de campo en español, validado y atómico.
 - Tema claro, oscuro o del sistema, guardado en el celular.
+- Identidad monocroma (blanco, negro y grises) y detalle de proyecto fiel a la tarjeta de referencia.
 - Sin cuenta, sin nube, sin analytics, sin permisos de red ni de almacenamiento.
 
 El APK listo para instalar está en la raíz del repositorio: **`ListMaster.apk`**.
+
+El archivo **`list-master-import.json`** es un respaldo listo para importar: trae los proyectos en marcha del vault, el recordatorio personal y la lista del MCU en orden cronológico. Se importa desde **Ajustes → Importar JSON** y reemplaza todo el contenido actual.
 
 ## Cómo instalar
 
