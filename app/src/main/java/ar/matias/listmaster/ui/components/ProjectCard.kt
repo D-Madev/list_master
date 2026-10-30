@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DateRange
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.Icon
@@ -47,8 +48,105 @@ import ar.matias.listmaster.domain.model.ProjectStatus
 import ar.matias.listmaster.domain.model.Task
 import ar.matias.listmaster.ui.formatShort
 import ar.matias.listmaster.ui.theme.LocalExtendedColors
+import java.time.LocalDate
 
 private const val MAX_CARD_ROWS = 4
+
+/**
+ * Fila compacta del listado: nombre, recuento y barra. Al tocarla se despliega
+ * la tarjeta completa; la tarjeta sigue abriendo el detalle.
+ */
+@Composable
+fun ProjectCompactRow(
+    project: Project,
+    progress: ProjectProgress,
+    expanded: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val scheme = MaterialTheme.colorScheme
+    val extended = LocalExtendedColors.current
+    val shape = RoundedCornerShape(16.dp)
+    val darkTheme = scheme.surface.luminance() < 0.5f
+    val rotation by animateFloatAsState(
+        targetValue = if (expanded) 180f else 0f,
+        animationSpec = tween(durationMillis = 180, easing = EaseOut),
+        label = "compactChevron",
+    )
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .shadow(elevation = if (darkTheme) 0.dp else 1.dp, shape = shape)
+            .clip(shape)
+            .background(scheme.surface)
+            .border(1.dp, scheme.outlineVariant, shape)
+            .clickable(onClick = onToggle)
+            .padding(horizontal = 14.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        ProjectIconTile(
+            project = project,
+            contentDescription = null,
+            size = 32,
+            modifier = Modifier.clip(RoundedCornerShape(10.dp)),
+        )
+        Spacer(Modifier.width(12.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = project.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = if (project.status == ProjectStatus.CANCELLED) {
+                        scheme.onSurfaceVariant
+                    } else {
+                        scheme.onSurface
+                    },
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = if (progress.hasTasks) {
+                        stringResource(R.string.progress_fraction, progress.done, progress.total)
+                    } else {
+                        stringResource(R.string.project_no_tasks_short)
+                    },
+                    style = MaterialTheme.typography.labelMedium,
+                    color = if (progress.hasTasks) extended.success else scheme.onSurfaceVariant,
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            if (progress.hasTasks) {
+                ThinProgressBar(
+                    fraction = progress.percentage / 100f,
+                    color = extended.success,
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(3.dp)
+                        .clip(RoundedCornerShape(999.dp))
+                        .background(extended.surfaceSunken),
+                )
+            }
+        }
+        Spacer(Modifier.width(8.dp))
+        Icon(
+            imageVector = Icons.Outlined.KeyboardArrowDown,
+            contentDescription = stringResource(
+                if (expanded) R.string.cd_collapse_project else R.string.cd_expand_project,
+                project.title,
+            ),
+            modifier = Modifier
+                .size(18.dp)
+                .graphicsLayer { rotationZ = rotation },
+            tint = scheme.onSurfaceVariant,
+        )
+    }
+}
 
 @Composable
 fun ProjectCard(
@@ -64,6 +162,7 @@ fun ProjectCard(
     onPriorityClick: () -> Unit,
     onOpenSubproject: (String) -> Unit,
     modifier: Modifier = Modifier,
+    onCollapse: (() -> Unit)? = null,
 ) {
     val scheme = MaterialTheme.colorScheme
     val extended = LocalExtendedColors.current
@@ -78,7 +177,11 @@ fun ProjectCard(
     val darkTheme = scheme.surface.luminance() < 0.5f
 
     val rows = buildList {
-        directTasks.forEach { add(CardRow.TaskRow(it)) }
+        // Primero lo que falta: si el proyecto tiene muchas tareas hechas, las
+        // pendientes igual aparecen en la vista previa.
+        directTasks
+            .sortedWith(compareBy({ it.done }, { it.dueDate ?: LocalDate.MAX }))
+            .forEach { add(CardRow.TaskRow(it)) }
         subprojects.forEach { add(CardRow.SubprojectRow(it)) }
     }
     val visibleRows = rows.take(MAX_CARD_ROWS)
@@ -100,24 +203,12 @@ fun ProjectCard(
             .padding(16.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(extended.surfaceAlt),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    painter = painterResource(
-                        if (project.parentId == null) R.drawable.ic_folder else R.drawable.ic_layers,
-                    ),
-                    contentDescription = stringResource(
-                        if (project.parentId == null) R.string.cd_project_icon else R.string.cd_subproject_icon,
-                    ),
-                    modifier = Modifier.size(22.dp),
-                    tint = scheme.primary,
-                )
-            }
+            ProjectIconTile(
+                project = project,
+                contentDescription = stringResource(
+                    if (project.parentId == null) R.string.cd_project_icon else R.string.cd_subproject_icon,
+                ),
+            )
             Spacer(Modifier.width(12.dp))
             Text(
                 text = project.title,
@@ -127,6 +218,19 @@ fun ProjectCard(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
             )
+            if (onCollapse != null) {
+                IconButton(onClick = onCollapse) {
+                    Icon(
+                        imageVector = Icons.Outlined.KeyboardArrowDown,
+                        contentDescription = stringResource(
+                            R.string.cd_collapse_project,
+                            project.title,
+                        ),
+                        tint = scheme.onSurfaceVariant,
+                        modifier = Modifier.graphicsLayer { rotationZ = 180f },
+                    )
+                }
+            }
             IconButton(onClick = onMenu) {
                 Icon(
                     imageVector = Icons.Outlined.MoreVert,
@@ -150,7 +254,6 @@ fun ProjectCard(
                         task = row.task,
                         depth = 1,
                         isLast = isLast,
-                        projectDone = project.status == ProjectStatus.DONE,
                         onToggle = { onToggleTask(row.task) },
                         onOpen = null,
                     )
@@ -235,15 +338,12 @@ fun TaskRow(
     task: Task,
     depth: Int,
     isLast: Boolean,
-    projectDone: Boolean,
     onToggle: () -> Unit,
     onOpen: (() -> Unit)?,
     modifier: Modifier = Modifier,
     ancestorContinues: List<Boolean> = emptyList(),
 ) {
     val scheme = MaterialTheme.colorScheme
-    val extended = LocalExtendedColors.current
-    val checkTint = if (projectDone && task.done) extended.success else scheme.primary
     val contentDescription = stringResource(
         if (task.done) R.string.task_done_description else R.string.task_pending_description,
         task.title,
@@ -260,7 +360,6 @@ fun TaskRow(
             done = task.done,
             contentDescription = contentDescription,
             onToggle = onToggle,
-            tint = checkTint,
         )
         Column(
             modifier = Modifier
@@ -325,10 +424,11 @@ fun SubprojectRow(
         connectorInset = (-8).dp,
         hasChildren = hasChildren,
     ) {
-        Icon(
-            painter = painterResource(R.drawable.ic_layers),
+        ProjectIcon(
+            icon = project.icon,
+            isSubproject = true,
             contentDescription = stringResource(R.string.cd_subproject_icon),
-            modifier = Modifier.size(18.dp),
+            size = 18.dp,
             tint = scheme.onSurfaceVariant,
         )
         Spacer(Modifier.width(8.dp))

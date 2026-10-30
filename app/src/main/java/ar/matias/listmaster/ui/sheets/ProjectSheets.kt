@@ -1,8 +1,12 @@
 package ar.matias.listmaster.ui.sheets
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -45,11 +49,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ar.matias.listmaster.R
+import ar.matias.listmaster.domain.model.MAX_ICON_LENGTH
 import ar.matias.listmaster.domain.model.MAX_TITLE_LENGTH
 import ar.matias.listmaster.domain.model.Priority
 import ar.matias.listmaster.domain.model.Project
@@ -60,6 +66,8 @@ import ar.matias.listmaster.ui.formatLong
 import ar.matias.listmaster.ui.iconRes
 import ar.matias.listmaster.ui.labelRes
 import ar.matias.listmaster.ui.components.PrimaryButton
+import ar.matias.listmaster.ui.components.ProjectIcon
+import ar.matias.listmaster.ui.components.projectIconRes
 import ar.matias.listmaster.ui.theme.LocalExtendedColors
 import java.time.Instant
 import java.time.LocalDate
@@ -479,6 +487,110 @@ fun TaskFormSheet(
             },
         ) {
             DatePicker(state = state)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Composable
+fun ProjectIconSheet(
+    current: String?,
+    onDismiss: () -> Unit,
+    onSelect: (String?) -> Unit,
+) {
+    var emoji by remember(current) {
+        mutableStateOf(if (current != null && projectIconRes(current) == null) current else "")
+    }
+    val scheme = MaterialTheme.colorScheme
+    val extended = LocalExtendedColors.current
+    val choices = listOf(
+        null to R.string.icon_default,
+        "layers" to R.string.icon_layers,
+        "star" to R.string.icon_star,
+        "bolt" to R.string.icon_bolt,
+        "heart" to R.string.icon_heart,
+        "target" to R.string.icon_target,
+        "book" to R.string.icon_book,
+        "cart" to R.string.icon_cart,
+        "home" to R.string.icon_home,
+        "briefcase" to R.string.icon_briefcase,
+    )
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        containerColor = scheme.surface,
+    ) {
+        Column(
+            modifier = Modifier
+                .imePadding()
+                .navigationBarsPadding()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 20.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.icon_pick_title),
+                style = MaterialTheme.typography.titleLarge,
+            )
+            Spacer(Modifier.height(12.dp))
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                choices.forEach { (value, labelRes) ->
+                    val selected = current == value
+                    Column(
+                        modifier = Modifier
+                            .width(72.dp)
+                            .height(72.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(if (selected) scheme.primaryContainer else extended.surfaceAlt)
+                            .border(
+                                width = if (selected) 2.dp else 1.dp,
+                                color = if (selected) scheme.primary else scheme.outline,
+                                shape = RoundedCornerShape(16.dp),
+                            )
+                            .clickable { onSelect(value) }
+                            .padding(6.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                    ) {
+                        ProjectIcon(
+                            icon = value,
+                            isSubproject = false,
+                            contentDescription = null,
+                            size = 24.dp,
+                            tint = if (selected) scheme.primary else scheme.onSurfaceVariant,
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = stringResource(labelRes),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = scheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                }
+            }
+            Spacer(Modifier.height(20.dp))
+            OutlinedTextField(
+                value = emoji,
+                onValueChange = { emoji = it.take(MAX_ICON_LENGTH) },
+                label = { Text(stringResource(R.string.icon_emoji_label)) },
+                placeholder = { Text(stringResource(R.string.icon_emoji_placeholder)) },
+                singleLine = true,
+                shape = RoundedCornerShape(14.dp),
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(12.dp))
+            PrimaryButton(
+                text = stringResource(R.string.icon_use_emoji),
+                onClick = { onSelect(emoji.trim()) },
+                enabled = emoji.isNotBlank() && emoji.trim().length <= MAX_ICON_LENGTH,
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
     }
 }

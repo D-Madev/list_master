@@ -46,7 +46,7 @@ import ar.matias.listmaster.domain.model.ProjectStatus
 import ar.matias.listmaster.domain.model.Task
 import ar.matias.listmaster.ui.components.CenteredEmpty
 import ar.matias.listmaster.ui.components.DetailHeader
-import ar.matias.listmaster.ui.components.IconTile
+import ar.matias.listmaster.ui.components.ProjectIconTile
 import ar.matias.listmaster.ui.components.NoticeCard
 import ar.matias.listmaster.ui.components.NoticeTone
 import ar.matias.listmaster.ui.components.ProgressPill
@@ -171,12 +171,8 @@ fun ProjectDetailScreen(
                                 tint = MaterialTheme.colorScheme.onSurface,
                             )
                         }
-                        IconTile(
-                            iconRes = if (project.parentId == null) {
-                                R.drawable.ic_folder
-                            } else {
-                                R.drawable.ic_layers
-                            },
+                        ProjectIconTile(
+                            project = project,
                             contentDescription = stringResource(
                                 if (project.parentId == null) {
                                     R.string.cd_project_icon
@@ -304,7 +300,6 @@ fun ProjectDetailScreen(
                                     task = row.task,
                                     depth = row.depth,
                                     isLast = row.isLast,
-                                    projectDone = row.owner.status == ProjectStatus.DONE,
                                     onToggle = {
                                         haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                                         onToggleTask(row.task)

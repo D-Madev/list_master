@@ -209,6 +209,7 @@ fun ListMasterApp(viewModel: AppViewModel = viewModel()) {
                             projects = data.projects,
                             onOpenList = viewModel::openList,
                             onNewList = viewModel::newList,
+                            onToggleItem = viewModel::setListItemDone,
                             modifier = contentModifier,
                         )
 
@@ -247,11 +248,11 @@ fun ListMasterApp(viewModel: AppViewModel = viewModel()) {
                             parentId = current.parentId,
                             projects = data.projects,
                             onBack = viewModel::back,
-                            onCreate = { title, parentId, status, priority ->
-                                viewModel.createProject(title, parentId, status, priority)
+                            onCreate = { title, parentId, status, priority, icon ->
+                                viewModel.createProject(title, parentId, status, priority, icon)
                             },
-                            onUpdate = { id, title, status, priority ->
-                                viewModel.updateProject(id, title, status, priority)
+                            onUpdate = { id, title, status, priority, icon ->
+                                viewModel.updateProject(id, title, status, priority, icon)
                             },
                             modifier = contentModifier,
                         )

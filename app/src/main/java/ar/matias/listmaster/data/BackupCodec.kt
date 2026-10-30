@@ -3,6 +3,7 @@ package ar.matias.listmaster.data
 import ar.matias.listmaster.domain.ProjectTree
 import ar.matias.listmaster.domain.model.AppData
 import ar.matias.listmaster.domain.model.ListItem
+import ar.matias.listmaster.domain.model.MAX_ICON_LENGTH
 import ar.matias.listmaster.domain.model.MAX_ITEM_TITLE_LENGTH
 import ar.matias.listmaster.domain.model.MAX_SUBPROJECT_DEPTH
 import ar.matias.listmaster.domain.model.MAX_TITLE_LENGTH
@@ -58,6 +59,7 @@ object BackupCodec {
                     addProperty("estado", project.status.storedValue)
                     addProperty("proyecto_padre", project.parentId)
                     addProperty("prioridad", project.priority?.storedValue)
+                    addProperty("icono", project.icon)
                     addProperty("creado", project.createdAt.toString())
                     addProperty("actualizado", project.updatedAt.toString())
                 })
@@ -193,6 +195,11 @@ object BackupCodec {
             Priority.fromStored(value)
                 ?: throw BackupException("El proyecto «$title» tiene una prioridad inválida.")
         }
+        val icon = obj.optionalString("icono")?.trim()?.takeIf { it.isNotEmpty() }?.also { value ->
+            if (value.length > MAX_ICON_LENGTH) {
+                throw BackupException("El proyecto «$title» tiene un ícono demasiado largo.")
+            }
+        }
         val createdAt = obj.requireInstant("creado", "proyecto «$title»")
         val updatedAt = obj.optionalInstant("actualizado") ?: createdAt
         return Project(
@@ -205,6 +212,7 @@ object BackupCodec {
             priority = priority,
             createdAt = createdAt,
             updatedAt = updatedAt,
+            icon = icon,
         )
     }
 

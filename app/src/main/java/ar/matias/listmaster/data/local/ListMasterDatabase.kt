@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [
@@ -12,7 +14,7 @@ import androidx.room.RoomDatabase
         ListEntity::class,
         ListItemEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = true,
 )
 abstract class ListMasterDatabase : RoomDatabase() {
@@ -24,11 +26,20 @@ abstract class ListMasterDatabase : RoomDatabase() {
     companion object {
         const val NAME = "list_master.db"
 
+        /** Los proyectos ahora pueden tener un ícono o un emoji propio. */
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE projects ADD COLUMN icon TEXT")
+            }
+        }
+
         fun create(context: Context): ListMasterDatabase =
             Room.databaseBuilder(
                 context.applicationContext,
                 ListMasterDatabase::class.java,
                 NAME,
-            ).build()
+            )
+                .addMigrations(MIGRATION_1_2)
+                .build()
     }
 }

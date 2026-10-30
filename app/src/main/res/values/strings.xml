@@ -33,6 +33,10 @@
     <string name="section_closed">Terminados y Cancelados</string>
     <string name="section_show_closed">Ver Terminados y Cancelados (%1$d)</string>
     <string name="section_hide_closed">Ocultar Terminados y Cancelados</string>
+    <string name="projects_expand_all">Expandir Todo</string>
+    <string name="projects_collapse_all">Colapsar Todo</string>
+    <string name="cd_expand_project">Expandir %1$s</string>
+    <string name="cd_collapse_project">Colapsar %1$s</string>
 
     <string name="status_active">Activo</string>
     <string name="status_paused">En Pausa</string>
@@ -54,6 +58,21 @@
     <string name="project_status_label">Estado</string>
     <string name="project_priority_label">Prioridad</string>
     <string name="project_parent_label">Proyecto Padre</string>
+    <string name="project_icon_label">Ícono</string>
+    <string name="icon_pick_title">Ícono del Proyecto</string>
+    <string name="icon_default">Predeterminado</string>
+    <string name="icon_layers">Capas</string>
+    <string name="icon_star">Estrella</string>
+    <string name="icon_bolt">Rayo</string>
+    <string name="icon_heart">Corazón</string>
+    <string name="icon_target">Objetivo</string>
+    <string name="icon_book">Libro</string>
+    <string name="icon_cart">Carrito</string>
+    <string name="icon_home">Casa</string>
+    <string name="icon_briefcase">Maletín</string>
+    <string name="icon_emoji_label">Emoji</string>
+    <string name="icon_emoji_placeholder">🚀</string>
+    <string name="icon_use_emoji">Usar Emoji</string>
     <string name="project_parent_none">Sin Proyecto Padre</string>
     <string name="priority_none">Sin Prioridad</string>
     <string name="title_required">El título no puede estar vacío.</string>
@@ -94,6 +113,12 @@
     <string name="lists_empty_title">Todavía no tenés listas.</string>
     <string name="lists_empty_body">Armá una para las compras, las películas o lo que se te ocurra.</string>
     <string name="lists_empty_action">Nueva Lista</string>
+    <string name="lists_expand_all">Expandir Todo</string>
+    <string name="lists_collapse_all">Colapsar Todo</string>
+    <string name="cd_expand_list">Expandir %1$s</string>
+    <string name="cd_collapse_list">Colapsar %1$s</string>
+    <string name="list_more_items">+%1$d Más</string>
+    <string name="list_open_detail">Ver Detalle</string>
     <string name="list_new">Nueva Lista</string>
     <string name="list_edit">Editar Lista</string>
     <string name="list_title_label">Título</string>

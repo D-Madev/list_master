@@ -6,6 +6,7 @@ import java.time.LocalDate
 const val MAX_TITLE_LENGTH = 120
 const val MAX_ITEM_TITLE_LENGTH = 200
 const val MAX_SUBPROJECT_DEPTH = 3
+const val MAX_ICON_LENGTH = 32
 
 enum class ProjectStatus(val storedValue: String) {
     ACTIVE("Activo"),
@@ -43,6 +44,8 @@ data class Project(
     val priority: Priority?,
     val createdAt: Instant,
     val updatedAt: Instant,
+    /** Clave de un ícono incluido ("star", "bolt"…) o un emoji. Null = predeterminado. */
+    val icon: String? = null,
 )
 
 data class Task(

@@ -189,6 +189,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         parentId: String?,
         status: ProjectStatus,
         priority: Priority?,
+        icon: String?,
     ) {
         action {
             repository.createProject(
@@ -196,6 +197,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 parentId = parentId,
                 status = status,
                 priority = priority,
+                icon = icon,
             )
             navigation.pop()
         }
@@ -206,9 +208,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         title: String,
         status: ProjectStatus,
         priority: Priority?,
+        icon: String?,
     ) {
         action {
-            repository.updateProject(id, title, status, priority)
+            repository.updateProject(id, title, status, priority, icon)
             navigation.pop()
         }
     }

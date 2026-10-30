@@ -125,6 +125,7 @@ fun SelectorRow(
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     valueColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurface,
+    leading: @Composable (() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
@@ -136,12 +137,16 @@ fun SelectorRow(
             .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(
-            painter = painterResource(iconRes),
-            contentDescription = null,
-            modifier = Modifier.size(20.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        if (leading != null) {
+            leading()
+        } else {
+            Icon(
+                painter = painterResource(iconRes),
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
         Spacer(Modifier.width(12.dp))
         Text(
             text = label,

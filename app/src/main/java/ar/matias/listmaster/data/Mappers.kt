@@ -23,6 +23,7 @@ fun ProjectEntity.toDomain(): Project? {
         priority = priority?.let(Priority::fromStored),
         createdAt = Instant.parse(createdAt),
         updatedAt = Instant.parse(updatedAt),
+        icon = icon,
     )
 }
 
@@ -34,6 +35,7 @@ fun Project.toEntity(): ProjectEntity = ProjectEntity(
     priority = priority?.storedValue,
     createdAt = createdAt.toString(),
     updatedAt = updatedAt.toString(),
+    icon = icon,
 )
 
 fun TaskEntity.toDomain(): Task = Task(

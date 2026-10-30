@@ -34,6 +34,7 @@ class BackupCodecTest {
                 priority = Priority.HIGH,
                 createdAt = base,
                 updatedAt = base.plusSeconds(60),
+                icon = "star",
             ),
             Project(
                 id = childId,
@@ -405,6 +406,21 @@ class BackupCodecTest {
         val data = sampleData()
         val decoded = decode(BackupCodec.encode(data, base))
         assertEquals("Definir la paleta 🎨", decoded.tasks.single().title)
+    }
+
+    @Test
+    fun `conserva el icono y el emoji del proyecto`() {
+        val data = sampleData()
+        val decoded = decode(BackupCodec.encode(data, base))
+        assertEquals("star", decoded.projects.single { it.id == projectId }.icon)
+
+        val withEmoji = data.copy(
+            projects = data.projects.map { project ->
+                if (project.id == projectId) project.copy(icon = "🚀") else project
+            },
+        )
+        val emoji = decode(BackupCodec.encode(withEmoji, base))
+        assertEquals("🚀", emoji.projects.single { it.id == projectId }.icon)
     }
 
     @Test

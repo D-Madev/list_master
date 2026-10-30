@@ -59,6 +59,7 @@ class ListMasterRepository(
         parentId: String? = null,
         status: ProjectStatus = ProjectStatus.ACTIVE,
         priority: Priority? = null,
+        icon: String? = null,
     ): String {
         val clean = Validation.title(title)
         if (parentId != null) {
@@ -80,6 +81,7 @@ class ListMasterRepository(
                 priority = priority,
                 createdAt = timestamp,
                 updatedAt = timestamp,
+                icon = Validation.icon(icon),
             ).toEntity(),
         )
         return id
@@ -90,6 +92,7 @@ class ListMasterRepository(
         title: String,
         status: ProjectStatus,
         priority: Priority?,
+        icon: String? = null,
     ) {
         val existing = projectDao.getById(id) ?: throw IllegalArgumentException("El proyecto ya no existe.")
         val clean = Validation.title(title)
@@ -99,6 +102,7 @@ class ListMasterRepository(
                 status = status.storedValue,
                 priority = priority?.storedValue,
                 updatedAt = now().toString(),
+                icon = Validation.icon(icon),
             ),
         )
     }

@@ -1,5 +1,6 @@
 package ar.matias.listmaster.ui.components
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.LocalIndication
@@ -14,11 +15,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -37,14 +40,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ar.matias.listmaster.R
+import ar.matias.listmaster.domain.model.ListItem
 import ar.matias.listmaster.domain.model.TaskList
 import ar.matias.listmaster.ui.theme.LocalExtendedColors
+
+private const val MAX_LIST_ROWS = 6
 
 @Composable
 fun ListCard(
     list: TaskList,
     projectTitle: String?,
+    expanded: Boolean,
+    onToggle: () -> Unit,
     onOpen: () -> Unit,
+    onToggleItem: (ListItem, Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scheme = MaterialTheme.colorScheme
@@ -57,10 +66,17 @@ fun ListCard(
         animationSpec = tween(durationMillis = 120, easing = EaseOut),
         label = "listCardScale",
     )
+    val rotation by animateFloatAsState(
+        targetValue = if (expanded) 180f else 0f,
+        animationSpec = tween(durationMillis = 180, easing = EaseOut),
+        label = "listChevron",
+    )
     val darkTheme = scheme.surface.luminance() < 0.5f
     val done = list.items.count { it.done }
     val total = list.items.size
     val fraction = if (total == 0) 0f else done.toFloat() / total
+    val visibleItems = list.items.take(MAX_LIST_ROWS)
+    val hiddenCount = list.items.size - visibleItems.size
 
     Column(
         modifier = modifier
@@ -73,8 +89,9 @@ fun ListCard(
             .clickable(
                 interactionSource = interaction,
                 indication = LocalIndication.current,
-                onClick = onOpen,
+                onClick = onToggle,
             )
+            .animateContentSize()
             .padding(16.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -102,9 +119,14 @@ fun ListCard(
                 modifier = Modifier.weight(1f),
             )
             Icon(
-                imageVector = Icons.Outlined.KeyboardArrowRight,
-                contentDescription = null,
-                modifier = Modifier.size(18.dp),
+                imageVector = Icons.Outlined.KeyboardArrowDown,
+                contentDescription = stringResource(
+                    if (expanded) R.string.cd_collapse_list else R.string.cd_expand_list,
+                    list.title,
+                ),
+                modifier = Modifier
+                    .size(18.dp)
+                    .graphicsLayer { rotationZ = rotation },
                 tint = scheme.onSurfaceVariant,
             )
         }
@@ -118,15 +140,12 @@ fun ListCard(
                     stringResource(R.string.list_progress_fraction, done, total)
                 },
                 style = MaterialTheme.typography.labelMedium,
-                color = if (total > 0 && done == total) extended.success else scheme.onSurface,
+                color = if (total > 0) extended.success else scheme.onSurface,
             )
             if (total > 0) {
                 Spacer(Modifier.width(12.dp))
                 Box(modifier = Modifier.weight(1f)) {
-                    ThinProgressBar(
-                        fraction = fraction,
-                        color = if (done == total) extended.success else extended.highlight,
-                    )
+                    ThinProgressBar(fraction = fraction, color = extended.success)
                 }
             }
         }
@@ -150,5 +169,98 @@ fun ListCard(
                 }
             }
         }
+
+        if (expanded) {
+            if (visibleItems.isNotEmpty()) {
+                Spacer(Modifier.height(8.dp))
+                visibleItems.forEach { item ->
+                    ListPreviewRow(
+                        item = item,
+                        onToggle = { onToggleItem(item, !item.done) },
+                        onOpen = onOpen,
+                    )
+                }
+                if (hiddenCount > 0) {
+                    Text(
+                        text = stringResource(R.string.list_more_items, hiddenCount),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = scheme.primary,
+                        modifier = Modifier
+                            .heightIn(min = 40.dp)
+                            .clickable(onClick = onOpen)
+                            .padding(horizontal = 4.dp, vertical = 10.dp),
+                    )
+                }
+            } else {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = stringResource(R.string.list_empty_items),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = scheme.onSurfaceVariant,
+                )
+            }
+
+            Spacer(Modifier.height(4.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 44.dp)
+                    .clickable(onClick = onOpen)
+                    .padding(horizontal = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(R.string.list_open_detail),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = scheme.primary,
+                    modifier = Modifier.weight(1f),
+                )
+                Icon(
+                    imageVector = Icons.Outlined.KeyboardArrowRight,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                    tint = scheme.primary,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ListPreviewRow(
+    item: ListItem,
+    onToggle: () -> Unit,
+    onOpen: () -> Unit,
+) {
+    val contentDescription = stringResource(
+        if (item.done) R.string.item_done_description else R.string.item_pending_description,
+        item.title,
+    )
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 44.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        TaskCheck(
+            done = item.done,
+            contentDescription = contentDescription,
+            onToggle = onToggle,
+        )
+        Text(
+            text = item.title,
+            style = MaterialTheme.typography.bodyMedium,
+            color = if (item.done) {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            },
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .weight(1f)
+                .clickable(onClick = onOpen)
+                .padding(vertical = 8.dp),
+        )
     }
 }

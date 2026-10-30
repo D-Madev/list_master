@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,10 +34,13 @@ import ar.matias.listmaster.domain.model.Project
 import ar.matias.listmaster.domain.model.ProjectStatus
 import ar.matias.listmaster.ui.components.DetailHeader
 import ar.matias.listmaster.ui.components.PrimaryButton
+import ar.matias.listmaster.ui.components.ProjectIcon
 import ar.matias.listmaster.ui.components.SelectorRow
+import ar.matias.listmaster.ui.components.projectIconLabelRes
 import ar.matias.listmaster.ui.iconRes
 import ar.matias.listmaster.ui.labelRes
 import ar.matias.listmaster.ui.sheets.PriorityPickerSheet
+import ar.matias.listmaster.ui.sheets.ProjectIconSheet
 import ar.matias.listmaster.ui.sheets.StatusPickerSheet
 
 @Composable
@@ -44,17 +49,19 @@ fun ProjectFormScreen(
     parentId: String?,
     projects: List<Project>,
     onBack: () -> Unit,
-    onCreate: (String, String?, ProjectStatus, Priority?) -> Unit,
-    onUpdate: (String, String, ProjectStatus, Priority?) -> Unit,
+    onCreate: (String, String?, ProjectStatus, Priority?, String?) -> Unit,
+    onUpdate: (String, String, ProjectStatus, Priority?, String?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val existing = projectId?.let { id -> projects.firstOrNull { it.id == id } }
     var title by remember(projectId) { mutableStateOf(existing?.title.orEmpty()) }
     var status by remember(projectId) { mutableStateOf(existing?.status ?: ProjectStatus.ACTIVE) }
     var priority by remember(projectId) { mutableStateOf(existing?.priority) }
+    var icon by remember(projectId) { mutableStateOf(existing?.icon) }
     var titleError by remember { mutableStateOf<Int?>(null) }
     var statusOpen by remember { mutableStateOf(false) }
     var priorityOpen by remember { mutableStateOf(false) }
+    var iconOpen by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
     val visibleTitleError = titleError ?: if (title.trim().length > MAX_TITLE_LENGTH) {
         R.string.title_too_long
@@ -112,6 +119,23 @@ fun ProjectFormScreen(
 
             Spacer(Modifier.height(16.dp))
             SelectorRow(
+                iconRes = R.drawable.ic_folder,
+                label = stringResource(R.string.project_icon_label),
+                value = icon?.let { value ->
+                    projectIconLabelRes(value)?.let { stringResource(it) } ?: value
+                } ?: stringResource(R.string.icon_default),
+                onClick = { iconOpen = true },
+                leading = {
+                    ProjectIcon(
+                        icon = icon,
+                        isSubproject = existing?.parentId != null,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                },
+            )
+            SelectorRow(
                 iconRes = status.iconRes(),
                 label = stringResource(R.string.project_status_label),
                 value = stringResource(status.labelRes()),
@@ -141,8 +165,8 @@ fun ProjectFormScreen(
                     when {
                         clean.isEmpty() -> titleError = R.string.title_required
                         clean.length > MAX_TITLE_LENGTH -> titleError = R.string.title_too_long
-                        existing == null -> onCreate(clean, effectiveParentId, status, priority)
-                        else -> onUpdate(existing.id, clean, status, priority)
+                        existing == null -> onCreate(clean, effectiveParentId, status, priority, icon)
+                        else -> onUpdate(existing.id, clean, status, priority, icon)
                     }
                 },
                 enabled = title.isNotBlank() && visibleTitleError == null,
@@ -169,6 +193,17 @@ fun ProjectFormScreen(
             onSelect = {
                 priority = it
                 priorityOpen = false
+            },
+        )
+    }
+
+    if (iconOpen) {
+        ProjectIconSheet(
+            current = icon,
+            onDismiss = { iconOpen = false },
+            onSelect = {
+                icon = it
+                iconOpen = false
             },
         )
     }
