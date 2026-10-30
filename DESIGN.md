@@ -1,6 +1,6 @@
 # DESIGN.md — List Master
 
-- **Estado:** aprobado e implementado en la versión 1.1.0. La identidad pasó a blanco, negro y escalas de grises.
+- **Estado:** aprobado e implementado en la versión 1.1.1. La identidad pasó a blanco, negro y escalas de grises.
 - **Alcance:** proyectos, subproyectos, tareas y listas simples. Nada más.
 - **Referencia visual:** `docs/referencias/tarjeta-progreso.png`.
 - **Referencias de producto:** Linear (app), Notion (layout) y los ejemplos de sistemas de diseño de Figma: https://www.figma.com/resource-library/design-system-examples/
@@ -61,61 +61,44 @@ No se copia ninguna interfaz: se toman criterios. La identidad sigue siendo la d
 
 ### 1.2 Color
 
-La paleta es **monocroma**: negro, blanco y escalas de grises. Nada de azul ni de colores de estado. La jerarquía se construye con contraste, tamaño, iconos y texto, no con tono. **No se usa color dinámico (Material You)**: rompería la identidad.
+La base es **monocroma**: negro, blanco y escalas de grises. El color se reserva para lo que significa algo —prioridad, estado y progreso—, así que la pantalla se lee en gris y el ojo encuentra el color donde importa. **No se usa color dinámico (Material You)**: rompería la identidad.
 
-#### Tema claro
+#### Base neutra
 
-| Token | Hex | Uso |
-|---|---|---|
-| `bg` | `#F7F7F7` | Fondo de pantalla |
-| `surface` | `#FFFFFF` | Tarjetas, hojas, diálogos |
-| `surfaceAlt` | `#EFEFEF` | Inputs, tiles de icono, pastilla de progreso |
-| `surfaceSunken` | `#E2E2E2` | Riel de la barra, separadores |
-| `text` | `#0B0B0B` | Títulos y cuerpo |
-| `textSecondary` | `#565656` | Metadatos, texto de apoyo |
-| `textTertiary` | `#6B6B6B` | Iconos en reposo, placeholders |
-| `outline` | `#D6D6D6` | Bordes de 1 dp |
-| `accent` | `#111111` | Acción primaria, progreso, foco |
-| `onAccent` | `#FFFFFF` | Texto e iconos sobre `accent` |
-| `accentSoft` | `#EAEAEA` | Fondo de chips activos |
-| `success` | `#1C1C1C` | Terminado y progreso completo |
-| `successSoft` | `#E3E3E3` | Apoyo de Terminado |
-| `warning` | `#3F3F3F` | Postergado |
-| `warningSoft` | `#EDEDED` | Chip Postergado |
-| `danger` | `#000000` | Cancelado y acciones destructivas |
-| `dangerSoft` | `#E6E6E6` | Chip Cancelado |
-| `neutral` | `#5F5F5F` | Pausa |
-| `neutralSoft` | `#F1F1F1` | Chip Pausa |
+| Token | Claro | Oscuro | Uso |
+|---|---|---|---|
+| `bg` | `#F7F7F7` | `#0B0B0B` | Fondo de pantalla |
+| `surface` | `#FFFFFF` | `#141414` | Tarjetas, hojas, diálogos |
+| `surfaceAlt` | `#EFEFEF` | `#1C1C1C` | Inputs, tiles de icono, pastilla de progreso |
+| `surfaceSunken` | `#E2E2E2` | `#0F0F0F` | Riel de la barra, separadores |
+| `text` | `#0B0B0B` | `#F2F2F2` | Títulos y cuerpo |
+| `textSecondary` | `#565656` | `#B3B3B3` | Metadatos, texto de apoyo |
+| `textTertiary` | `#6B6B6B` | `#8F8F8F` | Iconos en reposo, placeholders |
+| `outline` | `#D6D6D6` | `#3A3A3A` | Bordes y guías del árbol |
+| `accent` | `#111111` | `#F2F2F2` | Chrome interactivo: FAB, pestañas, botones |
+| `accentSoft` | `#EAEAEA` | `#262626` | Fondo de selección neutro |
 
-#### Tema oscuro
+#### Color con significado
 
-| Token | Hex | Uso |
-|---|---|---|
-| `bg` | `#0B0B0B` | Fondo de pantalla |
-| `surface` | `#141414` | Tarjetas, hojas, diálogos |
-| `surfaceAlt` | `#1C1C1C` | Inputs, tiles de icono, pastilla de progreso |
-| `surfaceSunken` | `#0F0F0F` | Riel de la barra, separadores |
-| `text` | `#F2F2F2` | Títulos y cuerpo |
-| `textSecondary` | `#B3B3B3` | Metadatos, texto de apoyo |
-| `textTertiary` | `#8F8F8F` | Iconos en reposo, placeholders |
-| `outline` | `#2E2E2E` | Bordes de 1 dp |
-| `accent` | `#F2F2F2` | Acción primaria, progreso, foco |
-| `onAccent` | `#0B0B0B` | Texto e iconos sobre `accent` |
-| `accentSoft` | `#262626` | Fondo de chips activos |
-| `success` | `#FFFFFF` | Terminado y progreso completo |
-| `successSoft` | `#242424` | Apoyo de Terminado |
-| `warning` | `#D6D6D6` | Postergado |
-| `warningSoft` | `#2A2A2A` | Chip Postergado |
-| `danger` | `#FFFFFF` | Cancelado y acciones destructivas |
-| `dangerSoft` | `#2C2C2C` | Chip Cancelado |
-| `neutral` | `#A6A6A6` | Pausa |
-| `neutralSoft` | `#232323` | Chip Pausa |
+| Token | Claro | Oscuro | Uso |
+|---|---|---|---|
+| `highlight` | `#1A6FA8` | `#7DCFFF` | Estado Activo y progreso en curso |
+| `highlightSoft` | `#E3F0FA` | `#1B3547` | Fondo del chip Activo |
+| `success` | `#1E7B4D` | `#6FD39A` | Terminado y progreso al 100% |
+| `successSoft` | `#DDF3E7` | `#163326` | Fondo del chip Terminado |
+| `warning` | `#8A5A00` | `#F2C46B` | Postergado y prioridad Media |
+| `warningSoft` | `#FBEDD3` | `#3A2E17` | Fondo de Postergado / Media |
+| `danger` | `#B3261E` | `#FF8A80` | Cancelado, prioridad Alta y acciones destructivas |
+| `dangerSoft` | `#FBE2E0` | `#3A1F1E` | Fondo de Cancelado / Alta |
+| `neutral` | `#5B6672` | `#9DB6CB` | Pausa, prioridad Baja y sin prioridad |
+| `neutralSoft` | `#E8EDF3` | `#232C37` | Fondo de Pausa / Baja |
 
 #### Reglas de uso
 
-- El **acento** es para lo interactivo y para el progreso. No se pinta una tarjeta entera de acento salvo un estado seleccionado muy puntual.
-- Sin color, los estados se distinguen por **icono + texto + tono**, y los dos estados fuertes se **invierten**: `Terminado` y prioridad `Alta` usan fondo `text` y contenido `surface` (chip negro en claro, chip blanco en oscuro). El resto usa fondos suaves.
-- Los **colores de estado** viven en chips, iconos pequeños y barras. No tiñen el fondo de la tarjeta.
+- La **base** (fondo, tarjetas, texto, bordes, navegación) se queda en gris. El color no tiñe superficies completas.
+- El **color** aparece sólo en los chips de prioridad y estado, en sus iconos y en la barra de progreso. Es información, no decoración.
+- **Progreso:** `highlight` mientras el proyecto está en curso; `success` cuando llega al 100%.
+- El **acento** es el chrome interactivo (FAB, pestañas, botones) y se queda en gris. El **highlight** es el azul semántico de Activo y del progreso; no se pinta una tarjeta entera de azul.
 - Nunca se usa el tono como único portador de información: el chip siempre tiene icono + texto.
 - El texto sobre fondos suaves debe cumplir contraste AA (4.5:1 para texto normal). Los pares de la tabla están elegidos para eso; si se cambia un tono, se vuelve a medir.
 - En oscuro, el fondo es casi negro (`#0B0B0B`). Las tarjetas son más claras que el fondo. En claro, la tarjeta es blanca y el fondo es gris muy claro; la separación la hace la sombra + el borde.

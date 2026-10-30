@@ -82,6 +82,10 @@ data class ExtendedColors(
     val surfaceAlt: Color,
     val surfaceSunken: Color,
     val textTertiary: Color,
+    // Azul semántico para Activo y para el progreso en curso. El `primary` de
+    // Material sigue siendo neutro: el color no se usa para el chrome.
+    val highlight: Color,
+    val highlightSoft: Color,
     val success: Color,
     val successSoft: Color,
     val warning: Color,
@@ -96,6 +100,8 @@ private val LightExtended = ExtendedColors(
     surfaceAlt = SurfaceAltLight,
     surfaceSunken = SurfaceSunkenLight,
     textTertiary = TextTertiaryLight,
+    highlight = HighlightLight,
+    highlightSoft = HighlightSoftLight,
     success = SuccessLight,
     successSoft = SuccessSoftLight,
     warning = WarningLight,
@@ -110,6 +116,8 @@ private val DarkExtended = ExtendedColors(
     surfaceAlt = SurfaceAltDark,
     surfaceSunken = SurfaceSunkenDark,
     textTertiary = TextTertiaryDark,
+    highlight = HighlightDark,
+    highlightSoft = HighlightSoftDark,
     success = SuccessDark,
     successSoft = SuccessSoftDark,
     warning = WarningDark,

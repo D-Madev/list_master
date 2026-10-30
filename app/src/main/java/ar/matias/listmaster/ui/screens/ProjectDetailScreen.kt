@@ -69,22 +69,26 @@ private data class TaskEditor(
     val task: Task?,
 )
 
-private sealed interface DetailRow {
+internal sealed interface DetailRow {
     val depth: Int
     val isLast: Boolean
+    val ancestorContinues: List<Boolean>
 
     data class TaskItem(
         val task: Task,
         val owner: Project,
         override val depth: Int,
         override val isLast: Boolean,
+        override val ancestorContinues: List<Boolean>,
     ) : DetailRow
 
     data class ProjectItem(
         val project: Project,
         val progress: ProjectProgress,
+        val hasChildren: Boolean,
         override val depth: Int,
         override val isLast: Boolean,
+        override val ancestorContinues: List<Boolean>,
     ) : DetailRow
 }
 
@@ -306,6 +310,7 @@ fun ProjectDetailScreen(
                                         onToggleTask(row.task)
                                     },
                                     onOpen = { taskEditor = TaskEditor(row.owner.id, row.task) },
+                                    ancestorContinues = row.ancestorContinues,
                                 )
 
                                 is DetailRow.ProjectItem -> SubprojectRow(
@@ -314,6 +319,8 @@ fun ProjectDetailScreen(
                                     depth = row.depth,
                                     isLast = row.isLast,
                                     onClick = { onOpenProject(row.project.id) },
+                                    ancestorContinues = row.ancestorContinues,
+                                    hasChildren = row.hasChildren,
                                 )
                             }
                         }
@@ -426,7 +433,7 @@ fun ProjectDetailScreen(
  * Árbol completo del detalle: tareas directas primero, después cada subproyecto
  * con su propio subárbol. La raíz no se dibuja como fila.
  */
-private fun buildDetailRows(
+internal fun buildDetailRows(
     root: Project,
     projects: List<Project>,
     tasks: List<Task>,
@@ -435,7 +442,11 @@ private fun buildDetailRows(
     val childrenByParent = projects.groupBy { it.parentId }
     val rows = mutableListOf<DetailRow>()
 
-    fun emitChildren(project: Project, depth: Int) {
+    fun emitChildren(
+        project: Project,
+        depth: Int,
+        ancestorContinues: List<Boolean>,
+    ) {
         val items = buildList<Any> {
             addAll(tasksByProject[project.id].orEmpty())
             addAll(childrenByParent[project.id].orEmpty())
@@ -449,6 +460,7 @@ private fun buildDetailRows(
                         owner = project,
                         depth = depth,
                         isLast = isLast,
+                        ancestorContinues = ancestorContinues,
                     ),
                 )
 
@@ -457,16 +469,21 @@ private fun buildDetailRows(
                         DetailRow.ProjectItem(
                             project = item,
                             progress = ProgressCalculator.calculate(item.id, projects, tasks),
+                            hasChildren = tasksByProject[item.id].orEmpty().isNotEmpty() ||
+                                childrenByParent[item.id].orEmpty().isNotEmpty(),
                             depth = depth,
                             isLast = isLast,
+                            ancestorContinues = ancestorContinues,
                         ),
                     )
-                    emitChildren(item, depth + 1)
+                    // Para los hijos, este proyecto es un ancestro más: su
+                    // vertical sigue sólo si él tiene un hermano después.
+                    emitChildren(item, depth + 1, ancestorContinues + !isLast)
                 }
             }
         }
     }
 
-    emitChildren(root, depth = 1)
+    emitChildren(root, depth = 1, ancestorContinues = emptyList())
     return rows
 }

@@ -165,7 +165,7 @@ fun ProjectCard(
                 }
             }
             if (hiddenCount > 0) {
-                TreeRow(depth = 1, isLast = true) {
+                TreeRow(depth = 1, isLast = true, connectorInset = (-8).dp) {
                     Text(
                         text = stringResource(R.string.project_more_rows, hiddenCount),
                         style = MaterialTheme.typography.labelLarge,
@@ -239,6 +239,7 @@ fun TaskRow(
     onToggle: () -> Unit,
     onOpen: (() -> Unit)?,
     modifier: Modifier = Modifier,
+    ancestorContinues: List<Boolean> = emptyList(),
 ) {
     val scheme = MaterialTheme.colorScheme
     val extended = LocalExtendedColors.current
@@ -248,7 +249,13 @@ fun TaskRow(
         task.title,
     )
 
-    TreeRow(depth = depth, isLast = isLast, modifier = modifier.heightIn(min = 48.dp)) {
+    TreeRow(
+        depth = depth,
+        isLast = isLast,
+        modifier = modifier.heightIn(min = 48.dp),
+        ancestorContinues = ancestorContinues,
+        connectorInset = 6.dp,
+    ) {
         TaskCheck(
             done = task.done,
             contentDescription = contentDescription,
@@ -302,6 +309,8 @@ fun SubprojectRow(
     isLast: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    ancestorContinues: List<Boolean> = emptyList(),
+    hasChildren: Boolean = false,
 ) {
     val scheme = MaterialTheme.colorScheme
     val extended = LocalExtendedColors.current
@@ -312,6 +321,9 @@ fun SubprojectRow(
         modifier = modifier
             .heightIn(min = 48.dp)
             .clickable(onClick = onClick),
+        ancestorContinues = ancestorContinues,
+        connectorInset = (-8).dp,
+        hasChildren = hasChildren,
     ) {
         Icon(
             painter = painterResource(R.drawable.ic_layers),

@@ -125,7 +125,7 @@ fun ListCard(
                 Box(modifier = Modifier.weight(1f)) {
                     ThinProgressBar(
                         fraction = fraction,
-                        color = if (done == total) extended.success else scheme.primary,
+                        color = if (done == total) extended.success else extended.highlight,
                     )
                 }
             }

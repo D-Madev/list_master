@@ -42,6 +42,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -50,6 +53,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ar.matias.listmaster.R
 import ar.matias.listmaster.domain.ProjectProgress
@@ -207,7 +211,7 @@ fun ProgressPill(
             painter = painterResource(R.drawable.ic_status_done),
             contentDescription = null,
             modifier = Modifier.size(16.dp),
-            tint = if (progress.isComplete) extended.success else scheme.onSurface,
+            tint = if (progress.isComplete) extended.success else extended.highlight,
         )
         Spacer(Modifier.width(6.dp))
         if (!progress.hasTasks) {
@@ -239,14 +243,14 @@ fun ProgressPill(
                     modifier = Modifier
                         .fillMaxHeight()
                         .fillMaxWidth(animated)
-                        .background(if (progress.isComplete) extended.success else scheme.primary),
+                        .background(if (progress.isComplete) extended.success else extended.highlight),
                 )
             }
             Spacer(Modifier.width(8.dp))
             Text(
                 text = "${progress.percentage}%",
                 style = MaterialTheme.typography.labelMedium,
-                color = scheme.onSurfaceVariant,
+                color = if (progress.isComplete) extended.success else extended.highlight,
             )
         }
     }
@@ -395,14 +399,24 @@ fun TaskCheck(
 }
 
 /**
- * Fila con las guías del árbol dibujadas: una vertical por ancestro y una
- * horizontal hacia el contenido. El nivel 0 no dibuja nada.
+ * Fila con las guías del árbol dibujadas.
+ *
+ * Cada ancestro dibuja su vertical sólo si su rama sigue abierta. El nivel
+ * propio baja desde arriba, hace un codo redondeado hacia el contenido y, si
+ * quedan hermanos, sigue bajando. Así las líneas se conectan entre filas y no
+ * quedan cortadas en los bordes.
+ *
+ * [connectorInset] estira la horizontal para que toque el checkbox de la tarea
+ * sin meterse debajo del icono de un subproyecto.
  */
 @Composable
 fun TreeRow(
     depth: Int,
     isLast: Boolean,
     modifier: Modifier = Modifier,
+    ancestorContinues: List<Boolean> = emptyList(),
+    connectorInset: Dp = 0.dp,
+    hasChildren: Boolean = false,
     content: @Composable RowScope.() -> Unit,
 ) {
     val guideColor = MaterialTheme.colorScheme.outline
@@ -412,25 +426,64 @@ fun TreeRow(
             .drawBehind {
                 if (depth == 0) return@drawBehind
                 val step = 16.dp.toPx()
-                val stroke = 1.dp.toPx()
+                val stroke = 1.2.dp.toPx()
+                val radius = 8.dp.toPx()
                 val middle = size.height / 2f
-                for (level in 1..depth) {
+                val lineStyle = Stroke(width = stroke, cap = StrokeCap.Round)
+
+                // Ancestros: la vertical sigue mientras su rama tenga hermanos.
+                for (level in 1 until depth) {
+                    if (ancestorContinues.getOrNull(level - 1) != true) continue
                     val x = (level - 1) * step + step / 2f
-                    val endY = if (level == depth && isLast) middle else size.height
                     drawLine(
                         color = guideColor,
                         start = Offset(x, 0f),
-                        end = Offset(x, endY),
+                        end = Offset(x, size.height),
                         strokeWidth = stroke,
+                        cap = StrokeCap.Round,
                     )
                 }
+
                 val x = (depth - 1) * step + step / 2f
-                drawLine(
-                    color = guideColor,
-                    start = Offset(x, middle),
-                    end = Offset(x + step, middle),
-                    strokeWidth = stroke,
-                )
+                val endX = x + step + connectorInset.toPx()
+                if (isLast) {
+                    // La rama termina acá: vertical hasta el codo y curva al contenido.
+                    val path = Path().apply {
+                        moveTo(x, 0f)
+                        lineTo(x, (middle - radius).coerceAtLeast(0f))
+                        quadraticBezierTo(x, middle, x + radius, middle)
+                        lineTo(endX, middle)
+                    }
+                    drawPath(path, guideColor, style = lineStyle)
+                } else {
+                    // Pasa de largo y deja un codo suave hacia el contenido.
+                    drawLine(
+                        color = guideColor,
+                        start = Offset(x, 0f),
+                        end = Offset(x, size.height),
+                        strokeWidth = stroke,
+                        cap = StrokeCap.Round,
+                    )
+                    val path = Path().apply {
+                        moveTo(x, middle - radius)
+                        quadraticBezierTo(x, middle, x + radius, middle)
+                        lineTo(endX, middle)
+                    }
+                    drawPath(path, guideColor, style = lineStyle)
+                }
+
+                // Si la fila es un proyecto con hijos, la guía baja desde el
+                // icono hasta el borde para encontrarse con la primera subtarea.
+                if (hasChildren) {
+                    val childX = depth * step + step / 2f
+                    drawLine(
+                        color = guideColor,
+                        start = Offset(childX, middle),
+                        end = Offset(childX, size.height),
+                        strokeWidth = stroke,
+                        cap = StrokeCap.Round,
+                    )
+                }
             }
             .padding(start = (depth * 16).dp),
         verticalAlignment = Alignment.CenterVertically,

@@ -2,7 +2,6 @@ package ar.matias.listmaster.ui
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import ar.matias.listmaster.R
@@ -19,19 +18,11 @@ data class ChipColors(
 fun ProjectStatus.chipColors(): ChipColors {
     val extended = LocalExtendedColors.current
     return when (this) {
-        ProjectStatus.ACTIVE -> ChipColors(
-            content = MaterialTheme.colorScheme.primary,
-            container = MaterialTheme.colorScheme.primaryContainer,
-        )
+        ProjectStatus.ACTIVE -> ChipColors(extended.highlight, extended.highlightSoft)
 
         ProjectStatus.PAUSED -> ChipColors(extended.neutral, extended.neutralSoft)
         ProjectStatus.POSTPONED -> ChipColors(extended.warning, extended.warningSoft)
-        // En una paleta sin color, Terminado se distingue invirtiendo el chip:
-        // fondo oscuro con texto claro en tema claro, y al revés en oscuro.
-        ProjectStatus.DONE -> ChipColors(
-            content = MaterialTheme.colorScheme.surface,
-            container = MaterialTheme.colorScheme.onSurface,
-        )
+        ProjectStatus.DONE -> ChipColors(extended.success, extended.successSoft)
         ProjectStatus.CANCELLED -> ChipColors(extended.danger, extended.dangerSoft)
     }
 }
@@ -58,11 +49,7 @@ fun ProjectStatus.iconRes(): Int = when (this) {
 fun Priority.chipColors(): ChipColors {
     val extended = LocalExtendedColors.current
     return when (this) {
-        // Alta se invierte para que siga leyéndose como lo más urgente.
-        Priority.HIGH -> ChipColors(
-            content = MaterialTheme.colorScheme.surface,
-            container = MaterialTheme.colorScheme.onSurface,
-        )
+        Priority.HIGH -> ChipColors(extended.danger, extended.dangerSoft)
         Priority.MEDIUM -> ChipColors(extended.warning, extended.warningSoft)
         Priority.LOW -> ChipColors(extended.neutral, extended.neutralSoft)
     }
