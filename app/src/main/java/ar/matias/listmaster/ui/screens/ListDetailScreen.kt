@@ -155,7 +155,7 @@ fun ListDetailScreen(
                                 stringResource(R.string.list_progress_fraction, done, total)
                             },
                             style = MaterialTheme.typography.labelLarge,
-                            color = if (total > 0 && done == total) {
+                            color = if (total > 0) {
                                 extended.success
                             } else {
                                 MaterialTheme.colorScheme.onSurface
@@ -166,11 +166,7 @@ fun ListDetailScreen(
                             Box(modifier = Modifier.weight(1f)) {
                                 ThinProgressBar(
                                     fraction = done.toFloat() / total,
-                                    color = if (done == total) {
-                                        extended.success
-                                    } else {
-                                        MaterialTheme.colorScheme.primary
-                                    },
+                                    color = extended.success,
                                 )
                             }
                         }

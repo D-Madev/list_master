@@ -1,10 +1,12 @@
 package ar.matias.listmaster.ui.screens
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -14,7 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -42,6 +44,7 @@ import ar.matias.listmaster.domain.model.ProjectStatus
 import ar.matias.listmaster.domain.model.Task
 import ar.matias.listmaster.ui.components.CenteredEmpty
 import ar.matias.listmaster.ui.components.ProjectCard
+import ar.matias.listmaster.ui.components.ProjectCompactRow
 import ar.matias.listmaster.ui.components.ScreenTitle
 import ar.matias.listmaster.ui.components.SectionHeader
 import ar.matias.listmaster.ui.sheets.DeleteProjectDialog
@@ -73,6 +76,8 @@ fun ProjectsScreen(
     modifier: Modifier = Modifier,
 ) {
     var showClosed by rememberSaveable { mutableStateOf(false) }
+    // Los ids abiertos se guardan para que el estado sobreviva a la rotación.
+    var expandedIds by rememberSaveable { mutableStateOf(arrayListOf<String>()) }
     var menuProject by remember { mutableStateOf<Project?>(null) }
     var statusProject by remember { mutableStateOf<Project?>(null) }
     var priorityProject by remember { mutableStateOf<Project?>(null) }
@@ -91,6 +96,22 @@ fun ProjectsScreen(
     val tasksByProject = tasks.groupBy { it.projectId }
 
     fun progressOf(id: String) = ProgressCalculator.calculate(id, projects, tasks)
+
+    val allExpanded = roots.isNotEmpty() && roots.all { it.id in expandedIds }
+
+    fun toggleExpanded(id: String) {
+        expandedIds = ArrayList(expandedIds).also { ids ->
+            if (!ids.remove(id)) ids.add(id)
+        }
+    }
+
+    fun setAllExpanded(expanded: Boolean) {
+        expandedIds = if (expanded) {
+            ArrayList(roots.map { it.id })
+        } else {
+            arrayListOf()
+        }
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         if (roots.isEmpty()) {
@@ -125,19 +146,41 @@ fun ProjectsScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 item(key = "header") {
-                    ScreenTitle(
-                        text = stringResource(R.string.projects_title),
-                        subtitle = if (active.isEmpty()) {
-                            null
-                        } else {
-                            pluralStringResource(
-                                R.plurals.projects_active_count,
-                                active.size,
-                                active.size,
+                    Column {
+                        ScreenTitle(
+                            text = stringResource(R.string.projects_title),
+                            subtitle = if (active.isEmpty()) {
+                                null
+                            } else {
+                                pluralStringResource(
+                                    R.plurals.projects_active_count,
+                                    active.size,
+                                    active.size,
+                                )
+                            },
+                            modifier = Modifier.padding(bottom = 4.dp),
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End,
+                        ) {
+                            Text(
+                                text = stringResource(
+                                    if (allExpanded) {
+                                        R.string.projects_collapse_all
+                                    } else {
+                                        R.string.projects_expand_all
+                                    },
+                                ),
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier
+                                    .heightIn(min = 40.dp)
+                                    .clickable { setAllExpanded(!allExpanded) }
+                                    .padding(horizontal = 4.dp, vertical = 10.dp),
                             )
-                        },
-                        modifier = Modifier.padding(bottom = 4.dp),
-                    )
+                        }
+                    }
                 }
 
                 if (active.isNotEmpty()) {
@@ -159,6 +202,8 @@ fun ProjectsScreen(
                                 haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                                 onToggleTask(task)
                             },
+                            expanded = project.id in expandedIds,
+                            onToggleExpanded = { toggleExpanded(project.id) },
                         )
                     }
                 }
@@ -185,6 +230,8 @@ fun ProjectsScreen(
                                 haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                                 onToggleTask(task)
                             },
+                            expanded = project.id in expandedIds,
+                            onToggleExpanded = { toggleExpanded(project.id) },
                         )
                     }
                 }
@@ -224,6 +271,8 @@ fun ProjectsScreen(
                                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                                     onToggleTask(task)
                                 },
+                                expanded = project.id in expandedIds,
+                                onToggleExpanded = { toggleExpanded(project.id) },
                             )
                         }
                     }
@@ -231,22 +280,20 @@ fun ProjectsScreen(
             }
         }
 
-        ExtendedFloatingActionButton(
+        FloatingActionButton(
             onClick = { onNewProject(null) },
-            icon = {
-                Icon(
-                    imageVector = Icons.Outlined.Add,
-                    contentDescription = null,
-                )
-            },
-            text = { Text(stringResource(R.string.project_new)) },
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
             shape = RoundedCornerShape(18.dp),
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(20.dp),
-        )
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Add,
+                contentDescription = stringResource(R.string.project_new),
+            )
+        }
     }
 
     menuProject?.let { project ->
@@ -349,19 +396,34 @@ private fun ProjectCardItem(
     onStatusClick: () -> Unit,
     onPriorityClick: () -> Unit,
     onToggleTask: (Task) -> Unit,
+    expanded: Boolean,
+    onToggleExpanded: () -> Unit,
 ) {
     val children = childrenByParent[project.id].orEmpty()
-    ProjectCard(
-        project = project,
-        progress = progressOf(project.id),
-        directTasks = tasksByProject[project.id].orEmpty(),
-        subprojects = children,
-        subprojectProgress = children.associate { it.id to progressOf(it.id) },
-        onOpen = { onOpenProject(project.id) },
-        onToggleTask = onToggleTask,
-        onMenu = onMenu,
-        onStatusClick = onStatusClick,
-        onPriorityClick = onPriorityClick,
-        onOpenSubproject = onOpenProject,
-    )
+    val progress = progressOf(project.id)
+    Column(modifier = Modifier.animateContentSize()) {
+        if (expanded) {
+            ProjectCard(
+                project = project,
+                progress = progress,
+                directTasks = tasksByProject[project.id].orEmpty(),
+                subprojects = children,
+                subprojectProgress = children.associate { it.id to progressOf(it.id) },
+                onOpen = { onOpenProject(project.id) },
+                onToggleTask = onToggleTask,
+                onMenu = onMenu,
+                onStatusClick = onStatusClick,
+                onPriorityClick = onPriorityClick,
+                onOpenSubproject = onOpenProject,
+                onCollapse = onToggleExpanded,
+            )
+        } else {
+            ProjectCompactRow(
+                project = project,
+                progress = progress,
+                expanded = false,
+                onToggle = onToggleExpanded,
+            )
+        }
+    }
 }

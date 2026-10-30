@@ -211,7 +211,7 @@ fun ProgressPill(
             painter = painterResource(R.drawable.ic_status_done),
             contentDescription = null,
             modifier = Modifier.size(16.dp),
-            tint = if (progress.isComplete) extended.success else extended.highlight,
+            tint = scheme.onSurfaceVariant,
         )
         Spacer(Modifier.width(6.dp))
         if (!progress.hasTasks) {
@@ -243,14 +243,14 @@ fun ProgressPill(
                     modifier = Modifier
                         .fillMaxHeight()
                         .fillMaxWidth(animated)
-                        .background(if (progress.isComplete) extended.success else extended.highlight),
+                        .background(extended.success),
                 )
             }
             Spacer(Modifier.width(8.dp))
             Text(
                 text = "${progress.percentage}%",
                 style = MaterialTheme.typography.labelMedium,
-                color = if (progress.isComplete) extended.success else extended.highlight,
+                color = extended.success,
             )
         }
     }
@@ -324,9 +324,9 @@ private fun Chip(
     ) {
         Row(
             modifier = Modifier
-                .clip(RoundedCornerShape(999.dp))
+                .clip(RoundedCornerShape(9.dp))
                 .background(colors.container)
-                .padding(horizontal = 8.dp, vertical = 5.dp),
+                .padding(horizontal = 9.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
@@ -360,7 +360,7 @@ fun TaskCheck(
     contentDescription: String,
     onToggle: () -> Unit,
     modifier: Modifier = Modifier,
-    tint: Color = MaterialTheme.colorScheme.primary,
+    tint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
 ) {
     Box(
         modifier = modifier
@@ -391,7 +391,7 @@ fun TaskCheck(
                     imageVector = Icons.Outlined.Check,
                     contentDescription = null,
                     modifier = Modifier.size(14.dp),
-                    tint = MaterialTheme.colorScheme.onPrimary,
+                    tint = MaterialTheme.colorScheme.surface,
                 )
             }
         }
