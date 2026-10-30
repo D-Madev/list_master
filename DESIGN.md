@@ -1,6 +1,6 @@
 # DESIGN.md — List Master
 
-- **Estado:** aprobado e implementado en la versión 1.1.1. La identidad pasó a blanco, negro y escalas de grises.
+- **Estado:** aprobado e implementado en la versión 1.2.0. La base es monocroma y el color queda para prioridad, estado y progreso.
 - **Alcance:** proyectos, subproyectos, tareas y listas simples. Nada más.
 - **Referencia visual:** `docs/referencias/tarjeta-progreso.png`.
 - **Referencias de producto:** Linear (app), Notion (layout) y los ejemplos de sistemas de diseño de Figma: https://www.figma.com/resource-library/design-system-examples/
@@ -136,7 +136,8 @@ La base es **monocroma**: negro, blanco y escalas de grises. El color se reserva
 | FAB extendido | 18 dp |
 | Hoja inferior | 24 dp (esquinas superiores) |
 | Diálogo | 24 dp |
-| Chip / pastilla | 999 dp (píldora) |
+| Chip de prioridad / estado | 9 dp (cuadrado con borde redondo) |
+| Pastilla de progreso | 999 dp (píldora) |
 
 **Nunca** se anidan tarjetas con sombra dentro de tarjetas con sombra. Si hace falta un bloque interno, se usa `surfaceAlt` + un divisor de 1 dp, sin sombra.
 
@@ -145,7 +146,8 @@ La base es **monocroma**: negro, blanco y escalas de grises. El color se reserva
 - **Iconos de línea, no rellenos.** Trazo de 1.5–1.75 dp, terminaciones redondeadas.
 - Tamaños: 16 dp dentro de chips, 20 dp en filas, 22–24 dp en encabezados y navegación.
 - En reposo, 80% de opacidad; activo, 100% y color de acento.
-- El único “relleno” permitido es el **círculo de check lleno** de una tarea hecha: es un indicador de estado, no un icono decorativo.
+- El único “relleno” permitido es el **círculo de check lleno** de una tarea hecha: es un indicador de estado, no un icono decorativo. Va en `onSurfaceVariant`, más tenue que el texto, para no competir con lo pendiente.
+- **Ícono del proyecto:** además de `folder` y `layers`, hay un set corto en el mismo trazo (`star`, `bolt`, `heart`, `target`, `book`, `cart`, `home`, `briefcase`). También se puede usar un emoji. El ícono se elige desde el formulario del proyecto; el predeterminado sigue siendo `folder` para proyectos y `layers` para subproyectos.
 - Se usan Material Symbols Outlined o vectores propios; nunca un set mezclado.
 - Iconos del MVP: `folder` (proyecto), `layers` (subproyecto), `check-circle` / `circle` (tarea), `flag` (prioridad), `hourglass` o `schedule` (estado), `list` (lista), `calendar` (fecha), `more-horiz` (menú), `plus`, `chevron-right`, `arrow-left`, `trash`, `pencil`, `download`, `upload`, `sun`, `moon`, `smartphone`.
 - Todo icono interactivo tiene etiqueta accesible; todo icono decorativo tiene `contentDescription = null`.
@@ -218,7 +220,7 @@ La referencia muestra “Urgente”; en una app personal de tres niveles, “Alt
 - Pastilla: **“3 de 4”** y **“75%”**. Sin espacio antes del `%`, para que la pastilla no se estire.
 - Sin tareas en todo el árbol: **“Sin tareas todavía”**, sin barra y sin porcentaje. No es 0%.
 - Con tareas y ninguna hecha: **“0 de 4”** y **“0%”**. Eso sí es un dato real.
-- Todo hecho: **“Todo hecho”** y **“100%”**. La barra pasa a `success`.
+- La barra y el porcentaje van siempre en `success`: el verde es la lectura de completitud, esté en 3 de 4 o en 100%.
 - Nunca 100% si queda una tarea pendiente: el porcentaje se redondea, pero se topa en 99% hasta que el total esté completo.
 - Las listas simples **no** suman al progreso del proyecto. Su progreso es propio.
 
@@ -259,13 +261,15 @@ La referencia muestra “Urgente”; en una app personal de tres niveles, “Alt
 
 1. **Encabezado:** tile de icono de 40–44 dp (`surfaceAlt`, radio 14 dp, icono de línea de 22 dp), título a 20 sp SemiBold, menú “⋯” a la derecha en un objetivo de 48 dp.
 2. **Pastilla de progreso:** una sola píldora con icono de check, “3 de 4”, barra y “75%”. Fondo `surfaceAlt`; en oscuro, un punto más claro que la tarjeta.
-3. **Árbol:** conectores de 1 dp en `outline`, con una vertical que baja desde la pastilla y una horizontal de 10 dp hacia cada fila. Las tareas hechas llevan círculo lleno de acento con el check en `onAccent` (blanco en claro, casi negro en oscuro); las pendientes, círculo vacío de 1.5 dp.
+3. **Árbol:** guías continuas de 1.2 dp en `outline`. Cada ancestro mantiene su vertical mientras su rama siga abierta; el nivel propio baja, hace un codo redondeado de 8 dp hacia el contenido y sigue si quedan hermanos. Los proyectos con hijos dibujan un tallo hasta su primera subtarea. Las tareas hechas llevan círculo lleno `onSurfaceVariant` con el check en `surface`; las pendientes, círculo vacío de 1.5 dp.
 4. **Chips:** fila de Prioridad y fila de Estado, cada una con icono + rótulo a la izquierda y chip a la derecha. El chip tiene fondo suave, texto del color fuerte, icono y un chevron de 12 dp.
 5. **Sin avatares.** La app es personal. Esa fila no se reemplaza por datos inventados: la tarjeta termina en los chips.
 
 **Comportamiento**
 
-- Tocar la tarjeta (fuera del check y del menú) abre el detalle del proyecto.
+- En el listado, cada proyecto aparece primero como **registro compacto**: ícono, nombre, “3 de 4” y barra verde. Tocar la fila despliega la tarjeta completa en el lugar; el chevron del encabezado la vuelve a colapsar.
+- Ya desplegada, tocar la tarjeta (fuera del check, el chevron y el menú) abre el detalle del proyecto.
+- “Expandir Todo” / “Colapsar Todo” en el encabezado abre o cierra todos los registros de la sección.
 - Tocar el círculo de check marca/desmarca la tarea sin abrir el detalle; el objetivo táctil es de 48 dp aunque el círculo se vea de 20 dp.
 - Tocar el menú abre una hoja inferior con: Editar, Cambiar Estado, Agregar Subproyecto, Agregar Tarea, Eliminar.
 - Tocar un chip de Estado o Prioridad abre la hoja de selección correspondiente.
@@ -278,15 +282,15 @@ La referencia muestra “Urgente”; en una app personal de tres niveles, “Alt
 La tarjeta muestra **un nivel**: primero las tareas directas del proyecto, después una fila por subproyecto con su propio “2 de 5”. No expande las tareas de los subproyectos en la tarjeta: eso haría la tarjeta interminable. El detalle sí muestra el árbol completo hasta 3 niveles de subproyectos (raíz + 3).
 
 - Máximo 4 filas visibles. Si hay más: “+3 Más”, que abre el detalle.
-- Orden natural de creación, no “pendientes primero”: el árbol no salta de lugar cuando marcás algo. El detalle puede ofrecer un filtro “Pendientes” más adelante, pero no en el MVP.
+- **Pendientes primero**, después las hechas y al final los subproyectos. Así una vista previa con muchas tareas terminadas igual muestra lo que falta; dentro de cada grupo se respeta el orden de creación.
 - Si el proyecto no tiene ni tareas ni subproyectos: la pastilla dice “Sin tareas todavía” y el árbol no se dibuja. En su lugar, una línea: “Agregá una tarea para empezar a medir el progreso.”
 
 ### 3.2 Pastilla de progreso
 
 - Alto 32 dp, radio píldora, padding horizontal 10 dp.
 - Icono de check de 16 dp, texto “3 de 4” en 12 sp SemiBold, barra de 56–80 dp (flexible), texto “75%” en 12 sp SemiBold.
-- Barra: riel `surfaceSunken`, relleno `accent`, 5 dp de alto, radio píldora. A 100%, el relleno pasa a `success`.
-- Animación: el ancho de la barra va de un valor al otro en 300 ms `ease-out`; el cambio de color a `success` es un crossfade de 200 ms. El número cambia sin contar dígito por dígito.
+- Barra: riel `surfaceSunken`, relleno `success`, 5 dp de alto, radio píldora. El porcentaje también va en `success`; el icono de check queda en `onSurfaceVariant`.
+- Animación: el ancho de la barra va de un valor al otro en 300 ms `ease-out`. El número cambia sin contar dígito por dígito.
 - En escala de fuente grande, la pastilla puede pasar a dos líneas: texto arriba, barra abajo. No se recorta.
 - Accesibilidad: “3 de 4 tareas hechas, 75 por ciento”.
 
@@ -294,17 +298,17 @@ La tarjeta muestra **un nivel**: primero las tareas directas del proyecto, despu
 
 - Indentación de 16 dp por nivel; el conector vertical se mantiene alineado con el padre.
 - Fila de 32–36 dp de alto; check de 20 dp; texto de 15 sp; gap de 10 dp.
-- Tarea hecha: check lleno `accent`, texto `textSecondary`; **sin tachado**. El tachado ensucia la tarjeta y no aporta: el check ya dice todo. Cuando el proyecto está Terminado y no queda ninguna pendiente, el check y la barra pasan a `success`.
+- Tarea hecha: check lleno `onSurfaceVariant`, texto `textSecondary`; **sin tachado**. El tachado ensucia la tarjeta y no aporta: el check ya dice todo. La barra y el porcentaje del proyecto siguen en `success`.
 - Tarea pendiente: círculo de 1.5 dp `outline`, texto `text`.
-- Subproyecto: icono `layers` de 18 dp, título, y una mini pastilla “2 de 5” a la derecha. Tocar la fila abre el subproyecto.
+- Subproyecto: su ícono (o `layers` si no tiene uno) de 18 dp, título, y una mini pastilla “2 de 5” a la derecha. Tocar la fila abre el subproyecto.
 - Fecha: si existe, va debajo del título en 12 sp `textSecondary`, con icono de calendario de 12 dp. Si no, no se muestra nada.
 - Los conectores se dibujan con `Canvas`/`drawBehind`, no con caracteres `├─`.
 - En el detalle, el árbol completo puede ser largo: se permite scroll; las filas mantienen el conector. Si hay 3 niveles de subproyectos, el nivel 3 se ve con 48 dp de indentación (16 dp por nivel) y el texto no se corta.
 
 ### 3.4 Chips de prioridad y estado
 
-- Alto 28 dp, radio píldora, padding horizontal 8 dp, icono 14 dp, texto 12 sp SemiBold, chevron 12 dp.
-- Fondo suave (`*Soft`), texto fuerte, sin borde. En oscuro, el fondo suave no se aclara demasiado: el chip tiene que seguir leyéndose como una píldora, no como una alarma.
+- Alto 28 dp, **cuadrado con borde redondo de 9 dp**, padding horizontal 9 dp, icono 14 dp, texto 12 sp SemiBold, chevron 12 dp. El chip de estado y prioridad es el mismo en la tarjeta, el detalle y el formulario.
+- Fondo suave (`*Soft`), texto fuerte, sin borde. En oscuro, el fondo suave no se aclara demasiado: el chip tiene que seguir leyéndose como una etiqueta, no como una alarma.
 - Objetivo táctil de 48 dp: se logra con padding vertical/`minimumInteractiveComponentSize`, no agrandando el chip visual.
 - La fila de prioridad se **omite** si el proyecto no tiene prioridad. En el detalle se muestra “Sin Prioridad” con una acción para asignarla.
 - La fila de estado siempre está.
@@ -313,6 +317,8 @@ La tarjeta muestra **un nivel**: primero las tareas directas del proyecto, despu
 ### 3.5 Tarjeta y detalle de lista simple
 
 - Tarjeta más simple que la de proyecto: icono `list`, título, “4 de 7” y una barra fina; si está vinculada, un chip pequeño “En «Proyecto»”.
+- Tocar la tarjeta la despliega en el lugar y muestra hasta 6 ítems con su check, para marcar sin salir del listado. “+N Más” y “Ver Detalle” abren el detalle completo.
+- “Expandir Todo” / “Colapsar Todo” en el encabezado abre o cierra todas las listas.
 - Sin chips de prioridad ni estado: una lista simple no tiene estado de proyecto.
 - Detalle: título, vínculo (si existe), ítems con check, campo para agregar al final (“Agregar Ítem”), menú con Editar, Vincular/Desvincular y Eliminar.
 - Marcar un ítem actualiza “4 de 7” con la misma animación de la barra; no hay celebración.
@@ -324,7 +330,7 @@ La tarjeta muestra **un nivel**: primero las tareas directas del proyecto, despu
 - **Secundario:** fondo `accentSoft`, texto `accent`, misma altura.
 - **Texto:** solo texto `accent`; para acciones terciarias.
 - **Destructivo:** texto `danger`, siempre con confirmación. No se usa un botón rojo lleno para borrar en la tarjeta; sí en el diálogo de confirmación.
-- **FAB:** extendido en las pantallas de lista (“Nuevo Proyecto”, “Nueva Lista”), con icono `plus` y texto; 56 dp de alto, radio 18 dp, sombra. En el detalle, FAB circular de 56 dp para “Agregar Tarea” o “Agregar Ítem”.
+- **FAB:** circular de 56 dp con solo el icono `plus` en Proyectos y Listas: el contexto ya dice si crea un proyecto o una lista, y la etiqueta queda en la descripción accesible. Radio 18 dp, sombra. En el detalle, FAB para “Agregar Tarea” o “Agregar Ítem”.
 - **Barra inferior:** 3 destinos: Proyectos (`folder`), Listas (`list`), Ajustes (`tune`). Alto 80 dp + inset; fondo `surface`, borde superior de 1 dp `outline`; activo con píldora `accentSoft` detrás del icono y texto `accent`; inactivo `textTertiary`. Sin haptics al navegar.
 - **Detalle:** se oculta la barra inferior; el botón de atrás está en la barra superior y el gesto de atrás del sistema funciona. No se intercepta.
 - **Barra superior:** título 24 sp SemiBold, fondo `bg` (no transparente sobre contenido que se desplaza), acciones a la derecha. En detalle: atrás, título y menú “⋯”.
@@ -357,8 +363,8 @@ La tarjeta muestra **un nivel**: primero las tareas directas del proyecto, despu
 - Barra superior “Mis Proyectos”.
 - Línea de estado: “Tenés 3 proyectos activos.” Si no hay: se omite y se muestra el estado vacío.
 - Secciones: **Activos** primero; **En Pausa / Postergados** después; **Terminados / Cancelados** al final, colapsados con “Ver Terminados y Cancelados (4)”.
-- Tarjetas de proyecto, separadas 12 dp.
-- FAB extendido “Nuevo Proyecto” abajo a la derecha.
+- Registros compactos de proyecto, separados 12 dp: nombre, “3 de 4” y barra verde. Se despliegan en el lugar y se pueden abrir o cerrar todos juntos.
+- FAB “+” abajo a la derecha; crea un proyecto.
 - Sin filtros ni búsqueda en el MVP: las secciones alcanzan para una app personal.
 
 ### 4.2 Detalle de proyecto
@@ -370,12 +376,14 @@ La tarjeta muestra **un nivel**: primero las tareas directas del proyecto, despu
 - Si el proyecto está Terminado y quedan tareas pendientes: aviso honesto “Te quedan 2 tareas sin hacer.” No se marcan solas.
 - Si el progreso llega a 100% pero el estado sigue Activo: “Todo hecho. ¿Lo marcás como Terminado?” con una acción; no se cambia el estado solo.
 - Menú: Editar, Cambiar Estado, Agregar Subproyecto, Agregar Tarea, Eliminar.
+- Formulario: título, ícono (set incluido o emoji), estado y prioridad. El ícono elegido se ve en la tarjeta, el registro compacto y el detalle.
 
 ### 4.3 Listas
 
 - Barra superior “Mis Listas”.
 - Listas sueltas y vinculadas en una sola lista, con chip de vínculo cuando corresponde.
-- FAB extendido “Nueva Lista”.
+- Cada lista se despliega en el lugar con sus primeros ítems; “Ver Detalle” abre la lista completa.
+- FAB “+” abajo a la derecha; crea una lista.
 - Estado vacío propio.
 
 ### 4.4 Detalle de lista

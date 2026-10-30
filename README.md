@@ -6,15 +6,16 @@ Es una app Android propia. Los datos quedan en el celular, sin cuenta ni servido
 
 ## Estado
 
-**Versión 1.1.1.** La app está completa según el alcance acordado:
+**Versión 1.2.0.** La app está completa según el alcance acordado:
 
-- Proyectos con subproyectos hasta tres niveles, estados y prioridad opcional.
+- Proyectos con subproyectos hasta tres niveles, estados y prioridad opcional, con ícono propio o emoji.
+- Listado de proyectos y listas en registros compactos que se despliegan en el lugar, con “Expandir Todo” / “Colapsar Todo”.
 - Tareas con fecha opcional dentro de cada proyecto.
 - Listas simples, vinculadas o no a un proyecto.
 - Progreso calculado sobre el árbol de proyectos, sin contar listas.
 - Export e import JSON con nombres de campo en español, validado y atómico.
 - Tema claro, oscuro o del sistema, guardado en el celular.
-- Identidad monocroma (blanco, negro y grises) y detalle de proyecto fiel a la tarjeta de referencia.
+- Base monocroma (blanco, negro y grises) con color semántico en prioridad, estado y progreso; detalle fiel a la tarjeta de referencia.
 - Sin cuenta, sin nube, sin analytics, sin permisos de red ni de almacenamiento.
 
 El APK listo para instalar está en la raíz del repositorio: **`ListMaster.apk`**.
