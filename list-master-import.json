@@ -1,0 +1,1802 @@
+{
+  "version": 1,
+  "aplicacion": "list_master",
+  "exportado": "2026-10-30T12:00:00Z",
+  "proyectos": [
+    {
+      "id": "989b85c4-c8a3-511f-b2fc-bc93d6450ea0",
+      "titulo": "My Room",
+      "estado": "Activo",
+      "proyecto_padre": null,
+      "prioridad": null,
+      "creado": "2026-08-20T12:00:00Z",
+      "actualizado": "2026-08-20T12:00:00Z"
+    },
+    {
+      "id": "c8c96943-14d6-5eb9-8ebe-bdacccfe450a",
+      "titulo": "0a Garage",
+      "estado": "Activo",
+      "proyecto_padre": "989b85c4-c8a3-511f-b2fc-bc93d6450ea0",
+      "prioridad": null,
+      "creado": "2026-08-28T12:00:00Z",
+      "actualizado": "2026-08-28T12:00:00Z"
+    },
+    {
+      "id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "titulo": "Vaciado y Despeje",
+      "estado": "Activo",
+      "proyecto_padre": "c8c96943-14d6-5eb9-8ebe-bdacccfe450a",
+      "prioridad": null,
+      "creado": "2026-08-28T12:01:00Z",
+      "actualizado": "2026-08-28T12:01:00Z"
+    },
+    {
+      "id": "28b81bda-71a1-5bbd-b162-b0ae94d256af",
+      "titulo": "Ventana",
+      "estado": "Activo",
+      "proyecto_padre": "c8c96943-14d6-5eb9-8ebe-bdacccfe450a",
+      "prioridad": null,
+      "creado": "2026-08-28T12:02:00Z",
+      "actualizado": "2026-08-28T12:02:00Z"
+    },
+    {
+      "id": "fb952adb-07a4-572d-b8e0-57bb59e0354c",
+      "titulo": "Presupuestos y Contactos",
+      "estado": "Activo",
+      "proyecto_padre": "c8c96943-14d6-5eb9-8ebe-bdacccfe450a",
+      "prioridad": null,
+      "creado": "2026-08-28T12:03:00Z",
+      "actualizado": "2026-08-28T12:03:00Z"
+    },
+    {
+      "id": "e14e232c-fd1c-5f41-9611-74ce66ee5987",
+      "titulo": "1a Galpón",
+      "estado": "Activo",
+      "proyecto_padre": "989b85c4-c8a3-511f-b2fc-bc93d6450ea0",
+      "prioridad": null,
+      "creado": "2026-08-28T12:04:00Z",
+      "actualizado": "2026-08-28T12:04:00Z"
+    },
+    {
+      "id": "730e5f39-14ed-5104-8090-49faafcd0532",
+      "titulo": "B Habitación",
+      "estado": "Activo",
+      "proyecto_padre": "989b85c4-c8a3-511f-b2fc-bc93d6450ea0",
+      "prioridad": null,
+      "creado": "2026-08-28T12:05:00Z",
+      "actualizado": "2026-08-28T12:05:00Z"
+    },
+    {
+      "id": "f810b298-062d-5b74-a430-26347af9d79b",
+      "titulo": "C Baño",
+      "estado": "Activo",
+      "proyecto_padre": "989b85c4-c8a3-511f-b2fc-bc93d6450ea0",
+      "prioridad": null,
+      "creado": "2026-08-28T12:06:00Z",
+      "actualizado": "2026-08-28T12:06:00Z"
+    },
+    {
+      "id": "399eb3f8-17ed-514e-a451-555264b1478b",
+      "titulo": "Arreglos de la Casa",
+      "estado": "Activo",
+      "proyecto_padre": null,
+      "prioridad": null,
+      "creado": "2026-09-06T12:00:00Z",
+      "actualizado": "2026-09-06T12:00:00Z"
+    },
+    {
+      "id": "af28dfbb-e331-5834-b5b8-f4b54daf84a2",
+      "titulo": "A.R.G.O.S",
+      "estado": "Pausa",
+      "proyecto_padre": null,
+      "prioridad": null,
+      "creado": "2026-09-12T12:00:00Z",
+      "actualizado": "2026-09-12T12:00:00Z"
+    },
+    {
+      "id": "e5ded385-2743-50e8-8a28-1220aadf8d1f",
+      "titulo": "Renovar mi Instagram",
+      "estado": "Pausa",
+      "proyecto_padre": null,
+      "prioridad": null,
+      "creado": "2026-09-20T12:00:00Z",
+      "actualizado": "2026-09-20T12:00:00Z"
+    },
+    {
+      "id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
+      "titulo": "Taekwondista",
+      "estado": "Activo",
+      "proyecto_padre": null,
+      "prioridad": null,
+      "creado": "2026-09-20T13:00:00Z",
+      "actualizado": "2026-09-20T13:00:00Z"
+    },
+    {
+      "id": "64725d0b-3345-58a3-aa35-7c526fab7f58",
+      "titulo": "List Master",
+      "estado": "Activo",
+      "proyecto_padre": null,
+      "prioridad": null,
+      "creado": "2026-10-29T12:00:00Z",
+      "actualizado": "2026-10-29T12:00:00Z"
+    },
+    {
+      "id": "23918c00-7a9a-5574-9271-8ab985d16add",
+      "titulo": "Tracker de Ánimo",
+      "estado": "Pausa",
+      "proyecto_padre": null,
+      "prioridad": null,
+      "creado": "2026-10-29T13:00:00Z",
+      "actualizado": "2026-10-29T13:00:00Z"
+    },
+    {
+      "id": "3f50874c-275b-55d7-8fc8-72a7e89fb201",
+      "titulo": "Concesionaria",
+      "estado": "Activo",
+      "proyecto_padre": null,
+      "prioridad": null,
+      "creado": "2026-10-30T09:00:00Z",
+      "actualizado": "2026-10-30T09:00:00Z"
+    },
+    {
+      "id": "157491cb-9118-58dc-b1a0-4ed0e249a03f",
+      "titulo": "2B",
+      "estado": "Activo",
+      "proyecto_padre": null,
+      "prioridad": null,
+      "creado": "2026-10-30T09:01:00Z",
+      "actualizado": "2026-10-30T09:01:00Z"
+    },
+    {
+      "id": "ec310c7e-f1b4-569a-96e3-a1b70313e198",
+      "titulo": "Zapador",
+      "estado": "Activo",
+      "proyecto_padre": null,
+      "prioridad": null,
+      "creado": "2026-10-30T09:02:00Z",
+      "actualizado": "2026-10-30T09:02:00Z"
+    },
+    {
+      "id": "7f402cf6-0366-5d21-8f48-d3090ab15163",
+      "titulo": "RAC",
+      "estado": "Activo",
+      "proyecto_padre": null,
+      "prioridad": null,
+      "creado": "2026-10-30T09:03:00Z",
+      "actualizado": "2026-10-30T09:03:00Z"
+    },
+    {
+      "id": "46471454-0ac3-5066-b9d4-ddede3817d77",
+      "titulo": "Código Activar Bandera en Intranet",
+      "estado": "Activo",
+      "proyecto_padre": null,
+      "prioridad": null,
+      "creado": "2026-10-30T09:04:00Z",
+      "actualizado": "2026-10-30T09:04:00Z"
+    },
+    {
+      "id": "4bc8eccb-3e75-5ac9-a451-623312a63f2e",
+      "titulo": "Inglés",
+      "estado": "Activo",
+      "proyecto_padre": null,
+      "prioridad": null,
+      "creado": "2026-10-30T09:05:00Z",
+      "actualizado": "2026-10-30T09:05:00Z"
+    }
+  ],
+  "tareas": [
+    {
+      "id": "3fde3744-e3ad-5800-abdc-6665582945f2",
+      "titulo": "Empezar a vaciar el garage (con Rocío)",
+      "hecha": true,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:00Z",
+      "actualizado": "2026-08-28T12:01:00Z"
+    },
+    {
+      "id": "240d97fd-ebfb-5be2-af40-ee945c9f7d8f",
+      "titulo": "Seguir vaciándolo solo",
+      "hecha": true,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:01Z",
+      "actualizado": "2026-08-28T12:01:01Z"
+    },
+    {
+      "id": "5dcbc94d-c2bd-59b1-b33a-dea160957b57",
+      "titulo": "Separar todo en tres listas: vender, donar, tirar",
+      "hecha": true,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:02Z",
+      "actualizado": "2026-08-28T12:01:02Z"
+    },
+    {
+      "id": "906bc3fc-2a7d-5550-95d0-dea67e07fb24",
+      "titulo": "Tirar todo lo que se tenía que tirar",
+      "hecha": true,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:03Z",
+      "actualizado": "2026-08-28T12:01:03Z"
+    },
+    {
+      "id": "a4aa6723-2220-5c17-9fde-cb3ad54443bd",
+      "titulo": "Donar mi ropa de chico",
+      "hecha": true,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:04Z",
+      "actualizado": "2026-08-28T12:01:04Z"
+    },
+    {
+      "id": "3d691e0b-a570-5704-94c0-eaf8755ba434",
+      "titulo": "Averiguar dónde y a cuánto pagan el papel",
+      "hecha": false,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:05Z",
+      "actualizado": "2026-08-28T12:01:05Z"
+    },
+    {
+      "id": "2e6e8c16-c82b-551e-b8fa-1819a24be3d1",
+      "titulo": "Pesar / juntar el bulto",
+      "hecha": false,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:06Z",
+      "actualizado": "2026-08-28T12:01:06Z"
+    },
+    {
+      "id": "0f93070c-6028-5add-876b-0c56ab94e8b0",
+      "titulo": "Llevarlos y cobrar",
+      "hecha": false,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:07Z",
+      "actualizado": "2026-08-28T12:01:07Z"
+    },
+    {
+      "id": "2abc16c2-6a5b-58aa-b734-dcb1f5ccde85",
+      "titulo": "Decidir dónde va (¿quincho?)",
+      "hecha": false,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:08Z",
+      "actualizado": "2026-08-28T12:01:08Z"
+    },
+    {
+      "id": "98d493b7-405a-5223-a654-210f1cf5f166",
+      "titulo": "Vaciarlo lo suficiente para poder moverlo",
+      "hecha": false,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:09Z",
+      "actualizado": "2026-08-28T12:01:09Z"
+    },
+    {
+      "id": "90c1c04d-f9a0-5c5a-93fb-b7351b2bada8",
+      "titulo": "Moverlo",
+      "hecha": false,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:10Z",
+      "actualizado": "2026-08-28T12:01:10Z"
+    },
+    {
+      "id": "b4028f6e-8184-56e8-a8bc-b9eb2fc9e3a1",
+      "titulo": "Conseguir la zorra",
+      "hecha": true,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:11Z",
+      "actualizado": "2026-08-28T12:01:11Z"
+    },
+    {
+      "id": "62237035-814c-57ff-b9a6-3aedc9a457e8",
+      "titulo": "Cargarla y cruzarla",
+      "hecha": false,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:12Z",
+      "actualizado": "2026-08-28T12:01:12Z"
+    },
+    {
+      "id": "b204adc6-5b9e-5dfa-8936-34fb55545f90",
+      "titulo": "Coordinar que se la lleven",
+      "hecha": true,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:13Z",
+      "actualizado": "2026-08-28T12:01:13Z"
+    },
+    {
+      "id": "ee1feca9-c108-5bb8-ba5b-4a3895ece438",
+      "titulo": "Preguntarle a Gabriel o a Rocío si me consiguen una",
+      "hecha": false,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:14Z",
+      "actualizado": "2026-08-28T12:01:14Z"
+    },
+    {
+      "id": "4d438ecc-ae9f-500b-bd4f-53b322f9c191",
+      "titulo": "Cortar los fierros",
+      "hecha": false,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:15Z",
+      "actualizado": "2026-08-28T12:01:15Z"
+    },
+    {
+      "id": "ba562e79-6913-57e0-b44a-a99b53dcb6bf",
+      "titulo": "Llamar a unos hombres para que vengan a comprármelas",
+      "hecha": true,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:16Z",
+      "actualizado": "2026-08-28T12:01:16Z"
+    },
+    {
+      "id": "3e0ed7c9-05ad-5f80-8b9f-8b2b2fc5739f",
+      "titulo": "Que vengan y se las lleven",
+      "hecha": true,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:17Z",
+      "actualizado": "2026-08-28T12:01:17Z"
+    },
+    {
+      "id": "79c6ec5c-5f6c-5964-b84c-d9b2e7115bd4",
+      "titulo": "Anotar cuánto se sacó",
+      "hecha": true,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:18Z",
+      "actualizado": "2026-08-28T12:01:18Z"
+    },
+    {
+      "id": "90a1503d-4673-5341-81b6-bc683fa1e82e",
+      "titulo": "Burlete para sellar la puerta de calle (tiene hendiduras y queda bastante abierta) — ~$8.000–15.000",
+      "hecha": true,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:19Z",
+      "actualizado": "2026-08-28T12:01:19Z"
+    },
+    {
+      "id": "adc845bb-c087-568c-9bc4-297c643fc895",
+      "titulo": "Madera o plancha aislante para tapar provisoriamente la ventanita vieja (1m×45cm) — ~$10.000–20.000",
+      "hecha": true,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:20Z",
+      "actualizado": "2026-08-28T12:01:20Z"
+    },
+    {
+      "id": "af9884e4-10dd-597d-a587-d1f5a18462d5",
+      "titulo": "Comprar un caloventor/convector chico — salió $55.000",
+      "hecha": true,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:21Z",
+      "actualizado": "2026-08-28T12:01:21Z"
+    },
+    {
+      "id": "a836bed6-6427-538b-bf3d-2821ccc61ef9",
+      "titulo": "Mover el mueble de herramientas a una esquina del garage (provisorio, hasta reubicarlo dentro de casa)",
+      "hecha": false,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:22Z",
+      "actualizado": "2026-08-28T12:01:22Z"
+    },
+    {
+      "id": "4c02be1d-ad9b-588d-b839-7abb8f6d9278",
+      "titulo": "Mover la cama y una mesita de luz chica al garage",
+      "hecha": true,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:23Z",
+      "actualizado": "2026-08-28T12:01:23Z"
+    },
+    {
+      "id": "985b5166-8238-5e18-88c1-0b96ee7b1bab",
+      "titulo": "Ropa: dejar en el placar lo que no uso seguido y llevar al garage sólo lo del día a día",
+      "hecha": false,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:24Z",
+      "actualizado": "2026-08-28T12:01:24Z"
+    },
+    {
+      "id": "0bacfc0f-04e6-5459-8710-f405cccd9b2f",
+      "titulo": "Limpieza general antes de mudarme",
+      "hecha": false,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:25Z",
+      "actualizado": "2026-08-28T12:01:25Z"
+    },
+    {
+      "id": "cc40a8cb-b65f-574c-a9d8-6ace20f5701a",
+      "titulo": "Burletes de cepillo para la parte inferior del portón",
+      "hecha": false,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:26Z",
+      "actualizado": "2026-08-28T12:01:26Z"
+    },
+    {
+      "id": "42a28ba8-e647-51d6-bbc0-474149801487",
+      "titulo": "Resolver el viento que entra por la parte de arriba del portón",
+      "hecha": false,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:27Z",
+      "actualizado": "2026-08-28T12:01:27Z"
+    },
+    {
+      "id": "d0b1d6a3-bd5b-54c0-83cf-54d8ced11714",
+      "titulo": "Listones de madera para tapar las rendijas que quedan",
+      "hecha": false,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:28Z",
+      "actualizado": "2026-08-28T12:01:28Z"
+    },
+    {
+      "id": "d018a7a4-14c7-540e-a227-8a44b2ab217a",
+      "titulo": "Manijón para la entrada",
+      "hecha": false,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:29Z",
+      "actualizado": "2026-08-28T12:01:29Z"
+    },
+    {
+      "id": "3c459bf4-8c55-5971-a5e4-233279a4c53a",
+      "titulo": "Limpieza profunda",
+      "hecha": false,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:30Z",
+      "actualizado": "2026-08-28T12:01:30Z"
+    },
+    {
+      "id": "751d4e01-0f88-5d8c-a440-377dffa8424b",
+      "titulo": "Medir el garage (largo, ancho, alto, posición de aberturas)",
+      "hecha": true,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:31Z",
+      "actualizado": "2026-08-28T12:01:31Z"
+    },
+    {
+      "id": "bfff7257-24a4-5d9a-bfde-db56a82a0dd7",
+      "titulo": "Dibujar el croquis con medidas reales",
+      "hecha": true,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:32Z",
+      "actualizado": "2026-08-28T12:01:32Z"
+    },
+    {
+      "id": "c23c24ca-341c-5cf0-b91a-c9e0b2d37dd9",
+      "titulo": "Recién ahí, diseñar y presupuestar en serio",
+      "hecha": false,
+      "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
+      "fecha": null,
+      "creado": "2026-08-28T12:01:33Z",
+      "actualizado": "2026-08-28T12:01:33Z"
+    },
+    {
+      "id": "5542c9eb-9e11-5452-ad36-2f3116586df6",
+      "titulo": "Medir la pared y definir la cota exacta del centro de la ventana",
+      "hecha": false,
+      "proyecto_id": "28b81bda-71a1-5bbd-b162-b0ae94d256af",
+      "fecha": null,
+      "creado": "2026-08-28T12:02:00Z",
+      "actualizado": "2026-08-28T12:02:00Z"
+    },
+    {
+      "id": "88356c50-b935-5fce-a79b-a4a4a36c4f92",
+      "titulo": "Confirmar en obra que efectivamente no pasa nada por adentro",
+      "hecha": false,
+      "proyecto_id": "28b81bda-71a1-5bbd-b162-b0ae94d256af",
+      "fecha": null,
+      "creado": "2026-08-28T12:02:01Z",
+      "actualizado": "2026-08-28T12:02:01Z"
+    },
+    {
+      "id": "05b83cab-04f8-5d4f-b41b-dba903eed625",
+      "titulo": "Confirmar que 150 × 110 entra bien en la pared elegida",
+      "hecha": false,
+      "proyecto_id": "28b81bda-71a1-5bbd-b162-b0ae94d256af",
+      "fecha": null,
+      "creado": "2026-08-28T12:02:02Z",
+      "actualizado": "2026-08-28T12:02:02Z"
+    },
+    {
+      "id": "5149b730-f844-5867-a723-c7a04e4aebe6",
+      "titulo": "Confirmar precio actualizado y disponibilidad",
+      "hecha": false,
+      "proyecto_id": "28b81bda-71a1-5bbd-b162-b0ae94d256af",
+      "fecha": null,
+      "creado": "2026-08-28T12:02:03Z",
+      "actualizado": "2026-08-28T12:02:03Z"
+    },
+    {
+      "id": "6e4ae9e4-c0f4-5a36-b4e6-302283ae47b3",
+      "titulo": "Seguir preguntando a gente conocida por albañiles cercanos",
+      "hecha": false,
+      "proyecto_id": "28b81bda-71a1-5bbd-b162-b0ae94d256af",
+      "fecha": null,
+      "creado": "2026-08-28T12:02:04Z",
+      "actualizado": "2026-08-28T12:02:04Z"
+    },
+    {
+      "id": "f7df0a9a-2916-54a5-a8f9-65816b94935f",
+      "titulo": "Juntar al menos 2 presupuestos más para comparar",
+      "hecha": false,
+      "proyecto_id": "28b81bda-71a1-5bbd-b162-b0ae94d256af",
+      "fecha": null,
+      "creado": "2026-08-28T12:02:05Z",
+      "actualizado": "2026-08-28T12:02:05Z"
+    },
+    {
+      "id": "61e87aa0-e16e-58e1-962c-663b673ae3af",
+      "titulo": "Preguntar si el precio incluye tapar la ventanita vieja",
+      "hecha": false,
+      "proyecto_id": "28b81bda-71a1-5bbd-b162-b0ae94d256af",
+      "fecha": null,
+      "creado": "2026-08-28T12:02:06Z",
+      "actualizado": "2026-08-28T12:02:06Z"
+    },
+    {
+      "id": "42835307-a1b2-5a38-92f0-eb1224b462f8",
+      "titulo": "Preguntarles si me consiguen una amoladora",
+      "hecha": false,
+      "proyecto_id": "fb952adb-07a4-572d-b8e0-57bb59e0354c",
+      "fecha": null,
+      "creado": "2026-08-28T12:03:00Z",
+      "actualizado": "2026-08-28T12:03:00Z"
+    },
+    {
+      "id": "68acada4-cc82-527b-bdd5-18e6e496082c",
+      "titulo": "Seguir preguntando por albañiles de la zona",
+      "hecha": true,
+      "proyecto_id": "fb952adb-07a4-572d-b8e0-57bb59e0354c",
+      "fecha": null,
+      "creado": "2026-08-28T12:03:01Z",
+      "actualizado": "2026-08-28T12:03:01Z"
+    },
+    {
+      "id": "8e1b1c69-1adb-598b-95fa-77d7ea868363",
+      "titulo": "Medir espacio del patio",
+      "hecha": false,
+      "proyecto_id": "e14e232c-fd1c-5f41-9611-74ce66ee5987",
+      "fecha": null,
+      "creado": "2026-08-28T12:04:00Z",
+      "actualizado": "2026-08-28T12:04:00Z"
+    },
+    {
+      "id": "747e747e-d984-5d9a-8296-d3d1fd0c1d99",
+      "titulo": "Medir objetos que ocupan lugar en el quincho",
+      "hecha": false,
+      "proyecto_id": "e14e232c-fd1c-5f41-9611-74ce66ee5987",
+      "fecha": null,
+      "creado": "2026-08-28T12:04:01Z",
+      "actualizado": "2026-08-28T12:04:01Z"
+    },
+    {
+      "id": "3dfb7519-7dde-5cbd-a1b6-08c9060154eb",
+      "titulo": "Decidir qué cosas se tiran, qué se vende, qué se guarda y qué cosas se reubican",
+      "hecha": false,
+      "proyecto_id": "e14e232c-fd1c-5f41-9611-74ce66ee5987",
+      "fecha": null,
+      "creado": "2026-08-28T12:04:02Z",
+      "actualizado": "2026-08-28T12:04:02Z"
+    },
+    {
+      "id": "05d5db79-75ed-505f-b97a-8e92b81110d4",
+      "titulo": "Hacer croquis simple con medidas reales",
+      "hecha": false,
+      "proyecto_id": "e14e232c-fd1c-5f41-9611-74ce66ee5987",
+      "fecha": null,
+      "creado": "2026-08-28T12:04:03Z",
+      "actualizado": "2026-08-28T12:04:03Z"
+    },
+    {
+      "id": "e833b273-6ba6-5bf7-b93f-a93f3d1e7cdd",
+      "titulo": "Presupuestar materiales",
+      "hecha": false,
+      "proyecto_id": "e14e232c-fd1c-5f41-9611-74ce66ee5987",
+      "fecha": null,
+      "creado": "2026-08-28T12:04:04Z",
+      "actualizado": "2026-08-28T12:04:04Z"
+    },
+    {
+      "id": "129cd08e-5fb3-575c-a9df-2529fa559e3f",
+      "titulo": "Pedir al menos 1 presupuesto externo para comparar",
+      "hecha": false,
+      "proyecto_id": "e14e232c-fd1c-5f41-9611-74ce66ee5987",
+      "fecha": null,
+      "creado": "2026-08-28T12:04:05Z",
+      "actualizado": "2026-08-28T12:04:05Z"
+    },
+    {
+      "id": "935bc0ce-2939-52bc-b82e-fa6cec27556b",
+      "titulo": "Opción A: Lo construye alguien",
+      "hecha": false,
+      "proyecto_id": "e14e232c-fd1c-5f41-9611-74ce66ee5987",
+      "fecha": null,
+      "creado": "2026-08-28T12:04:06Z",
+      "actualizado": "2026-08-28T12:04:06Z"
+    },
+    {
+      "id": "888f33c6-6587-51de-8471-0024a759e21c",
+      "titulo": "Opción B: Lo hago yo, simple y funcional",
+      "hecha": false,
+      "proyecto_id": "e14e232c-fd1c-5f41-9611-74ce66ee5987",
+      "fecha": null,
+      "creado": "2026-08-28T12:04:07Z",
+      "actualizado": "2026-08-28T12:04:07Z"
+    },
+    {
+      "id": "55f1a402-a343-5164-b79f-801c0cfe1c96",
+      "titulo": "Opción C: Se posterga si los números no cierran",
+      "hecha": false,
+      "proyecto_id": "e14e232c-fd1c-5f41-9611-74ce66ee5987",
+      "fecha": null,
+      "creado": "2026-08-28T12:04:08Z",
+      "actualizado": "2026-08-28T12:04:08Z"
+    },
+    {
+      "id": "ece54bcf-dcd1-5616-8c87-4cd8267b97d7",
+      "titulo": "Limpieza profunda",
+      "hecha": false,
+      "proyecto_id": "730e5f39-14ed-5104-8090-49faafcd0532",
+      "fecha": null,
+      "creado": "2026-08-28T12:05:00Z",
+      "actualizado": "2026-08-28T12:05:00Z"
+    },
+    {
+      "id": "d4595f58-61ef-549a-9fae-4e0684fdf6cb",
+      "titulo": "Medir espacio del quincho",
+      "hecha": false,
+      "proyecto_id": "730e5f39-14ed-5104-8090-49faafcd0532",
+      "fecha": null,
+      "creado": "2026-08-28T12:05:01Z",
+      "actualizado": "2026-08-28T12:05:01Z"
+    },
+    {
+      "id": "6b311f84-e8e4-56bb-a91e-19a992418c20",
+      "titulo": "Dibujar croquis con medidas reales",
+      "hecha": false,
+      "proyecto_id": "730e5f39-14ed-5104-8090-49faafcd0532",
+      "fecha": null,
+      "creado": "2026-08-28T12:05:02Z",
+      "actualizado": "2026-08-28T12:05:02Z"
+    },
+    {
+      "id": "ff757a73-3fa6-5e97-b7ff-96846e2bcff0",
+      "titulo": "Revisar electricidad",
+      "hecha": false,
+      "proyecto_id": "730e5f39-14ed-5104-8090-49faafcd0532",
+      "fecha": null,
+      "creado": "2026-08-28T12:05:03Z",
+      "actualizado": "2026-08-28T12:05:03Z"
+    },
+    {
+      "id": "9d1fead6-78cc-529a-8305-006eb354154a",
+      "titulo": "Reparar filtraciones",
+      "hecha": false,
+      "proyecto_id": "730e5f39-14ed-5104-8090-49faafcd0532",
+      "fecha": null,
+      "creado": "2026-08-28T12:05:04Z",
+      "actualizado": "2026-08-28T12:05:04Z"
+    },
+    {
+      "id": "50161777-9e7c-5ab5-aa4b-6426e869fa94",
+      "titulo": "Presupuestar materiales",
+      "hecha": false,
+      "proyecto_id": "730e5f39-14ed-5104-8090-49faafcd0532",
+      "fecha": null,
+      "creado": "2026-08-28T12:05:05Z",
+      "actualizado": "2026-08-28T12:05:05Z"
+    },
+    {
+      "id": "1f0f5ac2-bbe0-56ea-b912-9831ef4bf6e2",
+      "titulo": "Calcular remodelaciones",
+      "hecha": false,
+      "proyecto_id": "730e5f39-14ed-5104-8090-49faafcd0532",
+      "fecha": null,
+      "creado": "2026-08-28T12:05:06Z",
+      "actualizado": "2026-08-28T12:05:06Z"
+    },
+    {
+      "id": "d63f378e-4274-5b72-aeeb-8a639cce07ab",
+      "titulo": "Averiguar un presupuesto por la mano de obra",
+      "hecha": false,
+      "proyecto_id": "730e5f39-14ed-5104-8090-49faafcd0532",
+      "fecha": null,
+      "creado": "2026-08-28T12:05:07Z",
+      "actualizado": "2026-08-28T12:05:07Z"
+    },
+    {
+      "id": "d766a798-7735-56a8-9c8c-9af09fdc2c8d",
+      "titulo": "Ambiente cerrado",
+      "hecha": false,
+      "proyecto_id": "730e5f39-14ed-5104-8090-49faafcd0532",
+      "fecha": null,
+      "creado": "2026-08-28T12:05:08Z",
+      "actualizado": "2026-08-28T12:05:08Z"
+    },
+    {
+      "id": "dba7c398-5bb5-511f-8ec6-00ac49eaa98f",
+      "titulo": "Pintura básica",
+      "hecha": false,
+      "proyecto_id": "730e5f39-14ed-5104-8090-49faafcd0532",
+      "fecha": null,
+      "creado": "2026-08-28T12:05:09Z",
+      "actualizado": "2026-08-28T12:05:09Z"
+    },
+    {
+      "id": "cd14b34f-d05b-5bac-82c3-7630126677a6",
+      "titulo": "Cama",
+      "hecha": false,
+      "proyecto_id": "730e5f39-14ed-5104-8090-49faafcd0532",
+      "fecha": null,
+      "creado": "2026-08-28T12:05:10Z",
+      "actualizado": "2026-08-28T12:05:10Z"
+    },
+    {
+      "id": "e6f78d67-d6d4-5389-90c2-1645237b8975",
+      "titulo": "Escritorio",
+      "hecha": false,
+      "proyecto_id": "730e5f39-14ed-5104-8090-49faafcd0532",
+      "fecha": null,
+      "creado": "2026-08-28T12:05:11Z",
+      "actualizado": "2026-08-28T12:05:11Z"
+    },
+    {
+      "id": "41cd3224-f92e-562b-a31f-240a78194da4",
+      "titulo": "Luz buena",
+      "hecha": false,
+      "proyecto_id": "730e5f39-14ed-5104-8090-49faafcd0532",
+      "fecha": null,
+      "creado": "2026-08-28T12:05:12Z",
+      "actualizado": "2026-08-28T12:05:12Z"
+    },
+    {
+      "id": "25f5f9c5-60a8-5dce-af7c-f3b85336dcdd",
+      "titulo": "Ventilador",
+      "hecha": false,
+      "proyecto_id": "730e5f39-14ed-5104-8090-49faafcd0532",
+      "fecha": null,
+      "creado": "2026-08-28T12:05:13Z",
+      "actualizado": "2026-08-28T12:05:13Z"
+    },
+    {
+      "id": "82e5a501-c158-5acc-b571-f3886a5a9c21",
+      "titulo": "Estética",
+      "hecha": false,
+      "proyecto_id": "730e5f39-14ed-5104-8090-49faafcd0532",
+      "fecha": null,
+      "creado": "2026-08-28T12:05:14Z",
+      "actualizado": "2026-08-28T12:05:14Z"
+    },
+    {
+      "id": "ed451949-cdf1-5f1e-a631-2428ff5e0d9c",
+      "titulo": "Placard",
+      "hecha": false,
+      "proyecto_id": "730e5f39-14ed-5104-8090-49faafcd0532",
+      "fecha": null,
+      "creado": "2026-08-28T12:05:15Z",
+      "actualizado": "2026-08-28T12:05:15Z"
+    },
+    {
+      "id": "f957fa66-fa74-50f4-a2d9-f5289145aa04",
+      "titulo": "Detalles",
+      "hecha": false,
+      "proyecto_id": "730e5f39-14ed-5104-8090-49faafcd0532",
+      "fecha": null,
+      "creado": "2026-08-28T12:05:16Z",
+      "actualizado": "2026-08-28T12:05:16Z"
+    },
+    {
+      "id": "2c7c013f-7cd2-56af-962a-1d9f01ea6fb7",
+      "titulo": "Aislamiento mejor",
+      "hecha": false,
+      "proyecto_id": "730e5f39-14ed-5104-8090-49faafcd0532",
+      "fecha": null,
+      "creado": "2026-08-28T12:05:17Z",
+      "actualizado": "2026-08-28T12:05:17Z"
+    },
+    {
+      "id": "65892536-d313-5413-9955-3f7e98b342f4",
+      "titulo": "Estilo propio",
+      "hecha": false,
+      "proyecto_id": "730e5f39-14ed-5104-8090-49faafcd0532",
+      "fecha": null,
+      "creado": "2026-08-28T12:05:18Z",
+      "actualizado": "2026-08-28T12:05:18Z"
+    },
+    {
+      "id": "fefa7cd8-167c-5871-ab65-dbd69dc4a596",
+      "titulo": "Identificar dónde está el baño de abajo",
+      "hecha": false,
+      "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
+      "fecha": null,
+      "creado": "2026-08-28T12:06:00Z",
+      "actualizado": "2026-08-28T12:06:00Z"
+    },
+    {
+      "id": "b172018f-af80-5ed0-8aed-17ca06027e4e",
+      "titulo": "Ver por dónde suben caños de agua",
+      "hecha": false,
+      "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
+      "fecha": null,
+      "creado": "2026-08-28T12:06:01Z",
+      "actualizado": "2026-08-28T12:06:01Z"
+    },
+    {
+      "id": "801997a0-4a02-54c7-a567-227adcefe89d",
+      "titulo": "Ver por dónde bajaría el desagüe",
+      "hecha": false,
+      "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
+      "fecha": null,
+      "creado": "2026-08-28T12:06:02Z",
+      "actualizado": "2026-08-28T12:06:02Z"
+    },
+    {
+      "id": "36a177c6-e5cc-5ccd-841a-6d4b36194869",
+      "titulo": "Confirmar pendiente suficiente para cloaca",
+      "hecha": false,
+      "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
+      "fecha": null,
+      "creado": "2026-08-28T12:06:03Z",
+      "actualizado": "2026-08-28T12:06:03Z"
+    },
+    {
+      "id": "08e0873b-16c3-5676-a82e-36c6cc6f515b",
+      "titulo": "Ver si hay que romper losa",
+      "hecha": false,
+      "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
+      "fecha": null,
+      "creado": "2026-08-28T12:06:04Z",
+      "actualizado": "2026-08-28T12:06:04Z"
+    },
+    {
+      "id": "85b3dfc5-4872-5333-9cf0-95c9e0bcf387",
+      "titulo": "Ver peso estructural (muy importante)",
+      "hecha": false,
+      "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
+      "fecha": null,
+      "creado": "2026-08-28T12:06:05Z",
+      "actualizado": "2026-08-28T12:06:05Z"
+    },
+    {
+      "id": "94f7cdd1-9ac4-574c-bb4d-8368bcfb5e28",
+      "titulo": "Cañerías",
+      "hecha": false,
+      "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
+      "fecha": null,
+      "creado": "2026-08-28T12:06:06Z",
+      "actualizado": "2026-08-28T12:06:06Z"
+    },
+    {
+      "id": "8cef2f09-5b60-5272-bdf5-ac8291fdd900",
+      "titulo": "Desagües",
+      "hecha": false,
+      "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
+      "fecha": null,
+      "creado": "2026-08-28T12:06:07Z",
+      "actualizado": "2026-08-28T12:06:07Z"
+    },
+    {
+      "id": "6c9655c2-722f-5cf9-9674-e675bd41e2e5",
+      "titulo": "Impermeabilización",
+      "hecha": false,
+      "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
+      "fecha": null,
+      "creado": "2026-08-28T12:06:08Z",
+      "actualizado": "2026-08-28T12:06:08Z"
+    },
+    {
+      "id": "6751d650-f859-5d27-bb6c-6886b2ec8e1d",
+      "titulo": "Pruebas de filtración",
+      "hecha": false,
+      "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
+      "fecha": null,
+      "creado": "2026-08-28T12:06:09Z",
+      "actualizado": "2026-08-28T12:06:09Z"
+    },
+    {
+      "id": "9791df06-c5c8-57bf-8f62-86573174ab88",
+      "titulo": "Levantar paredes",
+      "hecha": false,
+      "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
+      "fecha": null,
+      "creado": "2026-08-28T12:06:10Z",
+      "actualizado": "2026-08-28T12:06:10Z"
+    },
+    {
+      "id": "94362641-d929-5b30-99b6-92f4496ee534",
+      "titulo": "Colocar piso",
+      "hecha": false,
+      "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
+      "fecha": null,
+      "creado": "2026-08-28T12:06:11Z",
+      "actualizado": "2026-08-28T12:06:11Z"
+    },
+    {
+      "id": "a47830f1-83c0-50c2-8fa9-7025713e71d5",
+      "titulo": "Instalar ducha",
+      "hecha": false,
+      "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
+      "fecha": null,
+      "creado": "2026-08-28T12:06:12Z",
+      "actualizado": "2026-08-28T12:06:12Z"
+    },
+    {
+      "id": "3017865e-1787-5881-99ef-123b7dd62012",
+      "titulo": "Revestimientos básicos",
+      "hecha": false,
+      "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
+      "fecha": null,
+      "creado": "2026-08-28T12:06:13Z",
+      "actualizado": "2026-08-28T12:06:13Z"
+    },
+    {
+      "id": "1ccaed79-1986-5445-8d90-ddaf2084d61a",
+      "titulo": "Artefactos",
+      "hecha": false,
+      "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
+      "fecha": null,
+      "creado": "2026-08-28T12:06:14Z",
+      "actualizado": "2026-08-28T12:06:14Z"
+    },
+    {
+      "id": "0f15811b-de38-58f5-8d48-a8bbd5fdc349",
+      "titulo": "Grifería",
+      "hecha": false,
+      "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
+      "fecha": null,
+      "creado": "2026-08-28T12:06:15Z",
+      "actualizado": "2026-08-28T12:06:15Z"
+    },
+    {
+      "id": "83a36c78-986d-5121-bf02-71ddaba8fe1f",
+      "titulo": "Ventilación",
+      "hecha": false,
+      "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
+      "fecha": null,
+      "creado": "2026-08-28T12:06:16Z",
+      "actualizado": "2026-08-28T12:06:16Z"
+    },
+    {
+      "id": "3bdfda66-6b08-54a6-b5f0-691b5ac5a837",
+      "titulo": "Espejo",
+      "hecha": false,
+      "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
+      "fecha": null,
+      "creado": "2026-08-28T12:06:17Z",
+      "actualizado": "2026-08-28T12:06:17Z"
+    },
+    {
+      "id": "c929741d-a1bc-55a3-837c-db66a8d03a03",
+      "titulo": "Iluminación",
+      "hecha": false,
+      "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
+      "fecha": null,
+      "creado": "2026-08-28T12:06:18Z",
+      "actualizado": "2026-08-28T12:06:18Z"
+    },
+    {
+      "id": "ef45eeb7-0b7f-5d00-a2e4-57c2591e2daf",
+      "titulo": "Canilla de la cocina",
+      "hecha": false,
+      "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
+      "fecha": null,
+      "creado": "2026-09-06T12:00:00Z",
+      "actualizado": "2026-09-06T12:00:00Z"
+    },
+    {
+      "id": "6cf96e12-d729-5a00-baff-fd2ee8bf3c43",
+      "titulo": "Bacha del baño",
+      "hecha": false,
+      "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
+      "fecha": null,
+      "creado": "2026-09-06T12:00:01Z",
+      "actualizado": "2026-09-06T12:00:01Z"
+    },
+    {
+      "id": "c92127a3-488e-5304-90b0-bbf077c954b2",
+      "titulo": "Espejo",
+      "hecha": false,
+      "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
+      "fecha": null,
+      "creado": "2026-09-06T12:00:02Z",
+      "actualizado": "2026-09-06T12:00:02Z"
+    },
+    {
+      "id": "01c7fe94-c19e-557e-a4a0-f55edaf362c2",
+      "titulo": "Inodoro",
+      "hecha": false,
+      "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
+      "fecha": null,
+      "creado": "2026-09-06T12:00:03Z",
+      "actualizado": "2026-09-06T12:00:03Z"
+    },
+    {
+      "id": "88ef14f8-9ebd-5c43-b1f9-e8367d9ddf1d",
+      "titulo": "Mueble para las cosas del botiquín",
+      "hecha": false,
+      "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
+      "fecha": null,
+      "creado": "2026-09-06T12:00:04Z",
+      "actualizado": "2026-09-06T12:00:04Z"
+    },
+    {
+      "id": "bd222b5d-7981-5201-a6cc-8fef32f15106",
+      "titulo": "Baranda para la ducha",
+      "hecha": false,
+      "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
+      "fecha": null,
+      "creado": "2026-09-06T12:00:05Z",
+      "actualizado": "2026-09-06T12:00:05Z"
+    },
+    {
+      "id": "8a1546cc-52e7-584c-9f4e-47f7bdaec083",
+      "titulo": "Cambio de cocina",
+      "hecha": false,
+      "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
+      "fecha": null,
+      "creado": "2026-09-06T12:00:06Z",
+      "actualizado": "2026-09-06T12:00:06Z"
+    },
+    {
+      "id": "da9a5913-1a2b-5fe5-8190-b63385bd2f74",
+      "titulo": "Cambio de heladera",
+      "hecha": false,
+      "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
+      "fecha": null,
+      "creado": "2026-09-06T12:00:07Z",
+      "actualizado": "2026-09-06T12:00:07Z"
+    },
+    {
+      "id": "4a45d0a4-bf22-586b-b107-2c7bd6dbeceb",
+      "titulo": "Filtro de agua roto",
+      "hecha": false,
+      "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
+      "fecha": null,
+      "creado": "2026-09-06T12:00:08Z",
+      "actualizado": "2026-09-06T12:00:08Z"
+    },
+    {
+      "id": "eab31cfa-fa8c-52b3-bcab-f4477adc8177",
+      "titulo": "Tuberías tapadas",
+      "hecha": false,
+      "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
+      "fecha": null,
+      "creado": "2026-09-06T12:00:09Z",
+      "actualizado": "2026-09-06T12:00:09Z"
+    },
+    {
+      "id": "f164a9a9-5563-55da-879d-4eb98a74a7f5",
+      "titulo": "Luces LED",
+      "hecha": false,
+      "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
+      "fecha": null,
+      "creado": "2026-09-06T12:00:10Z",
+      "actualizado": "2026-09-06T12:00:10Z"
+    },
+    {
+      "id": "2477634d-37da-523e-8571-3cb0f28e6b5d",
+      "titulo": "Muebles rotos",
+      "hecha": false,
+      "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
+      "fecha": null,
+      "creado": "2026-09-06T12:00:11Z",
+      "actualizado": "2026-09-06T12:00:11Z"
+    },
+    {
+      "id": "7ddca2e7-05af-57f8-8b57-20f91ff8e542",
+      "titulo": "Mueble de vajilla",
+      "hecha": false,
+      "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
+      "fecha": null,
+      "creado": "2026-09-06T12:00:12Z",
+      "actualizado": "2026-09-06T12:00:12Z"
+    },
+    {
+      "id": "868fac82-40ae-5ea3-b470-17d059bdd782",
+      "titulo": "Comprarme una botella mejor y ampliar mi vajilla propia",
+      "hecha": false,
+      "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
+      "fecha": null,
+      "creado": "2026-09-06T12:00:13Z",
+      "actualizado": "2026-09-06T12:00:13Z"
+    },
+    {
+      "id": "acc6bf73-04b9-5136-abd6-fdf16a5d73cc",
+      "titulo": "Placa de plastico para ventanas",
+      "hecha": false,
+      "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
+      "fecha": null,
+      "creado": "2026-09-06T12:00:14Z",
+      "actualizado": "2026-09-06T12:00:14Z"
+    },
+    {
+      "id": "f1832f46-08d6-574c-b279-88b141959408",
+      "titulo": "Revocar paredes de mama",
+      "hecha": false,
+      "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
+      "fecha": null,
+      "creado": "2026-09-06T12:00:15Z",
+      "actualizado": "2026-09-06T12:00:15Z"
+    },
+    {
+      "id": "17279d2d-72a4-5130-af50-0ea0db7e8bb5",
+      "titulo": "Pintura de habitaciones",
+      "hecha": false,
+      "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
+      "fecha": null,
+      "creado": "2026-09-06T12:00:16Z",
+      "actualizado": "2026-09-06T12:00:16Z"
+    },
+    {
+      "id": "8e50eb37-17cd-5244-863c-e0799f678959",
+      "titulo": "Ordenar herramientas",
+      "hecha": false,
+      "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
+      "fecha": null,
+      "creado": "2026-09-06T12:00:17Z",
+      "actualizado": "2026-09-06T12:00:17Z"
+    },
+    {
+      "id": "0d155320-b328-5088-801f-173a95eabd9b",
+      "titulo": "Guardar la pileta",
+      "hecha": false,
+      "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
+      "fecha": null,
+      "creado": "2026-09-06T12:00:18Z",
+      "actualizado": "2026-09-06T12:00:18Z"
+    },
+    {
+      "id": "ff6a2cb9-b17d-5c75-8c4b-cd4bf7ef97b4",
+      "titulo": "Limpiar el techo del garage",
+      "hecha": false,
+      "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
+      "fecha": null,
+      "creado": "2026-09-06T12:00:19Z",
+      "actualizado": "2026-09-06T12:00:19Z"
+    },
+    {
+      "id": "efda36fc-6feb-5f19-b696-7987680433a5",
+      "titulo": "Mirar el perfil entero de una sentada y anotar qué me molesta, concreto (no \"está horrible\")",
+      "hecha": false,
+      "proyecto_id": "e5ded385-2743-50e8-8a28-1220aadf8d1f",
+      "fecha": null,
+      "creado": "2026-09-20T12:00:00Z",
+      "actualizado": "2026-09-20T12:00:00Z"
+    },
+    {
+      "id": "ab02469b-fc62-5b40-a69d-e92d950ec125",
+      "titulo": "Limpiar o archivar lo que ya no soy",
+      "hecha": true,
+      "proyecto_id": "e5ded385-2743-50e8-8a28-1220aadf8d1f",
+      "fecha": null,
+      "creado": "2026-09-20T12:00:01Z",
+      "actualizado": "2026-09-20T12:00:01Z"
+    },
+    {
+      "id": "fac99851-1a31-5da1-82f1-821d1ea802e0",
+      "titulo": "Foto de perfil nueva — una donde me vea bien yo, no donde crea que me van a ver bien",
+      "hecha": false,
+      "proyecto_id": "e5ded385-2743-50e8-8a28-1220aadf8d1f",
+      "fecha": null,
+      "creado": "2026-09-20T12:00:02Z",
+      "actualizado": "2026-09-20T12:00:02Z"
+    },
+    {
+      "id": "4127523a-2ab1-5724-8e65-4622808712b3",
+      "titulo": "Escribir una bio corta y honesta",
+      "hecha": false,
+      "proyecto_id": "e5ded385-2743-50e8-8a28-1220aadf8d1f",
+      "fecha": null,
+      "creado": "2026-09-20T12:00:03Z",
+      "actualizado": "2026-09-20T12:00:03Z"
+    },
+    {
+      "id": "907a8cf4-9090-5732-a325-07ee0ceda89f",
+      "titulo": "Destacadas: portadas nuevas, más lindas y depuradas",
+      "hecha": true,
+      "proyecto_id": "e5ded385-2743-50e8-8a28-1220aadf8d1f",
+      "fecha": null,
+      "creado": "2026-09-20T12:00:04Z",
+      "actualizado": "2026-09-20T12:00:04Z"
+    },
+    {
+      "id": "d63cd785-c063-532d-9f12-e81e5af1c9f0",
+      "titulo": "Elegir tres o cuatro cosas que sí quiero mostrar, y no publicar nada que no entre ahí",
+      "hecha": false,
+      "proyecto_id": "e5ded385-2743-50e8-8a28-1220aadf8d1f",
+      "fecha": null,
+      "creado": "2026-09-20T12:00:05Z",
+      "actualizado": "2026-09-20T12:00:05Z"
+    },
+    {
+      "id": "0514f6c9-532a-5cc4-9e59-9c1456c873c9",
+      "titulo": "Anotar los nombres y contactos de los chicos que dijeron saber programar",
+      "hecha": true,
+      "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
+      "fecha": null,
+      "creado": "2026-09-20T13:00:00Z",
+      "actualizado": "2026-09-20T13:00:00Z"
+    },
+    {
+      "id": "1eac864a-37fd-5f1c-b27b-c61aab99c6e6",
+      "titulo": "Juntarme con Gastón: que me cuente el negocio y ver su carpeta de Drive como relevamiento",
+      "hecha": true,
+      "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
+      "fecha": null,
+      "creado": "2026-09-20T13:00:01Z",
+      "actualizado": "2026-09-20T13:00:01Z"
+    },
+    {
+      "id": "40dd5583-9220-53f4-abe5-4779846703cc",
+      "titulo": "Crear el repo en GitHub (de la asociación o mío, decidirlo)",
+      "hecha": true,
+      "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
+      "fecha": null,
+      "creado": "2026-09-20T13:00:02Z",
+      "actualizado": "2026-09-20T13:00:02Z"
+    },
+    {
+      "id": "9185163b-f9da-5a59-bda4-20bea97c466f",
+      "titulo": "Escribir en dos carillas qué hace hoy el sistema y qué duele (relevamiento)",
+      "hecha": true,
+      "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
+      "fecha": null,
+      "creado": "2026-09-20T13:00:03Z",
+      "actualizado": "2026-09-20T13:00:03Z"
+    },
+    {
+      "id": "c0016bef-a126-54ca-a6b3-fbd176813261",
+      "titulo": "Definir alcance mínimo de una v1 (inscripciones, llaves, puntuación, resultados) y qué queda afuera",
+      "hecha": true,
+      "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
+      "fecha": null,
+      "creado": "2026-09-20T13:00:04Z",
+      "actualizado": "2026-09-20T13:00:04Z"
+    },
+    {
+      "id": "e8f38d2f-c807-58ac-ae97-cd13bcfe7270",
+      "titulo": "Decidir mi rol: ¿desarrollo yo, coordino, o sólo diseño la arquitectura?",
+      "hecha": true,
+      "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
+      "fecha": null,
+      "creado": "2026-09-20T13:00:05Z",
+      "actualizado": "2026-09-20T13:00:05Z"
+    },
+    {
+      "id": "458dd375-69a5-58ca-b01d-dbf36dc4947a",
+      "titulo": "Ensayar la demo del 30/10 de punta a punta con Julián: crear torneo, inscribir, armar llaves, arbitrar (con gente real)",
+      "hecha": true,
+      "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
+      "fecha": null,
+      "creado": "2026-09-20T13:00:06Z",
+      "actualizado": "2026-09-20T13:00:06Z"
+    },
+    {
+      "id": "b74b6223-5e9f-5c20-af30-3ae77ce51b82",
+      "titulo": "Arreglar la lentitud de las llaves (prioridad del 21/10)",
+      "hecha": true,
+      "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
+      "fecha": null,
+      "creado": "2026-09-20T13:00:07Z",
+      "actualizado": "2026-09-20T13:00:07Z"
+    },
+    {
+      "id": "5c61bf7d-9087-5367-b04f-4727a36f9297",
+      "titulo": "Arreglar la impresión del cuadro",
+      "hecha": true,
+      "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
+      "fecha": null,
+      "creado": "2026-09-20T13:00:08Z",
+      "actualizado": "2026-09-20T13:00:08Z"
+    },
+    {
+      "id": "135f4ea8-10c8-59be-9fc7-56a0e1952b8f",
+      "titulo": "Permitir sumar colaboradores por PIN o email exacto",
+      "hecha": true,
+      "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
+      "fecha": null,
+      "creado": "2026-09-20T13:00:09Z",
+      "actualizado": "2026-09-20T13:00:09Z"
+    },
+    {
+      "id": "69dda665-6570-5c8e-9763-a6379ccbc9ad",
+      "titulo": "Decidir red local o nube para el 6/12 (ADR-0003)",
+      "hecha": true,
+      "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
+      "fecha": null,
+      "creado": "2026-09-20T13:00:10Z",
+      "actualizado": "2026-09-20T13:00:10Z"
+    },
+    {
+      "id": "504761e2-1189-507e-a05c-47d48765dd55",
+      "titulo": "Ordenar el submódulo de Gastón: commitear o descartar sus cambios",
+      "hecha": true,
+      "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
+      "fecha": null,
+      "creado": "2026-09-20T13:00:11Z",
+      "actualizado": "2026-09-20T13:00:11Z"
+    },
+    {
+      "id": "16f95b59-8a2b-56cc-bd50-3e8cdbece0b3",
+      "titulo": "Arrancar la app móvil en noviembre",
+      "hecha": true,
+      "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
+      "fecha": null,
+      "creado": "2026-09-20T13:00:12Z",
+      "actualizado": "2026-09-20T13:00:12Z"
+    },
+    {
+      "id": "ddbc6e0d-4dd2-5be3-9b0d-a215f7e787dc",
+      "titulo": "Aplicar detalles antes del domingo",
+      "hecha": false,
+      "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
+      "fecha": "2026-11-01",
+      "creado": "2026-10-30T09:10:00Z",
+      "actualizado": "2026-10-30T09:10:00Z"
+    },
+    {
+      "id": "e7518ef8-dc91-5a14-87b0-27a6ab75dc40",
+      "titulo": "Ver si funciona el ensamble del fondo con autos complicados y depurar",
+      "hecha": false,
+      "proyecto_id": "3f50874c-275b-55d7-8fc8-72a7e89fb201",
+      "fecha": null,
+      "creado": "2026-10-30T09:11:00Z",
+      "actualizado": "2026-10-30T09:11:00Z"
+    },
+    {
+      "id": "21cdd049-2b00-5e91-a334-0ca3ca66b3c7",
+      "titulo": "Crear el proyecto en el dashboard de List Master",
+      "hecha": false,
+      "proyecto_id": "157491cb-9118-58dc-b1a0-4ed0e249a03f",
+      "fecha": null,
+      "creado": "2026-10-30T09:12:00Z",
+      "actualizado": "2026-10-30T09:12:00Z"
+    },
+    {
+      "id": "c9a0688f-5e22-50ec-9c8e-3bc00e0b720f",
+      "titulo": "Logeo con APICPS",
+      "hecha": false,
+      "proyecto_id": "ec310c7e-f1b4-569a-96e3-a1b70313e198",
+      "fecha": null,
+      "creado": "2026-10-30T09:13:00Z",
+      "actualizado": "2026-10-30T09:13:00Z"
+    },
+    {
+      "id": "e85796c6-1a8c-587f-b17b-e807f3ab4ae8",
+      "titulo": "Reunión para ver Kiro",
+      "hecha": false,
+      "proyecto_id": "7f402cf6-0366-5d21-8f48-d3090ab15163",
+      "fecha": null,
+      "creado": "2026-10-30T09:14:00Z",
+      "actualizado": "2026-10-30T09:14:00Z"
+    },
+    {
+      "id": "01f103d0-641d-5892-803f-23285df4a715",
+      "titulo": "Decidir si lo usamos para rac2",
+      "hecha": false,
+      "proyecto_id": "7f402cf6-0366-5d21-8f48-d3090ab15163",
+      "fecha": null,
+      "creado": "2026-10-30T09:15:00Z",
+      "actualizado": "2026-10-30T09:15:00Z"
+    },
+    {
+      "id": "02ca495b-85ed-53c2-b37c-ca9dff5caf4b",
+      "titulo": "H1560",
+      "hecha": false,
+      "proyecto_id": "46471454-0ac3-5066-b9d4-ddede3817d77",
+      "fecha": null,
+      "creado": "2026-10-30T09:16:00Z",
+      "actualizado": "2026-10-30T09:16:00Z"
+    },
+    {
+      "id": "7d31793f-31d1-5043-84de-25e6499b7091",
+      "titulo": "Revisar si pagué todo y avisar",
+      "hecha": false,
+      "proyecto_id": "4bc8eccb-3e75-5ac9-a451-623312a63f2e",
+      "fecha": null,
+      "creado": "2026-10-30T09:17:00Z",
+      "actualizado": "2026-10-30T09:17:00Z"
+    },
+    {
+      "id": "4917793e-d84a-55ca-90e8-9ef0b7aa9745",
+      "titulo": "Regularizar mayo y abril",
+      "hecha": false,
+      "proyecto_id": "4bc8eccb-3e75-5ac9-a451-623312a63f2e",
+      "fecha": null,
+      "creado": "2026-10-30T09:18:00Z",
+      "actualizado": "2026-10-30T09:18:00Z"
+    }
+  ],
+  "listas": [
+    {
+      "id": "52682964-123a-5cec-b3e6-91a5d0963288",
+      "titulo": "PREGUNTAR",
+      "proyecto_id": null,
+      "creado": "2026-10-30T10:00:00Z",
+      "actualizado": "2026-10-30T10:00:00Z",
+      "items": [
+        {
+          "id": "a96332be-5909-5265-b5ab-342c74849fce",
+          "titulo": "Ingeniera ambiental → Lugar en ingenieros?",
+          "hecha": false,
+          "orden": 0
+        },
+        {
+          "id": "0e107a38-ac26-50a1-a1f7-cce26dbe2382",
+          "titulo": "Rutina de despertar tranquilo",
+          "hecha": false,
+          "orden": 1
+        }
+      ]
+    },
+    {
+      "id": "032a999d-55c6-512b-8c23-4e955723e3de",
+      "titulo": "Años por Ascenso",
+      "proyecto_id": null,
+      "creado": "2026-10-30T10:01:00Z",
+      "actualizado": "2026-10-30T10:01:00Z",
+      "items": [
+        {
+          "id": "19627f23-6d62-5b44-adbd-efa92492c80f",
+          "titulo": "5 años",
+          "hecha": false,
+          "orden": 0
+        },
+        {
+          "id": "7e7c3c8f-46d5-55e2-8fea-9b41c3ec581c",
+          "titulo": "6 años",
+          "hecha": false,
+          "orden": 1
+        },
+        {
+          "id": "f3c5ac39-16d2-54c7-9155-34ba2e444502",
+          "titulo": "7 años",
+          "hecha": false,
+          "orden": 2
+        },
+        {
+          "id": "17858d8b-928c-5c17-8b05-ae26d85701b9",
+          "titulo": "8 años",
+          "hecha": false,
+          "orden": 3
+        }
+      ]
+    },
+    {
+      "id": "e12649eb-932a-5ac4-919e-00b47edf3860",
+      "titulo": "MCU en orden cronológico",
+      "proyecto_id": null,
+      "creado": "2026-10-30T10:02:00Z",
+      "actualizado": "2026-10-30T10:02:00Z",
+      "items": [
+        {
+          "id": "5cc37c7f-c113-515b-8566-67810c583061",
+          "titulo": "Capitán América: El primer vengador (Ambientada en la década de 1940)",
+          "hecha": true,
+          "orden": 0
+        },
+        {
+          "id": "e8dea2c0-c7ed-5cea-9a2d-a29ee2ac7914",
+          "titulo": "Capitana Marvel (Ambientada en 1995)",
+          "hecha": true,
+          "orden": 1
+        },
+        {
+          "id": "633a51fd-b040-50bf-a2b4-cc88b3c0974d",
+          "titulo": "Iron Man (Ocurre en 2008)",
+          "hecha": true,
+          "orden": 2
+        },
+        {
+          "id": "ad698f38-96f6-50c3-b07b-afb95d702362",
+          "titulo": "Iron Man 2 (2011)",
+          "hecha": true,
+          "orden": 3
+        },
+        {
+          "id": "23bb958c-67de-54b7-90af-60909b321e14",
+          "titulo": "El increíble Hulk (2011)",
+          "hecha": true,
+          "orden": 4
+        },
+        {
+          "id": "f75dedde-23a7-535c-948e-3adad0fdd42e",
+          "titulo": "Thor (2011)",
+          "hecha": true,
+          "orden": 5
+        },
+        {
+          "id": "89920d7e-dbb2-5f77-b668-4c46052afe17",
+          "titulo": "Los Vengadores (Ocurre en 2012)",
+          "hecha": true,
+          "orden": 6
+        },
+        {
+          "id": "970682a6-ef81-512f-a829-797322156873",
+          "titulo": "Iron Man 3 (2012)",
+          "hecha": true,
+          "orden": 7
+        },
+        {
+          "id": "2be815eb-d95c-5818-89c8-c92eb5233fb8",
+          "titulo": "Thor: El mundo oscuro (2013)",
+          "hecha": true,
+          "orden": 8
+        },
+        {
+          "id": "91ddd772-5eb2-502b-893e-4d0eab838b8d",
+          "titulo": "Capitán América: El Soldado de Invierno (2014)",
+          "hecha": true,
+          "orden": 9
+        },
+        {
+          "id": "cd56b284-af80-514a-80fd-b3a9c1370b1b",
+          "titulo": "Guardianes de la Galaxia (2014)",
+          "hecha": true,
+          "orden": 10
+        },
+        {
+          "id": "fa05c83a-e21b-5d10-b1c0-683b9f2f81bc",
+          "titulo": "Guardianes de la Galaxia Vol. 2 (2014)",
+          "hecha": true,
+          "orden": 11
+        },
+        {
+          "id": "be0f2829-c7ae-53d4-95cc-7d19810c53c0",
+          "titulo": "Vengadores: La era de Ultrón (2015)",
+          "hecha": true,
+          "orden": 12
+        },
+        {
+          "id": "e198aa85-a2e9-5467-a461-9c727d077b38",
+          "titulo": "Ant-Man (2015)",
+          "hecha": true,
+          "orden": 13
+        },
+        {
+          "id": "e5dd60ab-de9e-5c03-9713-8aac285fe389",
+          "titulo": "Capitán América: Civil War (2016)",
+          "hecha": true,
+          "orden": 14
+        },
+        {
+          "id": "b900f626-5e6e-5f12-b2e6-44363ecb6896",
+          "titulo": "Spider-Man: Homecoming (2016)",
+          "hecha": false,
+          "orden": 15
+        },
+        {
+          "id": "f9c8ad88-d5e7-5bb8-ad50-7b4c46175d41",
+          "titulo": "Doctor Strange (2016-2017)",
+          "hecha": false,
+          "orden": 16
+        },
+        {
+          "id": "ea014193-b588-555f-8bf6-88eac219bdb6",
+          "titulo": "Black Panther (2017)",
+          "hecha": false,
+          "orden": 17
+        },
+        {
+          "id": "4a39b735-3dd4-57a8-b3b7-1ca9133dc8c8",
+          "titulo": "Thor: Ragnarok (2017)",
+          "hecha": false,
+          "orden": 18
+        },
+        {
+          "id": "9da3445d-9a3b-5492-af24-b1424a2a0535",
+          "titulo": "Ant-Man y la Avispa (2018)",
+          "hecha": false,
+          "orden": 19
+        },
+        {
+          "id": "5b3fc28d-30f4-5280-958f-c63b276bc333",
+          "titulo": "Vengadores: Infinity War (2018)",
+          "hecha": false,
+          "orden": 20
+        },
+        {
+          "id": "66902331-3a27-51c4-b03c-c06fc22e9fe6",
+          "titulo": "Vengadores: Endgame (2018-2023)",
+          "hecha": false,
+          "orden": 21
+        },
+        {
+          "id": "5d10003c-4995-5638-8c1b-8aa4d30cda90",
+          "titulo": "Spider-Man: Lejos de casa (2024)",
+          "hecha": false,
+          "orden": 22
+        },
+        {
+          "id": "d280805b-af01-543b-899d-601a8532778a",
+          "titulo": "Loki (Temporada 1) (Serie)",
+          "hecha": false,
+          "orden": 23
+        },
+        {
+          "id": "4c4ba335-ae62-5e61-b738-0932bab9b264",
+          "titulo": "WandaVision (Serie)",
+          "hecha": false,
+          "orden": 24
+        },
+        {
+          "id": "3558c466-0c60-548f-998e-c9921bf7241c",
+          "titulo": "Falcon y el Soldado de Invierno (Serie)",
+          "hecha": false,
+          "orden": 25
+        },
+        {
+          "id": "58b1881f-f0c2-5f90-b1a0-1f47c2601a2c",
+          "titulo": "Shang-Chi y la leyenda de los Diez Anillos (2021)",
+          "hecha": false,
+          "orden": 26
+        },
+        {
+          "id": "1ffc5dcc-6c19-555d-a8e9-348daa847772",
+          "titulo": "Eternals (2021)",
+          "hecha": false,
+          "orden": 27
+        },
+        {
+          "id": "27c2d7db-f249-55d0-b9b0-45bb27d78248",
+          "titulo": "Spider-Man: No Way Home (2021)",
+          "hecha": false,
+          "orden": 28
+        },
+        {
+          "id": "f8cb90ae-5671-5d26-9802-e6ae0eb2eedc",
+          "titulo": "Doctor Strange en el multiverso de la locura (2022)",
+          "hecha": false,
+          "orden": 29
+        },
+        {
+          "id": "b463d807-fb6f-50c7-8d3a-ef20cc04b751",
+          "titulo": "Ojo de Halcón (Hawkeye) (Serie)",
+          "hecha": false,
+          "orden": 30
+        },
+        {
+          "id": "e305310e-a707-5139-bd98-613bc4d1c506",
+          "titulo": "Moon Knight (Serie)",
+          "hecha": false,
+          "orden": 31
+        },
+        {
+          "id": "f35a5159-a6a2-5276-b363-d9b65fc7ae4f",
+          "titulo": "She-Hulk: Abogada She-Hulk (Serie)",
+          "hecha": false,
+          "orden": 32
+        },
+        {
+          "id": "be0db116-cb40-5e6d-b6d1-44fcae2f405d",
+          "titulo": "Ms. Marvel (Serie)",
+          "hecha": false,
+          "orden": 33
+        },
+        {
+          "id": "c4dd4656-8e30-52ac-b555-c96117941561",
+          "titulo": "Thor: Love and Thunder (2022)",
+          "hecha": false,
+          "orden": 34
+        },
+        {
+          "id": "eae6d0d9-7358-5c3d-bc3d-afdc4ca0b583",
+          "titulo": "Black Panther: Wakanda Forever (2022)",
+          "hecha": false,
+          "orden": 35
+        },
+        {
+          "id": "bc22b097-c207-5356-a0fb-d098208fad07",
+          "titulo": "Ant-Man y la Avispa: Quantumania (2023)",
+          "hecha": false,
+          "orden": 36
+        },
+        {
+          "id": "bbee71e9-d940-5487-9604-6925cf85cb85",
+          "titulo": "Guardianes de la Galaxia Vol. 3 (2023)",
+          "hecha": false,
+          "orden": 37
+        },
+        {
+          "id": "e3a5c754-62a2-5e9d-9ee6-0a7ce5111da3",
+          "titulo": "Invasión Secreta (Secret Invasion) (Serie)",
+          "hecha": false,
+          "orden": 38
+        },
+        {
+          "id": "493d3151-d508-5269-9cfc-60c3577a8058",
+          "titulo": "The Marvels (2023)",
+          "hecha": false,
+          "orden": 39
+        },
+        {
+          "id": "45548bb2-2a45-5e2c-bc95-e2a5f9884ce4",
+          "titulo": "Loki (Temporada 2) (Serie)",
+          "hecha": false,
+          "orden": 40
+        },
+        {
+          "id": "838607e7-0b47-5548-b7f5-13ae83c7b22b",
+          "titulo": "Deadpool y Wolverine (2024)",
+          "hecha": false,
+          "orden": 41
+        },
+        {
+          "id": "97e090fd-7c23-527d-8229-2f4c2d863dbc",
+          "titulo": "Agatha en todas partes (Agatha All Along) (Serie)",
+          "hecha": false,
+          "orden": 42
+        },
+        {
+          "id": "8a160e0a-de53-5ff2-bbee-b661170a4f05",
+          "titulo": "Daredevil: Born Again (Temporada 1) (Serie, 2025)",
+          "hecha": false,
+          "orden": 43
+        },
+        {
+          "id": "c5b89bf6-f311-59d6-b310-5ccc85331f21",
+          "titulo": "Capitán América: Brave New World (2025)",
+          "hecha": false,
+          "orden": 44
+        },
+        {
+          "id": "c3c3fa23-3b77-5d84-a93f-bb90961a1f41",
+          "titulo": "Thunderbolts (2025)",
+          "hecha": false,
+          "orden": 45
+        },
+        {
+          "id": "721b70cf-e4f1-5b3d-90ad-348847d5a392",
+          "titulo": "Los Cuatro Fantásticos: Primeros Pasos (2025)",
+          "hecha": false,
+          "orden": 46
+        },
+        {
+          "id": "f2be3f53-f6f2-5663-a40e-2e5f15c2a8c2",
+          "titulo": "Wonder Man (Serie, 2026)",
+          "hecha": false,
+          "orden": 47
+        },
+        {
+          "id": "14a5abf1-4382-5192-9abd-3331a3f5b268",
+          "titulo": "Spider-Man: Brand New Day (2026)",
+          "hecha": false,
+          "orden": 48
+        },
+        {
+          "id": "13df1cf5-5fb3-5fa4-98c6-a01e98426f25",
+          "titulo": "VisionQuest (Serie, 2026)",
+          "hecha": false,
+          "orden": 49
+        },
+        {
+          "id": "ab927ef1-aadb-521c-ae48-8b7e4b774c9d",
+          "titulo": "Avengers: Doomsday (Diciembre de 2026)",
+          "hecha": false,
+          "orden": 50
+        }
+      ]
+    }
+  ]
+}
