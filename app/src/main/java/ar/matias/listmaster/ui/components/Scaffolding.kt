@@ -168,6 +168,42 @@ fun SelectorRow(
     }
 }
 
+/**
+ * Fila de propiedad del detalle: icono y rótulo a la izquierda, chip a la
+ * derecha. Es la misma estructura de la tarjeta de referencia.
+ */
+@Composable
+fun PropertyRow(
+    @DrawableRes iconRes: Int,
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    trailing: @Composable () -> Unit,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 48.dp)
+            .clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.width(10.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f),
+        )
+        trailing()
+    }
+}
+
 /** Aviso honesto dentro del detalle: pendientes o sugerencia de Terminado. */
 @Composable
 fun NoticeCard(

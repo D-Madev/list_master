@@ -1,8 +1,9 @@
 # DESIGN.md — List Master
 
-- **Estado:** aprobado e implementado en la versión 1.0.0.
+- **Estado:** aprobado e implementado en la versión 1.1.0. La identidad pasó a blanco, negro y escalas de grises.
 - **Alcance:** proyectos, subproyectos, tareas y listas simples. Nada más.
 - **Referencia visual:** `docs/referencias/tarjeta-progreso.png`.
+- **Referencias de producto:** Linear (app), Notion (layout) y los ejemplos de sistemas de diseño de Figma: https://www.figma.com/resource-library/design-system-examples/
 - **Familia:** la misma que `registro_sueno`, sin copiar su código.
 
 Esto no es un mockup: es el criterio con el que se juzga cada pantalla antes de mirar si “funciona”. Si una instrucción del prompt es ambigua o fea, se interpreta a favor de la mejor experiencia posible dentro de esta identidad, y se señala antes de construir.
@@ -16,6 +17,14 @@ Tres reglas que mandan sobre el resto:
 1. **Nunca inventar datos.** Si no hay tareas, no hay 0%: hay “Sin tareas todavía”. Si no hay fecha, no hay fecha. Si no hay prioridad, no se muestra una prioridad falsa.
 2. **Lo que se ve, se puede tocar.** Un círculo de check, una tarjeta, un chip: si parece interactivo, lo es. Si no lo es, no lo parece.
 3. **La profundidad no es decoración.** Separa planos y ayuda a entender qué es una tarjeta, qué es una hoja y qué es el fondo. Nunca una tarjeta del mismo color que el fondo.
+
+### Referencias y qué tomar de cada una
+
+- **Linear (app):** densidad justa, jerarquía tipográfica clara, navegación rápida y microinteracciones sobrias. Nada de adornos: cada píxel ayuda a ubicarse.
+- **Notion (layout):** estructura de página con bloques, propiedades con chips, árbol de contenido y la sensación de que el contenido manda sobre el chrome.
+- **Figma — Design System Examples:** https://www.figma.com/resource-library/design-system-examples/ — patrones de tokens, componentes y documentación para mantener la identidad consistente.
+
+No se copia ninguna interfaz: se toman criterios. La identidad sigue siendo la de `docs/referencias/tarjeta-progreso.png`, ahora en blanco, negro y grises.
 
 ## 1. Identidad visual
 
@@ -52,63 +61,64 @@ Tres reglas que mandan sobre el resto:
 
 ### 1.2 Color
 
-La paleta es la de la app de sueño: azules sobre casi negro o sobre blanco roto. **No se usa color dinámico (Material You)**: rompería la identidad y la consistencia entre las dos apps.
+La paleta es **monocroma**: negro, blanco y escalas de grises. Nada de azul ni de colores de estado. La jerarquía se construye con contraste, tamaño, iconos y texto, no con tono. **No se usa color dinámico (Material You)**: rompería la identidad.
 
 #### Tema claro
 
 | Token | Hex | Uso |
 |---|---|---|
-| `bg` | `#F6F8FB` | Fondo de pantalla |
+| `bg` | `#F7F7F7` | Fondo de pantalla |
 | `surface` | `#FFFFFF` | Tarjetas, hojas, diálogos |
-| `surfaceAlt` | `#EEF2F7` | Inputs, tiles de icono, pastilla de progreso |
-| `surfaceSunken` | `#E5EBF2` | Riel de la barra, separadores |
-| `text` | `#0D1117` | Títulos y cuerpo |
-| `textSecondary` | `#5B6672` | Metadatos, texto de apoyo |
-| `textTertiary` | `#616C78` | Iconos en reposo, placeholders |
-| `outline` | `#D3DAE3` | Bordes de 1 dp |
-| `accent` | `#1A6FA8` | Acción primaria, progreso, foco |
+| `surfaceAlt` | `#EFEFEF` | Inputs, tiles de icono, pastilla de progreso |
+| `surfaceSunken` | `#E2E2E2` | Riel de la barra, separadores |
+| `text` | `#0B0B0B` | Títulos y cuerpo |
+| `textSecondary` | `#565656` | Metadatos, texto de apoyo |
+| `textTertiary` | `#6B6B6B` | Iconos en reposo, placeholders |
+| `outline` | `#D6D6D6` | Bordes de 1 dp |
+| `accent` | `#111111` | Acción primaria, progreso, foco |
 | `onAccent` | `#FFFFFF` | Texto e iconos sobre `accent` |
-| `accentSoft` | `#E3F0FA` | Fondo de chips activos (4.66:1 con `accent`) |
-| `success` | `#1E7B4D` | Terminado |
-| `successSoft` | `#DDF3E7` | Chip Terminado |
-| `warning` | `#8A5A00` | Postergado |
-| `warningSoft` | `#FBEDD3` | Chip Postergado |
-| `danger` | `#B3261E` | Cancelado, destructivo, prioridad alta |
-| `dangerSoft` | `#FBE2E0` | Chip Cancelado / prioridad alta |
-| `neutral` | `#5B6672` | Pausa |
-| `neutralSoft` | `#E8EDF3` | Chip Pausa |
+| `accentSoft` | `#EAEAEA` | Fondo de chips activos |
+| `success` | `#1C1C1C` | Terminado y progreso completo |
+| `successSoft` | `#E3E3E3` | Apoyo de Terminado |
+| `warning` | `#3F3F3F` | Postergado |
+| `warningSoft` | `#EDEDED` | Chip Postergado |
+| `danger` | `#000000` | Cancelado y acciones destructivas |
+| `dangerSoft` | `#E6E6E6` | Chip Cancelado |
+| `neutral` | `#5F5F5F` | Pausa |
+| `neutralSoft` | `#F1F1F1` | Chip Pausa |
 
 #### Tema oscuro
 
 | Token | Hex | Uso |
 |---|---|---|
-| `bg` | `#0D1117` | Fondo de pantalla |
-| `surface` | `#171E27` | Tarjetas, hojas, diálogos |
-| `surfaceAlt` | `#1C242E` | Inputs, tiles de icono, pastilla de progreso |
-| `surfaceSunken` | `#10161D` | Riel de la barra, separadores |
-| `text` | `#E6EDF3` | Títulos y cuerpo |
-| `textSecondary` | `#A7B4C2` | Metadatos, texto de apoyo |
-| `textTertiary` | `#8B97A5` | Iconos en reposo, placeholders |
-| `outline` | `#2A333F` | Bordes de 1 dp |
-| `accent` | `#7DCFFF` | Acción primaria, progreso, foco |
-| `onAccent` | `#0D1117` | Texto e iconos sobre `accent` |
-| `accentSoft` | `#1B3547` | Fondo de chips activos |
-| `success` | `#6FD39A` | Terminado |
-| `successSoft` | `#163326` | Chip Terminado |
-| `warning` | `#F2C46B` | Postergado |
-| `warningSoft` | `#3A2E17` | Chip Postergado |
-| `danger` | `#FF8A80` | Cancelado, destructivo, prioridad alta |
-| `dangerSoft` | `#3A1F1E` | Chip Cancelado / prioridad alta |
-| `neutral` | `#9DB6CB` | Pausa |
-| `neutralSoft` | `#232C37` | Chip Pausa |
+| `bg` | `#0B0B0B` | Fondo de pantalla |
+| `surface` | `#141414` | Tarjetas, hojas, diálogos |
+| `surfaceAlt` | `#1C1C1C` | Inputs, tiles de icono, pastilla de progreso |
+| `surfaceSunken` | `#0F0F0F` | Riel de la barra, separadores |
+| `text` | `#F2F2F2` | Títulos y cuerpo |
+| `textSecondary` | `#B3B3B3` | Metadatos, texto de apoyo |
+| `textTertiary` | `#8F8F8F` | Iconos en reposo, placeholders |
+| `outline` | `#2E2E2E` | Bordes de 1 dp |
+| `accent` | `#F2F2F2` | Acción primaria, progreso, foco |
+| `onAccent` | `#0B0B0B` | Texto e iconos sobre `accent` |
+| `accentSoft` | `#262626` | Fondo de chips activos |
+| `success` | `#FFFFFF` | Terminado y progreso completo |
+| `successSoft` | `#242424` | Apoyo de Terminado |
+| `warning` | `#D6D6D6` | Postergado |
+| `warningSoft` | `#2A2A2A` | Chip Postergado |
+| `danger` | `#FFFFFF` | Cancelado y acciones destructivas |
+| `dangerSoft` | `#2C2C2C` | Chip Cancelado |
+| `neutral` | `#A6A6A6` | Pausa |
+| `neutralSoft` | `#232323` | Chip Pausa |
 
 #### Reglas de uso
 
 - El **acento** es para lo interactivo y para el progreso. No se pinta una tarjeta entera de acento salvo un estado seleccionado muy puntual.
+- Sin color, los estados se distinguen por **icono + texto + tono**, y los dos estados fuertes se **invierten**: `Terminado` y prioridad `Alta` usan fondo `text` y contenido `surface` (chip negro en claro, chip blanco en oscuro). El resto usa fondos suaves.
 - Los **colores de estado** viven en chips, iconos pequeños y barras. No tiñen el fondo de la tarjeta.
-- Nunca se usa color como único portador de información: el chip siempre tiene icono + texto.
+- Nunca se usa el tono como único portador de información: el chip siempre tiene icono + texto.
 - El texto sobre fondos suaves debe cumplir contraste AA (4.5:1 para texto normal). Los pares de la tabla están elegidos para eso; si se cambia un tono, se vuelve a medir.
-- En oscuro, el fondo no es negro puro: `#0D1117`. Las tarjetas son más claras que el fondo. En claro, la tarjeta es blanca y el fondo es blanco roto; la separación la hace la sombra + el borde, no un cambio brusco de color.
+- En oscuro, el fondo es casi negro (`#0B0B0B`). Las tarjetas son más claras que el fondo. En claro, la tarjeta es blanca y el fondo es gris muy claro; la separación la hace la sombra + el borde.
 - No hay degradados planos como decoración. El único gradiente permitido es el **brillo ambiental** del fondo oscuro (ver 1.3).
 
 ### 1.3 Profundidad, forma y luz

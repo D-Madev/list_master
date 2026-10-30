@@ -127,8 +127,8 @@ fun ListMasterTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
-    // Sin color dinámico a propósito: la identidad es la misma en todos los
-    // celulares y coincide con la familia visual de registro_sueno.
+    // Sin color dinámico a propósito: la identidad monocroma es la misma en
+    // todos los celulares y no depende del fondo de pantalla del sistema.
     val colorScheme = if (darkTheme) DarkColors else LightColors
 
     // Los iconos del sistema siguen al tema de la app, no al del celular.

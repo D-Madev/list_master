@@ -198,7 +198,8 @@ fun ProgressPill(
         modifier = modifier
             .clearAndSetSemantics { contentDescription = description }
             .clip(shape)
-            .background(extended.surfaceAlt)
+            .background(scheme.surface)
+            .border(1.dp, scheme.outline, shape)
             .padding(horizontal = 10.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -206,7 +207,7 @@ fun ProgressPill(
             painter = painterResource(R.drawable.ic_status_done),
             contentDescription = null,
             modifier = Modifier.size(16.dp),
-            tint = if (progress.isComplete) extended.success else scheme.primary,
+            tint = if (progress.isComplete) extended.success else scheme.onSurface,
         )
         Spacer(Modifier.width(6.dp))
         if (!progress.hasTasks) {
@@ -245,7 +246,7 @@ fun ProgressPill(
             Text(
                 text = "${progress.percentage}%",
                 style = MaterialTheme.typography.labelMedium,
-                color = scheme.onSurface,
+                color = scheme.onSurfaceVariant,
             )
         }
     }
@@ -276,6 +277,22 @@ fun PriorityChip(
         label = stringResource(priority.labelRes()),
         iconRes = priority.iconRes(),
         colors = priority.chipColors(),
+        modifier = modifier,
+        onClick = onClick,
+    )
+}
+
+/** Chip equivalente para cuando el proyecto no tiene prioridad. */
+@Composable
+fun NoPriorityChip(
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+) {
+    val extended = LocalExtendedColors.current
+    Chip(
+        label = stringResource(R.string.priority_none),
+        iconRes = R.drawable.ic_flag,
+        colors = ChipColors(extended.neutral, extended.neutralSoft),
         modifier = modifier,
         onClick = onClick,
     )
