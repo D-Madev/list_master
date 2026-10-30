@@ -106,7 +106,7 @@ object BackupCodec {
     }
 
     fun decode(rawText: String): AppData {
-        val text = rawText.removePrefix("\uFEFF")
+        val text = normalize(rawText)
         if (text.isBlank()) throw BackupException("El archivo está vacío.")
 
         val root = try {
@@ -163,6 +163,19 @@ object BackupCodec {
         }
 
         return AppData(projects = projects, tasks = tasks, lists = lists)
+    }
+
+    /**
+     * Quita el BOM y, si el archivo llegó envuelto en un bloque de código o con
+     * texto alrededor, se queda con el objeto JSON que hay adentro. El contenido
+     * sigue validándose entero después.
+     */
+    private fun normalize(rawText: String): String {
+        val candidate = rawText.removePrefix("\uFEFF").trim()
+        if (candidate.startsWith("{")) return candidate
+        val start = candidate.indexOf('{')
+        val end = candidate.lastIndexOf('}')
+        return if (start >= 0 && end > start) candidate.substring(start, end + 1) else candidate
     }
 
     private fun parseProject(

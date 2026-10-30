@@ -407,5 +407,15 @@ class BackupCodecTest {
         assertEquals("Definir la paleta 🎨", decoded.tasks.single().title)
     }
 
+    @Test
+    fun `acepta un export envuelto en un bloque de codigo`() {
+        val json = BackupCodec.encode(sampleData(), base)
+        val wrapped = "```json\n$json\n```"
+        val decoded = decode(wrapped)
+        assertEquals(2, decoded.projects.size)
+        assertEquals(1, decoded.tasks.size)
+        assertEquals(1, decoded.lists.size)
+    }
+
     private fun baseOf(value: String): Instant = Instant.parse(value)
 }

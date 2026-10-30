@@ -50,7 +50,7 @@
     },
     {
       "id": "e14e232c-fd1c-5f41-9611-74ce66ee5987",
-      "titulo": "1a Galpón",
+      "titulo": "1a Galp\u00f3n",
       "estado": "Activo",
       "proyecto_padre": "989b85c4-c8a3-511f-b2fc-bc93d6450ea0",
       "prioridad": null,
@@ -59,7 +59,7 @@
     },
     {
       "id": "730e5f39-14ed-5104-8090-49faafcd0532",
-      "titulo": "B Habitación",
+      "titulo": "B Habitaci\u00f3n",
       "estado": "Activo",
       "proyecto_padre": "989b85c4-c8a3-511f-b2fc-bc93d6450ea0",
       "prioridad": null,
@@ -68,7 +68,7 @@
     },
     {
       "id": "f810b298-062d-5b74-a430-26347af9d79b",
-      "titulo": "C Baño",
+      "titulo": "C Ba\u00f1o",
       "estado": "Activo",
       "proyecto_padre": "989b85c4-c8a3-511f-b2fc-bc93d6450ea0",
       "prioridad": null,
@@ -122,7 +122,7 @@
     },
     {
       "id": "23918c00-7a9a-5574-9271-8ab985d16add",
-      "titulo": "Tracker de Ánimo",
+      "titulo": "Tracker de \u00c1nimo",
       "estado": "Pausa",
       "proyecto_padre": null,
       "prioridad": null,
@@ -167,7 +167,7 @@
     },
     {
       "id": "46471454-0ac3-5066-b9d4-ddede3817d77",
-      "titulo": "Código Activar Bandera en Intranet",
+      "titulo": "C\u00f3digo Activar Bandera en Intranet",
       "estado": "Activo",
       "proyecto_padre": null,
       "prioridad": null,
@@ -176,7 +176,7 @@
     },
     {
       "id": "4bc8eccb-3e75-5ac9-a451-623312a63f2e",
-      "titulo": "Inglés",
+      "titulo": "Ingl\u00e9s",
       "estado": "Activo",
       "proyecto_padre": null,
       "prioridad": null,
@@ -187,7 +187,7 @@
   "tareas": [
     {
       "id": "3fde3744-e3ad-5800-abdc-6665582945f2",
-      "titulo": "Empezar a vaciar el garage (con Rocío)",
+      "titulo": "Empezar a vaciar el garage (con Roc\u00edo)",
       "hecha": true,
       "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
       "fecha": null,
@@ -196,7 +196,7 @@
     },
     {
       "id": "240d97fd-ebfb-5be2-af40-ee945c9f7d8f",
-      "titulo": "Seguir vaciándolo solo",
+      "titulo": "Seguir vaci\u00e1ndolo solo",
       "hecha": true,
       "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
       "fecha": null,
@@ -214,7 +214,7 @@
     },
     {
       "id": "906bc3fc-2a7d-5550-95d0-dea67e07fb24",
-      "titulo": "Tirar todo lo que se tenía que tirar",
+      "titulo": "Tirar todo lo que se ten\u00eda que tirar",
       "hecha": true,
       "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
       "fecha": null,
@@ -232,7 +232,7 @@
     },
     {
       "id": "3d691e0b-a570-5704-94c0-eaf8755ba434",
-      "titulo": "Averiguar dónde y a cuánto pagan el papel",
+      "titulo": "Averiguar d\u00f3nde y a cu\u00e1nto pagan el papel",
       "hecha": false,
       "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
       "fecha": null,
@@ -259,7 +259,7 @@
     },
     {
       "id": "2abc16c2-6a5b-58aa-b734-dcb1f5ccde85",
-      "titulo": "Decidir dónde va (¿quincho?)",
+      "titulo": "Decidir d\u00f3nde va (\u00bfquincho?)",
       "hecha": false,
       "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
       "fecha": null,
@@ -313,7 +313,7 @@
     },
     {
       "id": "ee1feca9-c108-5bb8-ba5b-4a3895ece438",
-      "titulo": "Preguntarle a Gabriel o a Rocío si me consiguen una",
+      "titulo": "Preguntarle a Gabriel o a Roc\u00edo si me consiguen una",
       "hecha": false,
       "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
       "fecha": null,
@@ -331,7 +331,7 @@
     },
     {
       "id": "ba562e79-6913-57e0-b44a-a99b53dcb6bf",
-      "titulo": "Llamar a unos hombres para que vengan a comprármelas",
+      "titulo": "Llamar a unos hombres para que vengan a compr\u00e1rmelas",
       "hecha": true,
       "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
       "fecha": null,
@@ -349,7 +349,7 @@
     },
     {
       "id": "79c6ec5c-5f6c-5964-b84c-d9b2e7115bd4",
-      "titulo": "Anotar cuánto se sacó",
+      "titulo": "Anotar cu\u00e1nto se sac\u00f3",
       "hecha": true,
       "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
       "fecha": null,
@@ -358,7 +358,7 @@
     },
     {
       "id": "90a1503d-4673-5341-81b6-bc683fa1e82e",
-      "titulo": "Burlete para sellar la puerta de calle (tiene hendiduras y queda bastante abierta) — ~$8.000–15.000",
+      "titulo": "Burlete para sellar la puerta de calle (tiene hendiduras y queda bastante abierta) \u2014 ~$8.000\u201315.000",
       "hecha": true,
       "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
       "fecha": null,
@@ -367,7 +367,7 @@
     },
     {
       "id": "adc845bb-c087-568c-9bc4-297c643fc895",
-      "titulo": "Madera o plancha aislante para tapar provisoriamente la ventanita vieja (1m×45cm) — ~$10.000–20.000",
+      "titulo": "Madera o plancha aislante para tapar provisoriamente la ventanita vieja (1m\u00d745cm) \u2014 ~$10.000\u201320.000",
       "hecha": true,
       "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
       "fecha": null,
@@ -376,7 +376,7 @@
     },
     {
       "id": "af9884e4-10dd-597d-a587-d1f5a18462d5",
-      "titulo": "Comprar un caloventor/convector chico — salió $55.000",
+      "titulo": "Comprar un caloventor/convector chico \u2014 sali\u00f3 $55.000",
       "hecha": true,
       "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
       "fecha": null,
@@ -403,7 +403,7 @@
     },
     {
       "id": "985b5166-8238-5e18-88c1-0b96ee7b1bab",
-      "titulo": "Ropa: dejar en el placar lo que no uso seguido y llevar al garage sólo lo del día a día",
+      "titulo": "Ropa: dejar en el placar lo que no uso seguido y llevar al garage s\u00f3lo lo del d\u00eda a d\u00eda",
       "hecha": false,
       "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
       "fecha": null,
@@ -421,7 +421,7 @@
     },
     {
       "id": "cc40a8cb-b65f-574c-a9d8-6ace20f5701a",
-      "titulo": "Burletes de cepillo para la parte inferior del portón",
+      "titulo": "Burletes de cepillo para la parte inferior del port\u00f3n",
       "hecha": false,
       "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
       "fecha": null,
@@ -430,7 +430,7 @@
     },
     {
       "id": "42a28ba8-e647-51d6-bbc0-474149801487",
-      "titulo": "Resolver el viento que entra por la parte de arriba del portón",
+      "titulo": "Resolver el viento que entra por la parte de arriba del port\u00f3n",
       "hecha": false,
       "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
       "fecha": null,
@@ -448,7 +448,7 @@
     },
     {
       "id": "d018a7a4-14c7-540e-a227-8a44b2ab217a",
-      "titulo": "Manijón para la entrada",
+      "titulo": "Manij\u00f3n para la entrada",
       "hecha": false,
       "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
       "fecha": null,
@@ -466,7 +466,7 @@
     },
     {
       "id": "751d4e01-0f88-5d8c-a440-377dffa8424b",
-      "titulo": "Medir el garage (largo, ancho, alto, posición de aberturas)",
+      "titulo": "Medir el garage (largo, ancho, alto, posici\u00f3n de aberturas)",
       "hecha": true,
       "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
       "fecha": null,
@@ -484,7 +484,7 @@
     },
     {
       "id": "c23c24ca-341c-5cf0-b91a-c9e0b2d37dd9",
-      "titulo": "Recién ahí, diseñar y presupuestar en serio",
+      "titulo": "Reci\u00e9n ah\u00ed, dise\u00f1ar y presupuestar en serio",
       "hecha": false,
       "proyecto_id": "9adcb1c0-c176-576b-b134-9710ba0fbbdf",
       "fecha": null,
@@ -511,7 +511,7 @@
     },
     {
       "id": "05b83cab-04f8-5d4f-b41b-dba903eed625",
-      "titulo": "Confirmar que 150 × 110 entra bien en la pared elegida",
+      "titulo": "Confirmar que 150 \u00d7 110 entra bien en la pared elegida",
       "hecha": false,
       "proyecto_id": "28b81bda-71a1-5bbd-b162-b0ae94d256af",
       "fecha": null,
@@ -529,7 +529,7 @@
     },
     {
       "id": "6e4ae9e4-c0f4-5a36-b4e6-302283ae47b3",
-      "titulo": "Seguir preguntando a gente conocida por albañiles cercanos",
+      "titulo": "Seguir preguntando a gente conocida por alba\u00f1iles cercanos",
       "hecha": false,
       "proyecto_id": "28b81bda-71a1-5bbd-b162-b0ae94d256af",
       "fecha": null,
@@ -538,7 +538,7 @@
     },
     {
       "id": "f7df0a9a-2916-54a5-a8f9-65816b94935f",
-      "titulo": "Juntar al menos 2 presupuestos más para comparar",
+      "titulo": "Juntar al menos 2 presupuestos m\u00e1s para comparar",
       "hecha": false,
       "proyecto_id": "28b81bda-71a1-5bbd-b162-b0ae94d256af",
       "fecha": null,
@@ -565,7 +565,7 @@
     },
     {
       "id": "68acada4-cc82-527b-bdd5-18e6e496082c",
-      "titulo": "Seguir preguntando por albañiles de la zona",
+      "titulo": "Seguir preguntando por alba\u00f1iles de la zona",
       "hecha": true,
       "proyecto_id": "fb952adb-07a4-572d-b8e0-57bb59e0354c",
       "fecha": null,
@@ -592,7 +592,7 @@
     },
     {
       "id": "3dfb7519-7dde-5cbd-a1b6-08c9060154eb",
-      "titulo": "Decidir qué cosas se tiran, qué se vende, qué se guarda y qué cosas se reubican",
+      "titulo": "Decidir qu\u00e9 cosas se tiran, qu\u00e9 se vende, qu\u00e9 se guarda y qu\u00e9 cosas se reubican",
       "hecha": false,
       "proyecto_id": "e14e232c-fd1c-5f41-9611-74ce66ee5987",
       "fecha": null,
@@ -628,7 +628,7 @@
     },
     {
       "id": "935bc0ce-2939-52bc-b82e-fa6cec27556b",
-      "titulo": "Opción A: Lo construye alguien",
+      "titulo": "Opci\u00f3n A: Lo construye alguien",
       "hecha": false,
       "proyecto_id": "e14e232c-fd1c-5f41-9611-74ce66ee5987",
       "fecha": null,
@@ -637,7 +637,7 @@
     },
     {
       "id": "888f33c6-6587-51de-8471-0024a759e21c",
-      "titulo": "Opción B: Lo hago yo, simple y funcional",
+      "titulo": "Opci\u00f3n B: Lo hago yo, simple y funcional",
       "hecha": false,
       "proyecto_id": "e14e232c-fd1c-5f41-9611-74ce66ee5987",
       "fecha": null,
@@ -646,7 +646,7 @@
     },
     {
       "id": "55f1a402-a343-5164-b79f-801c0cfe1c96",
-      "titulo": "Opción C: Se posterga si los números no cierran",
+      "titulo": "Opci\u00f3n C: Se posterga si los n\u00fameros no cierran",
       "hecha": false,
       "proyecto_id": "e14e232c-fd1c-5f41-9611-74ce66ee5987",
       "fecha": null,
@@ -736,7 +736,7 @@
     },
     {
       "id": "dba7c398-5bb5-511f-8ec6-00ac49eaa98f",
-      "titulo": "Pintura básica",
+      "titulo": "Pintura b\u00e1sica",
       "hecha": false,
       "proyecto_id": "730e5f39-14ed-5104-8090-49faafcd0532",
       "fecha": null,
@@ -781,7 +781,7 @@
     },
     {
       "id": "82e5a501-c158-5acc-b571-f3886a5a9c21",
-      "titulo": "Estética",
+      "titulo": "Est\u00e9tica",
       "hecha": false,
       "proyecto_id": "730e5f39-14ed-5104-8090-49faafcd0532",
       "fecha": null,
@@ -826,7 +826,7 @@
     },
     {
       "id": "fefa7cd8-167c-5871-ab65-dbd69dc4a596",
-      "titulo": "Identificar dónde está el baño de abajo",
+      "titulo": "Identificar d\u00f3nde est\u00e1 el ba\u00f1o de abajo",
       "hecha": false,
       "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
       "fecha": null,
@@ -835,7 +835,7 @@
     },
     {
       "id": "b172018f-af80-5ed0-8aed-17ca06027e4e",
-      "titulo": "Ver por dónde suben caños de agua",
+      "titulo": "Ver por d\u00f3nde suben ca\u00f1os de agua",
       "hecha": false,
       "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
       "fecha": null,
@@ -844,7 +844,7 @@
     },
     {
       "id": "801997a0-4a02-54c7-a567-227adcefe89d",
-      "titulo": "Ver por dónde bajaría el desagüe",
+      "titulo": "Ver por d\u00f3nde bajar\u00eda el desag\u00fce",
       "hecha": false,
       "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
       "fecha": null,
@@ -880,7 +880,7 @@
     },
     {
       "id": "94f7cdd1-9ac4-574c-bb4d-8368bcfb5e28",
-      "titulo": "Cañerías",
+      "titulo": "Ca\u00f1er\u00edas",
       "hecha": false,
       "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
       "fecha": null,
@@ -889,7 +889,7 @@
     },
     {
       "id": "8cef2f09-5b60-5272-bdf5-ac8291fdd900",
-      "titulo": "Desagües",
+      "titulo": "Desag\u00fces",
       "hecha": false,
       "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
       "fecha": null,
@@ -898,7 +898,7 @@
     },
     {
       "id": "6c9655c2-722f-5cf9-9674-e675bd41e2e5",
-      "titulo": "Impermeabilización",
+      "titulo": "Impermeabilizaci\u00f3n",
       "hecha": false,
       "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
       "fecha": null,
@@ -907,7 +907,7 @@
     },
     {
       "id": "6751d650-f859-5d27-bb6c-6886b2ec8e1d",
-      "titulo": "Pruebas de filtración",
+      "titulo": "Pruebas de filtraci\u00f3n",
       "hecha": false,
       "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
       "fecha": null,
@@ -943,7 +943,7 @@
     },
     {
       "id": "3017865e-1787-5881-99ef-123b7dd62012",
-      "titulo": "Revestimientos básicos",
+      "titulo": "Revestimientos b\u00e1sicos",
       "hecha": false,
       "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
       "fecha": null,
@@ -961,7 +961,7 @@
     },
     {
       "id": "0f15811b-de38-58f5-8d48-a8bbd5fdc349",
-      "titulo": "Grifería",
+      "titulo": "Grifer\u00eda",
       "hecha": false,
       "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
       "fecha": null,
@@ -970,7 +970,7 @@
     },
     {
       "id": "83a36c78-986d-5121-bf02-71ddaba8fe1f",
-      "titulo": "Ventilación",
+      "titulo": "Ventilaci\u00f3n",
       "hecha": false,
       "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
       "fecha": null,
@@ -988,7 +988,7 @@
     },
     {
       "id": "c929741d-a1bc-55a3-837c-db66a8d03a03",
-      "titulo": "Iluminación",
+      "titulo": "Iluminaci\u00f3n",
       "hecha": false,
       "proyecto_id": "f810b298-062d-5b74-a430-26347af9d79b",
       "fecha": null,
@@ -1006,7 +1006,7 @@
     },
     {
       "id": "6cf96e12-d729-5a00-baff-fd2ee8bf3c43",
-      "titulo": "Bacha del baño",
+      "titulo": "Bacha del ba\u00f1o",
       "hecha": false,
       "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
       "fecha": null,
@@ -1033,7 +1033,7 @@
     },
     {
       "id": "88ef14f8-9ebd-5c43-b1f9-e8367d9ddf1d",
-      "titulo": "Mueble para las cosas del botiquín",
+      "titulo": "Mueble para las cosas del botiqu\u00edn",
       "hecha": false,
       "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
       "fecha": null,
@@ -1078,7 +1078,7 @@
     },
     {
       "id": "eab31cfa-fa8c-52b3-bcab-f4477adc8177",
-      "titulo": "Tuberías tapadas",
+      "titulo": "Tuber\u00edas tapadas",
       "hecha": false,
       "proyecto_id": "399eb3f8-17ed-514e-a451-555264b1478b",
       "fecha": null,
@@ -1177,7 +1177,7 @@
     },
     {
       "id": "efda36fc-6feb-5f19-b696-7987680433a5",
-      "titulo": "Mirar el perfil entero de una sentada y anotar qué me molesta, concreto (no \"está horrible\")",
+      "titulo": "Mirar el perfil entero de una sentada y anotar qu\u00e9 me molesta, concreto (no \"est\u00e1 horrible\")",
       "hecha": false,
       "proyecto_id": "e5ded385-2743-50e8-8a28-1220aadf8d1f",
       "fecha": null,
@@ -1195,7 +1195,7 @@
     },
     {
       "id": "fac99851-1a31-5da1-82f1-821d1ea802e0",
-      "titulo": "Foto de perfil nueva — una donde me vea bien yo, no donde crea que me van a ver bien",
+      "titulo": "Foto de perfil nueva \u2014 una donde me vea bien yo, no donde crea que me van a ver bien",
       "hecha": false,
       "proyecto_id": "e5ded385-2743-50e8-8a28-1220aadf8d1f",
       "fecha": null,
@@ -1213,7 +1213,7 @@
     },
     {
       "id": "907a8cf4-9090-5732-a325-07ee0ceda89f",
-      "titulo": "Destacadas: portadas nuevas, más lindas y depuradas",
+      "titulo": "Destacadas: portadas nuevas, m\u00e1s lindas y depuradas",
       "hecha": true,
       "proyecto_id": "e5ded385-2743-50e8-8a28-1220aadf8d1f",
       "fecha": null,
@@ -1222,7 +1222,7 @@
     },
     {
       "id": "d63cd785-c063-532d-9f12-e81e5af1c9f0",
-      "titulo": "Elegir tres o cuatro cosas que sí quiero mostrar, y no publicar nada que no entre ahí",
+      "titulo": "Elegir tres o cuatro cosas que s\u00ed quiero mostrar, y no publicar nada que no entre ah\u00ed",
       "hecha": false,
       "proyecto_id": "e5ded385-2743-50e8-8a28-1220aadf8d1f",
       "fecha": null,
@@ -1240,7 +1240,7 @@
     },
     {
       "id": "1eac864a-37fd-5f1c-b27b-c61aab99c6e6",
-      "titulo": "Juntarme con Gastón: que me cuente el negocio y ver su carpeta de Drive como relevamiento",
+      "titulo": "Juntarme con Gast\u00f3n: que me cuente el negocio y ver su carpeta de Drive como relevamiento",
       "hecha": true,
       "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
       "fecha": null,
@@ -1249,7 +1249,7 @@
     },
     {
       "id": "40dd5583-9220-53f4-abe5-4779846703cc",
-      "titulo": "Crear el repo en GitHub (de la asociación o mío, decidirlo)",
+      "titulo": "Crear el repo en GitHub (de la asociaci\u00f3n o m\u00edo, decidirlo)",
       "hecha": true,
       "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
       "fecha": null,
@@ -1258,7 +1258,7 @@
     },
     {
       "id": "9185163b-f9da-5a59-bda4-20bea97c466f",
-      "titulo": "Escribir en dos carillas qué hace hoy el sistema y qué duele (relevamiento)",
+      "titulo": "Escribir en dos carillas qu\u00e9 hace hoy el sistema y qu\u00e9 duele (relevamiento)",
       "hecha": true,
       "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
       "fecha": null,
@@ -1267,7 +1267,7 @@
     },
     {
       "id": "c0016bef-a126-54ca-a6b3-fbd176813261",
-      "titulo": "Definir alcance mínimo de una v1 (inscripciones, llaves, puntuación, resultados) y qué queda afuera",
+      "titulo": "Definir alcance m\u00ednimo de una v1 (inscripciones, llaves, puntuaci\u00f3n, resultados) y qu\u00e9 queda afuera",
       "hecha": true,
       "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
       "fecha": null,
@@ -1276,7 +1276,7 @@
     },
     {
       "id": "e8f38d2f-c807-58ac-ae97-cd13bcfe7270",
-      "titulo": "Decidir mi rol: ¿desarrollo yo, coordino, o sólo diseño la arquitectura?",
+      "titulo": "Decidir mi rol: \u00bfdesarrollo yo, coordino, o s\u00f3lo dise\u00f1o la arquitectura?",
       "hecha": true,
       "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
       "fecha": null,
@@ -1285,7 +1285,7 @@
     },
     {
       "id": "458dd375-69a5-58ca-b01d-dbf36dc4947a",
-      "titulo": "Ensayar la demo del 30/10 de punta a punta con Julián: crear torneo, inscribir, armar llaves, arbitrar (con gente real)",
+      "titulo": "Ensayar la demo del 30/10 de punta a punta con Juli\u00e1n: crear torneo, inscribir, armar llaves, arbitrar (con gente real)",
       "hecha": true,
       "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
       "fecha": null,
@@ -1303,7 +1303,7 @@
     },
     {
       "id": "5c61bf7d-9087-5367-b04f-4727a36f9297",
-      "titulo": "Arreglar la impresión del cuadro",
+      "titulo": "Arreglar la impresi\u00f3n del cuadro",
       "hecha": true,
       "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
       "fecha": null,
@@ -1330,7 +1330,7 @@
     },
     {
       "id": "504761e2-1189-507e-a05c-47d48765dd55",
-      "titulo": "Ordenar el submódulo de Gastón: commitear o descartar sus cambios",
+      "titulo": "Ordenar el subm\u00f3dulo de Gast\u00f3n: commitear o descartar sus cambios",
       "hecha": true,
       "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
       "fecha": null,
@@ -1339,7 +1339,7 @@
     },
     {
       "id": "16f95b59-8a2b-56cc-bd50-3e8cdbece0b3",
-      "titulo": "Arrancar la app móvil en noviembre",
+      "titulo": "Arrancar la app m\u00f3vil en noviembre",
       "hecha": true,
       "proyecto_id": "17d69bb1-f1c2-593f-836f-3eadc6b12f8e",
       "fecha": null,
@@ -1384,7 +1384,7 @@
     },
     {
       "id": "e85796c6-1a8c-587f-b17b-e807f3ab4ae8",
-      "titulo": "Reunión para ver Kiro",
+      "titulo": "Reuni\u00f3n para ver Kiro",
       "hecha": false,
       "proyecto_id": "7f402cf6-0366-5d21-8f48-d3090ab15163",
       "fecha": null,
@@ -1411,7 +1411,7 @@
     },
     {
       "id": "7d31793f-31d1-5043-84de-25e6499b7091",
-      "titulo": "Revisar si pagué todo y avisar",
+      "titulo": "Revisar si pagu\u00e9 todo y avisar",
       "hecha": false,
       "proyecto_id": "4bc8eccb-3e75-5ac9-a451-623312a63f2e",
       "fecha": null,
@@ -1438,7 +1438,7 @@
       "items": [
         {
           "id": "a96332be-5909-5265-b5ab-342c74849fce",
-          "titulo": "Ingeniera ambiental → Lugar en ingenieros?",
+          "titulo": "Ingeniera ambiental \u2192 Lugar en ingenieros?",
           "hecha": false,
           "orden": 0
         },
@@ -1452,32 +1452,32 @@
     },
     {
       "id": "032a999d-55c6-512b-8c23-4e955723e3de",
-      "titulo": "Años por Ascenso",
+      "titulo": "A\u00f1os por Ascenso",
       "proyecto_id": null,
       "creado": "2026-10-30T10:01:00Z",
       "actualizado": "2026-10-30T10:01:00Z",
       "items": [
         {
           "id": "19627f23-6d62-5b44-adbd-efa92492c80f",
-          "titulo": "5 años",
+          "titulo": "5 a\u00f1os",
           "hecha": false,
           "orden": 0
         },
         {
           "id": "7e7c3c8f-46d5-55e2-8fea-9b41c3ec581c",
-          "titulo": "6 años",
+          "titulo": "6 a\u00f1os",
           "hecha": false,
           "orden": 1
         },
         {
           "id": "f3c5ac39-16d2-54c7-9155-34ba2e444502",
-          "titulo": "7 años",
+          "titulo": "7 a\u00f1os",
           "hecha": false,
           "orden": 2
         },
         {
           "id": "17858d8b-928c-5c17-8b05-ae26d85701b9",
-          "titulo": "8 años",
+          "titulo": "8 a\u00f1os",
           "hecha": false,
           "orden": 3
         }
@@ -1485,14 +1485,14 @@
     },
     {
       "id": "e12649eb-932a-5ac4-919e-00b47edf3860",
-      "titulo": "MCU en orden cronológico",
+      "titulo": "MCU en orden cronol\u00f3gico",
       "proyecto_id": null,
       "creado": "2026-10-30T10:02:00Z",
       "actualizado": "2026-10-30T10:02:00Z",
       "items": [
         {
           "id": "5cc37c7f-c113-515b-8566-67810c583061",
-          "titulo": "Capitán América: El primer vengador (Ambientada en la década de 1940)",
+          "titulo": "Capit\u00e1n Am\u00e9rica: El primer vengador (Ambientada en la d\u00e9cada de 1940)",
           "hecha": true,
           "orden": 0
         },
@@ -1516,7 +1516,7 @@
         },
         {
           "id": "23bb958c-67de-54b7-90af-60909b321e14",
-          "titulo": "El increíble Hulk (2011)",
+          "titulo": "El incre\u00edble Hulk (2011)",
           "hecha": true,
           "orden": 4
         },
@@ -1546,7 +1546,7 @@
         },
         {
           "id": "91ddd772-5eb2-502b-893e-4d0eab838b8d",
-          "titulo": "Capitán América: El Soldado de Invierno (2014)",
+          "titulo": "Capit\u00e1n Am\u00e9rica: El Soldado de Invierno (2014)",
           "hecha": true,
           "orden": 9
         },
@@ -1564,7 +1564,7 @@
         },
         {
           "id": "be0f2829-c7ae-53d4-95cc-7d19810c53c0",
-          "titulo": "Vengadores: La era de Ultrón (2015)",
+          "titulo": "Vengadores: La era de Ultr\u00f3n (2015)",
           "hecha": true,
           "orden": 12
         },
@@ -1576,7 +1576,7 @@
         },
         {
           "id": "e5dd60ab-de9e-5c03-9713-8aac285fe389",
-          "titulo": "Capitán América: Civil War (2016)",
+          "titulo": "Capit\u00e1n Am\u00e9rica: Civil War (2016)",
           "hecha": true,
           "orden": 14
         },
@@ -1672,7 +1672,7 @@
         },
         {
           "id": "b463d807-fb6f-50c7-8d3a-ef20cc04b751",
-          "titulo": "Ojo de Halcón (Hawkeye) (Serie)",
+          "titulo": "Ojo de Halc\u00f3n (Hawkeye) (Serie)",
           "hecha": false,
           "orden": 30
         },
@@ -1720,7 +1720,7 @@
         },
         {
           "id": "e3a5c754-62a2-5e9d-9ee6-0a7ce5111da3",
-          "titulo": "Invasión Secreta (Secret Invasion) (Serie)",
+          "titulo": "Invasi\u00f3n Secreta (Secret Invasion) (Serie)",
           "hecha": false,
           "orden": 38
         },
@@ -1756,7 +1756,7 @@
         },
         {
           "id": "c5b89bf6-f311-59d6-b310-5ccc85331f21",
-          "titulo": "Capitán América: Brave New World (2025)",
+          "titulo": "Capit\u00e1n Am\u00e9rica: Brave New World (2025)",
           "hecha": false,
           "orden": 44
         },
@@ -1768,7 +1768,7 @@
         },
         {
           "id": "721b70cf-e4f1-5b3d-90ad-348847d5a392",
-          "titulo": "Los Cuatro Fantásticos: Primeros Pasos (2025)",
+          "titulo": "Los Cuatro Fant\u00e1sticos: Primeros Pasos (2025)",
           "hecha": false,
           "orden": 46
         },
