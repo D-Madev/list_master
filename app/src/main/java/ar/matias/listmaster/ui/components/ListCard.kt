@@ -55,6 +55,7 @@ fun ListCard(
     onOpen: () -> Unit,
     onToggleItem: (ListItem, Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    showDoneItems: Boolean = false,
 ) {
     val scheme = MaterialTheme.colorScheme
     val extended = LocalExtendedColors.current
@@ -75,8 +76,9 @@ fun ListCard(
     val done = list.items.count { it.done }
     val total = list.items.size
     val fraction = if (total == 0) 0f else done.toFloat() / total
-    val visibleItems = list.items.take(MAX_LIST_ROWS)
-    val hiddenCount = list.items.size - visibleItems.size
+    val shownItems = list.items.filter { !it.done } + if (showDoneItems) list.items.filter { it.done } else emptyList()
+    val visibleItems = shownItems.take(MAX_LIST_ROWS)
+    val hiddenCount = shownItems.size - visibleItems.size
 
     Column(
         modifier = modifier
@@ -194,7 +196,9 @@ fun ListCard(
             } else {
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    text = stringResource(R.string.list_empty_items),
+                    text = stringResource(
+                        if (total > 0) R.string.done_all_hidden_title else R.string.list_empty_items,
+                    ),
                     style = MaterialTheme.typography.bodyMedium,
                     color = scheme.onSurfaceVariant,
                 )

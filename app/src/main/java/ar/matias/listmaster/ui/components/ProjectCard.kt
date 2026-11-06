@@ -47,10 +47,13 @@ import ar.matias.listmaster.domain.model.Project
 import ar.matias.listmaster.domain.model.ProjectStatus
 import ar.matias.listmaster.domain.model.Task
 import ar.matias.listmaster.ui.formatShort
+import ar.matias.listmaster.ui.screens.DetailRow
 import ar.matias.listmaster.ui.theme.LocalExtendedColors
-import java.time.LocalDate
 
-private const val MAX_CARD_ROWS = 4
+private const val MAX_CARD_ROWS = 5
+
+/** Ancho común de los rótulos para que los chips queden alineados en columna. */
+private val PROPERTY_LABEL_WIDTH = 80.dp
 
 /**
  * Fila compacta del listado: nombre, recuento y barra. Al tocarla se despliega
@@ -149,12 +152,10 @@ fun ProjectCompactRow(
 }
 
 @Composable
-fun ProjectCard(
+internal fun ProjectCard(
     project: Project,
     progress: ProjectProgress,
-    directTasks: List<Task>,
-    subprojects: List<Project>,
-    subprojectProgress: Map<String, ProjectProgress>,
+    rows: List<DetailRow>,
     onOpen: () -> Unit,
     onToggleTask: (Task) -> Unit,
     onMenu: () -> Unit,
@@ -176,14 +177,7 @@ fun ProjectCard(
     )
     val darkTheme = scheme.surface.luminance() < 0.5f
 
-    val rows = buildList {
-        // Primero lo que falta: si el proyecto tiene muchas tareas hechas, las
-        // pendientes igual aparecen en la vista previa.
-        directTasks
-            .sortedWith(compareBy({ it.done }, { it.dueDate ?: LocalDate.MAX }))
-            .forEach { add(CardRow.TaskRow(it)) }
-        subprojects.forEach { add(CardRow.SubprojectRow(it)) }
-    }
+    // Las filas ya vienen con las pendientes primero; las hechas solo si se pidieron.
     val visibleRows = rows.take(MAX_CARD_ROWS)
     val hiddenCount = rows.size - visibleRows.size
 
@@ -247,23 +241,27 @@ fun ProjectCard(
 
         if (visibleRows.isNotEmpty()) {
             Spacer(Modifier.height(8.dp))
-            visibleRows.forEachIndexed { index, row ->
-                val isLast = index == visibleRows.lastIndex && hiddenCount == 0
+            visibleRows.forEach { row ->
+                // Si quedan filas ocultas, el "+N Más" cierra la rama del primer nivel.
+                val isLast = row.isLast && !(hiddenCount > 0 && row.depth == 1)
                 when (row) {
-                    is CardRow.TaskRow -> TaskRow(
+                    is DetailRow.TaskItem -> TaskRow(
                         task = row.task,
-                        depth = 1,
+                        depth = row.depth,
                         isLast = isLast,
                         onToggle = { onToggleTask(row.task) },
                         onOpen = null,
+                        ancestorContinues = row.ancestorContinues,
                     )
 
-                    is CardRow.SubprojectRow -> SubprojectRow(
+                    is DetailRow.ProjectItem -> SubprojectRow(
                         project = row.project,
-                        progress = subprojectProgress[row.project.id] ?: ProjectProgress(0, 0),
-                        depth = 1,
+                        progress = row.progress,
+                        depth = row.depth,
                         isLast = isLast,
                         onClick = { onOpenSubproject(row.project.id) },
+                        ancestorContinues = row.ancestorContinues,
+                        hasChildren = row.hasChildren,
                     )
                 }
             }
@@ -280,7 +278,7 @@ fun ProjectCard(
                     )
                 }
             }
-        } else if (project.status != ProjectStatus.CANCELLED) {
+        } else if (project.status != ProjectStatus.CANCELLED && !progress.hasTasks) {
             Spacer(Modifier.height(8.dp))
             Text(
                 text = stringResource(R.string.project_no_tasks_hint),
@@ -304,7 +302,7 @@ fun ProjectCard(
                     text = stringResource(R.string.project_priority_label),
                     style = MaterialTheme.typography.bodyMedium,
                     color = scheme.onSurfaceVariant,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.width(PROPERTY_LABEL_WIDTH),
                 )
                 PriorityChip(priority = project.priority, onClick = onPriorityClick)
             }
@@ -321,16 +319,11 @@ fun ProjectCard(
                 text = stringResource(R.string.project_status_label),
                 style = MaterialTheme.typography.bodyMedium,
                 color = scheme.onSurfaceVariant,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.width(PROPERTY_LABEL_WIDTH),
             )
             StatusChip(status = project.status, onClick = onStatusClick)
         }
     }
-}
-
-private sealed interface CardRow {
-    data class TaskRow(val task: Task) : CardRow
-    data class SubprojectRow(val project: Project) : CardRow
 }
 
 @Composable

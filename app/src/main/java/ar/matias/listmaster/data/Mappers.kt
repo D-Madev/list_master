@@ -46,6 +46,8 @@ fun TaskEntity.toDomain(): Task = Task(
     dueDate = dueDate?.let(LocalDate::parse),
     createdAt = Instant.parse(createdAt),
     updatedAt = Instant.parse(updatedAt),
+    description = description.orEmpty(),
+    priority = priority?.let(Priority::fromStored),
 )
 
 fun Task.toEntity(): TaskEntity = TaskEntity(
@@ -56,6 +58,8 @@ fun Task.toEntity(): TaskEntity = TaskEntity(
     dueDate = dueDate?.toString(),
     createdAt = createdAt.toString(),
     updatedAt = updatedAt.toString(),
+    description = description.ifEmpty { null },
+    priority = priority?.storedValue,
 )
 
 fun ListEntity.toDomain(items: List<ListItemEntity>): TaskList = TaskList(

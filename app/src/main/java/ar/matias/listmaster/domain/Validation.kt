@@ -1,5 +1,6 @@
 package ar.matias.listmaster.domain
 
+import ar.matias.listmaster.domain.model.MAX_DESCRIPTION_LENGTH
 import ar.matias.listmaster.domain.model.MAX_ICON_LENGTH
 import ar.matias.listmaster.domain.model.MAX_ITEM_TITLE_LENGTH
 import ar.matias.listmaster.domain.model.MAX_TITLE_LENGTH
@@ -16,6 +17,14 @@ object Validation {
     }
 
     fun itemTitle(raw: String): String = title(raw, MAX_ITEM_TITLE_LENGTH)
+
+    fun description(raw: String?): String {
+        val clean = raw?.trim().orEmpty()
+        require(clean.length <= MAX_DESCRIPTION_LENGTH) {
+            "La descripción no puede superar los $MAX_DESCRIPTION_LENGTH caracteres."
+        }
+        return clean
+    }
 
     /** Normaliza el ícono: vacío es "sin ícono" y se recorta a un emoji corto. */
     fun icon(raw: String?): String? {

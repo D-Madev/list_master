@@ -18,11 +18,14 @@ class AppSmokeTest {
     val composeRule = createComposeRule()
 
     @Test
-    fun arrancaEnProyectosYPermiteCambiarDeSeccion() {
+    fun arrancaEnPendientesYPermiteCambiarDeSeccion() {
         composeRule.setContent {
             ListMasterApp()
         }
 
+        composeRule.onNodeWithText("No tenés nada pendiente.").assertIsDisplayed()
+
+        composeRule.onNodeWithText("Proyectos").performClick()
         composeRule.onNodeWithText("Mis Proyectos").assertIsDisplayed()
         composeRule.onNodeWithText("Todavía no tenés proyectos.").assertIsDisplayed()
 

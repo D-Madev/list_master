@@ -55,10 +55,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ar.matias.listmaster.R
+import ar.matias.listmaster.domain.model.MAX_DESCRIPTION_LENGTH
 import ar.matias.listmaster.domain.model.MAX_ICON_LENGTH
 import ar.matias.listmaster.domain.model.MAX_TITLE_LENGTH
 import ar.matias.listmaster.domain.model.Priority
 import ar.matias.listmaster.domain.model.Project
+import ar.matias.listmaster.domain.model.ProjectFilter
 import ar.matias.listmaster.domain.model.ProjectStatus
 import ar.matias.listmaster.domain.model.Task
 import ar.matias.listmaster.ui.chipColors
@@ -339,19 +341,22 @@ fun DeleteProjectDialog(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun TaskFormSheet(
     task: Task?,
     onDismiss: () -> Unit,
-    onSave: (String, LocalDate?) -> Unit,
+    onSave: (String, LocalDate?, String, Priority?) -> Unit,
     onDelete: (() -> Unit)? = null,
 ) {
+    var priority by remember(task?.id) { mutableStateOf(task?.priority) }
     var title by remember(task?.id) { mutableStateOf(task?.title.orEmpty()) }
+    var description by remember(task?.id) { mutableStateOf(task?.description.orEmpty()) }
     var dueDate by remember(task?.id) { mutableStateOf(task?.dueDate) }
     var showDatePicker by remember { mutableStateOf(false) }
     var showError by remember { mutableStateOf(false) }
     val tooLong = title.trim().length > MAX_TITLE_LENGTH
+    val descriptionTooLong = description.trim().length > MAX_DESCRIPTION_LENGTH
     val extended = LocalExtendedColors.current
 
     ModalBottomSheet(
@@ -397,6 +402,42 @@ fun TaskFormSheet(
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(12.dp))
+            OutlinedTextField(
+                value = description,
+                onValueChange = { description = it },
+                label = { Text(stringResource(R.string.task_description_label)) },
+                placeholder = { Text(stringResource(R.string.task_description_placeholder)) },
+                minLines = 3,
+                maxLines = 8,
+                isError = descriptionTooLong,
+                shape = RoundedCornerShape(14.dp),
+                supportingText = if (descriptionTooLong) {
+                    { Text(stringResource(R.string.description_too_long)) }
+                } else {
+                    null
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = stringResource(R.string.project_priority_label),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(8.dp))
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                (listOf<Priority?>(null) + Priority.entries).forEach { option ->
+                    FilterToggle(
+                        label = stringResource(option?.labelRes() ?: R.string.priority_none),
+                        selected = priority == option,
+                        onClick = { priority = option },
+                    )
+                }
+            }
+            Spacer(Modifier.height(12.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -437,11 +478,11 @@ fun TaskFormSheet(
                 onClick = {
                     if (title.isBlank()) {
                         showError = true
-                    } else if (!tooLong) {
-                        onSave(title, dueDate)
+                    } else if (!tooLong && !descriptionTooLong) {
+                        onSave(title, dueDate, description, priority)
                     }
                 },
-                enabled = title.isNotBlank() && !tooLong,
+                enabled = title.isNotBlank() && !tooLong && !descriptionTooLong,
                 modifier = Modifier.fillMaxWidth(),
             )
             if (onDelete != null) {
@@ -592,5 +633,207 @@ fun ProjectIconSheet(
                 modifier = Modifier.fillMaxWidth(),
             )
         }
+    }
+}
+
+/**
+ * Elige un proyecto de una lista con sangría por nivel. Sirve para mover un
+ * subproyecto de padre y para decidir dónde va una tarea nueva.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProjectPickerSheet(
+    title: String,
+    options: List<Pair<Project, Int>>,
+    current: String?,
+    onDismiss: () -> Unit,
+    onSelect: (Project) -> Unit,
+    help: String? = null,
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        containerColor = MaterialTheme.colorScheme.surface,
+    ) {
+        Column(
+            modifier = Modifier
+                .navigationBarsPadding()
+                .padding(horizontal = 20.dp),
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+            )
+            if (help != null) {
+                Text(
+                    text = help,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            Column(
+                modifier = Modifier
+                    .weight(1f, fill = false)
+                    .verticalScroll(rememberScrollState())
+                    .padding(bottom = 16.dp),
+            ) {
+                options.forEach { (project, depth) ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 52.dp)
+                            .clickable { onSelect(project) }
+                            .padding(start = (depth * 20).dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        ProjectIcon(
+                            icon = project.icon,
+                            isSubproject = project.parentId != null,
+                            contentDescription = null,
+                            size = 20.dp,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Spacer(Modifier.width(12.dp))
+                        Text(
+                            text = project.title,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f),
+                        )
+                        if (project.id == current) {
+                            Icon(
+                                imageVector = Icons.Outlined.Check,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** Filtro de la pantalla de Proyectos. Se aplica al tocar y queda guardado. */
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Composable
+fun ProjectFilterSheet(
+    filter: ProjectFilter,
+    onChange: (ProjectFilter) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        containerColor = MaterialTheme.colorScheme.surface,
+    ) {
+        Column(
+            modifier = Modifier
+                .navigationBarsPadding()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 20.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(R.string.filter_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.weight(1f),
+                )
+                if (!filter.isDefault) {
+                    TextButton(onClick = { onChange(ProjectFilter.DEFAULT) }) {
+                        Text(stringResource(R.string.filter_reset))
+                    }
+                }
+            }
+            Spacer(Modifier.height(12.dp))
+            Text(
+                text = stringResource(R.string.filter_status),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(8.dp))
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                ProjectStatus.entries.forEach { status ->
+                    FilterToggle(
+                        label = stringResource(status.labelRes()),
+                        selected = status in filter.statuses,
+                        onClick = {
+                            onChange(filter.copy(statuses = filter.statuses.toggled(status)))
+                        },
+                    )
+                }
+            }
+            Spacer(Modifier.height(20.dp))
+            Text(
+                text = stringResource(R.string.filter_priority),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(8.dp))
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                (Priority.entries.toList() + listOf<Priority?>(null)).forEach { priority ->
+                    FilterToggle(
+                        label = stringResource(priority?.labelRes() ?: R.string.priority_none),
+                        selected = priority in filter.priorities,
+                        onClick = {
+                            onChange(filter.copy(priorities = filter.priorities.toggled(priority)))
+                        },
+                    )
+                }
+            }
+        }
+    }
+}
+
+private fun <T> Set<T>.toggled(value: T): Set<T> =
+    if (value in this) this - value else this + value
+
+@Composable
+private fun FilterToggle(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    val scheme = MaterialTheme.colorScheme
+    val shape = RoundedCornerShape(12.dp)
+    Row(
+        modifier = Modifier
+            .heightIn(min = 48.dp)
+            .clip(shape)
+            .background(if (selected) scheme.primaryContainer else LocalExtendedColors.current.surfaceAlt)
+            .border(
+                width = if (selected) 1.5.dp else 1.dp,
+                color = if (selected) scheme.primary else scheme.outline,
+                shape = shape,
+            )
+            .clickable(onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (selected) {
+            Icon(
+                imageVector = Icons.Outlined.Check,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+                tint = scheme.primary,
+            )
+            Spacer(Modifier.width(6.dp))
+        }
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelLarge,
+            color = if (selected) scheme.primary else scheme.onSurface,
+        )
     }
 }

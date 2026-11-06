@@ -26,6 +26,7 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -65,6 +66,8 @@ fun ListDetailScreen(
     onDelete: (String) -> Unit,
     onSetProject: (String, String?) -> Unit,
     onOpenProject: (String) -> Unit,
+    showDoneItems: Boolean,
+    onShowDoneItemsChange: (Boolean) -> Unit,
     onAddItem: (String, String) -> Unit,
     onToggleItem: (String, Boolean) -> Unit,
     onUpdateItemTitle: (String, String) -> Unit,
@@ -103,6 +106,7 @@ fun ListDetailScreen(
 
     val done = list.items.count { it.done }
     val total = list.items.size
+    val shownItems = list.items.filter { !it.done } + if (showDoneItems) list.items.filter { it.done } else emptyList()
     val projectTitle = list.projectId?.let { id -> projects.firstOrNull { it.id == id }?.title }
     val extended = LocalExtendedColors.current
 
@@ -191,6 +195,29 @@ fun ListDetailScreen(
                 }
             }
 
+            if (done > 0) {
+                item(key = "done-toggle") {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp)
+                            .clickable { onShowDoneItemsChange(!showDoneItems) },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.done_toggle_items_count, done),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f),
+                        )
+                        Switch(
+                            checked = showDoneItems,
+                            onCheckedChange = onShowDoneItemsChange,
+                        )
+                    }
+                }
+            }
+
             if (list.items.isEmpty()) {
                 item(key = "empty") {
                     Column(
@@ -213,7 +240,7 @@ fun ListDetailScreen(
                     }
                 }
             } else {
-                items(list.items, key = { it.id }) { item ->
+                items(shownItems, key = { it.id }) { item ->
                     ListItemRow(
                         item = item,
                         onToggle = {

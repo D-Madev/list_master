@@ -2,6 +2,7 @@ package ar.matias.listmaster.domain
 
 import ar.matias.listmaster.domain.model.MAX_SUBPROJECT_DEPTH
 import ar.matias.listmaster.domain.model.Project
+import ar.matias.listmaster.domain.model.sortRank
 
 /**
  * Reglas del árbol de proyectos.
@@ -13,10 +14,14 @@ object ProjectTree {
 
     fun byId(projects: List<Project>): Map<String, Project> = projects.associateBy { it.id }
 
+    /** Hermanos ordenados por prioridad (Alta primero) y, a igual prioridad, por antigüedad. */
+    val byPriority: Comparator<Project> =
+        compareBy<Project>({ it.priority.sortRank }, { it.createdAt }, { it.id })
+
     fun childrenOf(parentId: String?, projects: List<Project>): List<Project> =
         projects
             .filter { it.parentId == parentId }
-            .sortedWith(compareBy({ it.createdAt }, { it.id }))
+            .sortedWith(byPriority)
 
     /**
      * Nivel del proyecto: 0 para una raíz, 1..3 para subproyectos.
@@ -78,6 +83,50 @@ object ProjectTree {
             }
         }
         return result
+    }
+
+    /** Proyecto principal (nivel 0) del árbol al que pertenece [projectId]. */
+    fun rootOf(projectId: String, projects: List<Project>): Project? {
+        val index = byId(projects)
+        var current = index[projectId] ?: return null
+        val visited = mutableSetOf(projectId)
+        while (true) {
+            val parentId = current.parentId ?: return current
+            if (!visited.add(parentId)) return null
+            current = index[parentId] ?: return null
+        }
+    }
+
+    /** Niveles que hay debajo del proyecto: 0 si no tiene subproyectos. */
+    fun subtreeHeight(projectId: String, projects: List<Project>): Int {
+        val byParent = projects.groupBy { it.parentId }
+        fun height(id: String, seen: Set<String>): Int {
+            val children = byParent[id].orEmpty().filter { it.id !in seen }
+            return if (children.isEmpty()) 0 else 1 + children.maxOf { height(it.id, seen + id) }
+        }
+        return height(projectId, emptySet())
+    }
+
+    /**
+     * Padres posibles para un subproyecto: el proyecto principal de su árbol y
+     * cualquiera de sus subproyectos, menos él mismo y su descendencia, siempre
+     * que el subárbol movido no pase de [MAX_SUBPROJECT_DEPTH]. Los proyectos
+     * principales no se mueven: devuelve vacío.
+     */
+    fun validParents(projectId: String, projects: List<Project>): List<Project> {
+        val index = byId(projects)
+        val project = index[projectId] ?: return emptyList()
+        if (project.parentId == null) return emptyList()
+        val root = rootOf(projectId, projects) ?: return emptyList()
+        val own = subtreeIds(projectId, projects)
+        val height = subtreeHeight(projectId, projects)
+        return subtreeIds(root.id, projects)
+            .asSequence()
+            .filter { it !in own }
+            .mapNotNull { index[it] }
+            .filter { depthOf(it.id, projects) + 1 + height <= MAX_SUBPROJECT_DEPTH }
+            .sortedWith(compareBy({ depthOf(it.id, projects) }, { it.createdAt }, { it.id }))
+            .toList()
     }
 
     /** Ancestros desde la raíz hasta el padre inmediato. */

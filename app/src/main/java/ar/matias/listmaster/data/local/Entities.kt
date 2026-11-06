@@ -49,6 +49,8 @@ data class TaskEntity(
     @ColumnInfo(name = "due_date") val dueDate: String?,
     @ColumnInfo(name = "created_at") val createdAt: String,
     @ColumnInfo(name = "updated_at") val updatedAt: String,
+    val description: String? = null,
+    val priority: String? = null,
 )
 
 @Entity(

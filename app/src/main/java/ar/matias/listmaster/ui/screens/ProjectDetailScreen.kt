@@ -1,5 +1,6 @@
 package ar.matias.listmaster.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,10 +19,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.MoreVert
-import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ar.matias.listmaster.R
@@ -44,6 +47,7 @@ import ar.matias.listmaster.domain.model.Priority
 import ar.matias.listmaster.domain.model.Project
 import ar.matias.listmaster.domain.model.ProjectStatus
 import ar.matias.listmaster.domain.model.Task
+import ar.matias.listmaster.domain.model.TaskOrder
 import ar.matias.listmaster.ui.components.CenteredEmpty
 import ar.matias.listmaster.ui.components.DetailHeader
 import ar.matias.listmaster.ui.components.ProjectIconTile
@@ -104,9 +108,11 @@ fun ProjectDetailScreen(
     onSetStatus: (String, ProjectStatus) -> Unit,
     onSetPriority: (String, Priority?) -> Unit,
     onDeleteProject: (String) -> Unit,
+    showDoneTasks: Boolean,
+    onShowDoneTasksChange: (Boolean) -> Unit,
     onToggleTask: (Task) -> Unit,
-    onCreateTask: (String, String, LocalDate?) -> Unit,
-    onUpdateTask: (String, String, LocalDate?) -> Unit,
+    onCreateTask: (String, String, LocalDate?, String, Priority?) -> Unit,
+    onUpdateTask: (String, String, LocalDate?, String, Priority?) -> Unit,
     onDeleteTask: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -142,9 +148,10 @@ fun ProjectDetailScreen(
     }
 
     val progress = ProgressCalculator.calculate(project.id, projects, tasks)
-    val rows = remember(project.id, projects, tasks) {
-        buildDetailRows(project, projects, tasks)
+    val rows = remember(project.id, projects, tasks, showDoneTasks) {
+        buildDetailRows(project, projects, tasks, showDoneTasks)
     }
+    val doneCount = progress.done
     val depth = ProjectTree.depthOf(project.id, projects)
     val canHaveSubproject = depth in 0 until MAX_SUBPROJECT_DEPTH
     val ancestors = ProjectTree.ancestorsOf(project.id, projects)
@@ -270,8 +277,32 @@ fun ProjectDetailScreen(
                 }
             }
 
+            if (doneCount > 0) {
+                item(key = "done-toggle") {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp)
+                            .clickable { onShowDoneTasksChange(!showDoneTasks) },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.done_toggle_count, doneCount),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f),
+                        )
+                        Switch(
+                            checked = showDoneTasks,
+                            onCheckedChange = onShowDoneTasksChange,
+                        )
+                    }
+                }
+            }
+
             if (rows.isEmpty()) {
                 item(key = "empty") {
+                    val allHidden = doneCount > 0 && !showDoneTasks
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -279,15 +310,28 @@ fun ProjectDetailScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(
-                            text = stringResource(R.string.project_empty_tasks_title),
+                            text = stringResource(
+                                if (allHidden) {
+                                    R.string.done_all_hidden_title
+                                } else {
+                                    R.string.project_empty_tasks_title
+                                },
+                            ),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onBackground,
                         )
                         Spacer(Modifier.height(6.dp))
                         Text(
-                            text = stringResource(R.string.project_empty_tasks_body),
+                            text = stringResource(
+                                if (allHidden) {
+                                    R.string.done_all_hidden_body
+                                } else {
+                                    R.string.project_empty_tasks_body
+                                },
+                            ),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
                         )
                     }
                 }
@@ -324,17 +368,20 @@ fun ProjectDetailScreen(
             }
         }
 
-        ExtendedFloatingActionButton(
+        FloatingActionButton(
             onClick = { taskEditor = TaskEditor(project.id, null) },
-            icon = { Icon(Icons.Outlined.Add, contentDescription = null) },
-            text = { Text(stringResource(R.string.project_add_task)) },
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
             shape = RoundedCornerShape(18.dp),
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(20.dp),
-        )
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Add,
+                contentDescription = stringResource(R.string.project_add_task),
+            )
+        }
     }
 
     if (menuOpen) {
@@ -406,11 +453,11 @@ fun ProjectDetailScreen(
         TaskFormSheet(
             task = editor.task,
             onDismiss = { taskEditor = null },
-            onSave = { title, dueDate ->
+            onSave = { title, dueDate, description, priority ->
                 if (editor.task == null) {
-                    onCreateTask(editor.projectId, title, dueDate)
+                    onCreateTask(editor.projectId, title, dueDate, description, priority)
                 } else {
-                    onUpdateTask(editor.task.id, title, dueDate)
+                    onUpdateTask(editor.task.id, title, dueDate, description, priority)
                 }
                 taskEditor = null
             },
@@ -425,13 +472,15 @@ fun ProjectDetailScreen(
 }
 
 /**
- * Árbol completo del detalle: tareas directas primero, después cada subproyecto
- * con su propio subárbol. La raíz no se dibuja como fila.
+ * Árbol completo del detalle. En cada nivel van juntas las tareas pendientes,
+ * después los subproyectos (por prioridad, cada uno con su subárbol) y al final
+ * las hechas, que solo aparecen si [showDone]. La raíz no se dibuja como fila.
  */
 internal fun buildDetailRows(
     root: Project,
     projects: List<Project>,
     tasks: List<Task>,
+    showDone: Boolean = true,
 ): List<DetailRow> {
     val tasksByProject = tasks.groupBy { it.projectId }
     val childrenByParent = projects.groupBy { it.parentId }
@@ -442,9 +491,11 @@ internal fun buildDetailRows(
         depth: Int,
         ancestorContinues: List<Boolean>,
     ) {
+        val own = tasksByProject[project.id].orEmpty().sortedWith(TaskOrder)
         val items = buildList<Any> {
-            addAll(tasksByProject[project.id].orEmpty())
-            addAll(childrenByParent[project.id].orEmpty())
+            addAll(own.filter { !it.done })
+            addAll(childrenByParent[project.id].orEmpty().sortedWith(ProjectTree.byPriority))
+            if (showDone) addAll(own.filter { it.done })
         }
         items.forEachIndexed { index, item ->
             val isLast = index == items.lastIndex
@@ -464,7 +515,8 @@ internal fun buildDetailRows(
                         DetailRow.ProjectItem(
                             project = item,
                             progress = ProgressCalculator.calculate(item.id, projects, tasks),
-                            hasChildren = tasksByProject[item.id].orEmpty().isNotEmpty() ||
+                            hasChildren = tasksByProject[item.id].orEmpty()
+                                .any { showDone || !it.done } ||
                                 childrenByParent[item.id].orEmpty().isNotEmpty(),
                             depth = depth,
                             isLast = isLast,

@@ -42,6 +42,7 @@ import ar.matias.listmaster.data.ThemeMode
 import ar.matias.listmaster.ui.screens.ListDetailScreen
 import ar.matias.listmaster.ui.screens.ListFormScreen
 import ar.matias.listmaster.ui.screens.ListsScreen
+import ar.matias.listmaster.ui.screens.PendingScreen
 import ar.matias.listmaster.ui.screens.ProjectDetailScreen
 import ar.matias.listmaster.ui.screens.ProjectFormScreen
 import ar.matias.listmaster.ui.screens.ProjectsScreen
@@ -50,13 +51,14 @@ import ar.matias.listmaster.ui.theme.ListMasterTheme
 import java.time.LocalDate
 
 private fun Screen.isTabScreen(): Boolean =
-    this is Screen.Projects || this is Screen.Lists || this is Screen.Settings
+    this is Screen.Projects || this is Screen.Pending || this is Screen.Lists || this is Screen.Settings
 
 private enum class Tab(
     @StringRes val labelRes: Int,
     @DrawableRes val iconRes: Int,
     val screen: Screen,
 ) {
+    Pending(R.string.nav_pending, R.drawable.ic_check_list, Screen.Pending),
     Projects(R.string.nav_projects, R.drawable.ic_folder, Screen.Projects),
     Lists(R.string.nav_lists, R.drawable.ic_list, Screen.Lists),
     Settings(R.string.nav_settings, R.drawable.ic_tune, Screen.Settings),
@@ -73,6 +75,9 @@ fun ListMasterApp(viewModel: AppViewModel = viewModel()) {
 
     ListMasterTheme(darkTheme = darkTheme) {
         val data by viewModel.data.collectAsStateWithLifecycle()
+        val showDoneTasks by viewModel.showDoneTasks.collectAsStateWithLifecycle()
+        val showDoneListItems by viewModel.showDoneListItems.collectAsStateWithLifecycle()
+        val projectFilter by viewModel.projectFilter.collectAsStateWithLifecycle()
         val loaded by viewModel.loaded.collectAsStateWithLifecycle()
         val screen = viewModel.navigation.current
         val snackbarHostState = remember { SnackbarHostState() }
@@ -127,6 +132,7 @@ fun ListMasterApp(viewModel: AppViewModel = viewModel()) {
             bottomBar = {
                 val selected = when (screen) {
                     Screen.Projects -> Tab.Projects
+                    Screen.Pending -> Tab.Pending
                     Screen.Lists -> Tab.Lists
                     Screen.Settings -> Tab.Settings
                     else -> null
@@ -187,18 +193,37 @@ fun ListMasterApp(viewModel: AppViewModel = viewModel()) {
                         Screen.Projects -> ProjectsScreen(
                             projects = data.projects,
                             tasks = data.tasks,
+                            filter = projectFilter,
+                            onFilterChange = viewModel::setProjectFilter,
                             onOpenProject = viewModel::openProject,
                             onNewProject = viewModel::newProject,
                             onEditProject = viewModel::editProject,
                             onSetStatus = viewModel::setProjectStatus,
                             onSetPriority = viewModel::setProjectPriority,
                             onDeleteProject = viewModel::deleteProject,
+                            showDoneTasks = showDoneTasks,
+                            onShowDoneTasksChange = viewModel::setShowDoneTasks,
                             onToggleTask = { task -> viewModel.setTaskDone(task.id, !task.done) },
-                            onCreateTask = { projectId, title, dueDate ->
-                                viewModel.createTask(projectId, title, dueDate)
+                            onCreateTask = { projectId, title, dueDate, description, priority ->
+                                viewModel.createTask(projectId, title, dueDate, description, priority)
                             },
-                            onUpdateTask = { id, title, dueDate ->
-                                viewModel.updateTask(id, title, dueDate)
+                            onUpdateTask = { id, title, dueDate, description, priority ->
+                                viewModel.updateTask(id, title, dueDate, description, priority)
+                            },
+                            onDeleteTask = viewModel::deleteTask,
+                            modifier = contentModifier,
+                        )
+
+                        Screen.Pending -> PendingScreen(
+                            projects = data.projects,
+                            tasks = data.tasks,
+                            onOpenProject = viewModel::openProject,
+                            onToggleTask = { task -> viewModel.setTaskDone(task.id, !task.done) },
+                            onCreateTask = { projectId, title, dueDate, description, priority ->
+                                viewModel.createTask(projectId, title, dueDate, description, priority)
+                            },
+                            onUpdateTask = { id, title, dueDate, description, priority ->
+                                viewModel.updateTask(id, title, dueDate, description, priority)
                             },
                             onDeleteTask = viewModel::deleteTask,
                             modifier = contentModifier,
@@ -210,6 +235,8 @@ fun ListMasterApp(viewModel: AppViewModel = viewModel()) {
                             onOpenList = viewModel::openList,
                             onNewList = viewModel::newList,
                             onToggleItem = viewModel::setListItemDone,
+                            showDoneItems = showDoneListItems,
+                            onShowDoneItemsChange = viewModel::setShowDoneListItems,
                             modifier = contentModifier,
                         )
 
@@ -232,12 +259,14 @@ fun ListMasterApp(viewModel: AppViewModel = viewModel()) {
                             onSetStatus = viewModel::setProjectStatus,
                             onSetPriority = viewModel::setProjectPriority,
                             onDeleteProject = viewModel::deleteProject,
+                            showDoneTasks = showDoneTasks,
+                            onShowDoneTasksChange = viewModel::setShowDoneTasks,
                             onToggleTask = { task -> viewModel.setTaskDone(task.id, !task.done) },
-                            onCreateTask = { projectId, title, dueDate ->
-                                viewModel.createTask(projectId, title, dueDate)
+                            onCreateTask = { projectId, title, dueDate, description, priority ->
+                                viewModel.createTask(projectId, title, dueDate, description, priority)
                             },
-                            onUpdateTask = { id, title, dueDate ->
-                                viewModel.updateTask(id, title, dueDate)
+                            onUpdateTask = { id, title, dueDate, description, priority ->
+                                viewModel.updateTask(id, title, dueDate, description, priority)
                             },
                             onDeleteTask = viewModel::deleteTask,
                             modifier = contentModifier,
@@ -251,8 +280,8 @@ fun ListMasterApp(viewModel: AppViewModel = viewModel()) {
                             onCreate = { title, parentId, status, priority, icon ->
                                 viewModel.createProject(title, parentId, status, priority, icon)
                             },
-                            onUpdate = { id, title, status, priority, icon ->
-                                viewModel.updateProject(id, title, status, priority, icon)
+                            onUpdate = { id, title, status, priority, icon, newParentId ->
+                                viewModel.updateProject(id, title, status, priority, icon, newParentId)
                             },
                             modifier = contentModifier,
                         )
@@ -271,6 +300,8 @@ fun ListMasterApp(viewModel: AppViewModel = viewModel()) {
                                 }
                             },
                             onOpenProject = viewModel::openProject,
+                            showDoneItems = showDoneListItems,
+                            onShowDoneItemsChange = viewModel::setShowDoneListItems,
                             onAddItem = viewModel::addListItem,
                             onToggleItem = viewModel::setListItemDone,
                             onUpdateItemTitle = viewModel::updateListItemTitle,

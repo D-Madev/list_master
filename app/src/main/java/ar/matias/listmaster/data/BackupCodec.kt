@@ -3,6 +3,7 @@ package ar.matias.listmaster.data
 import ar.matias.listmaster.domain.ProjectTree
 import ar.matias.listmaster.domain.model.AppData
 import ar.matias.listmaster.domain.model.ListItem
+import ar.matias.listmaster.domain.model.MAX_DESCRIPTION_LENGTH
 import ar.matias.listmaster.domain.model.MAX_ICON_LENGTH
 import ar.matias.listmaster.domain.model.MAX_ITEM_TITLE_LENGTH
 import ar.matias.listmaster.domain.model.MAX_SUBPROJECT_DEPTH
@@ -74,6 +75,8 @@ object BackupCodec {
                     addProperty("hecha", task.done)
                     addProperty("proyecto_id", task.projectId)
                     addProperty("fecha", task.dueDate?.toString())
+                    if (task.description.isNotEmpty()) addProperty("descripcion", task.description)
+                    if (task.priority != null) addProperty("prioridad", task.priority.storedValue)
                     addProperty("creado", task.createdAt.toString())
                     addProperty("actualizado", task.updatedAt.toString())
                 })
@@ -239,6 +242,14 @@ object BackupCodec {
                 throw BackupException("La tarea «$title» tiene una fecha inválida.", error)
             }
         }
+        val description = obj.optionalString("descripcion")?.trim().orEmpty()
+        if (description.length > MAX_DESCRIPTION_LENGTH) {
+            throw BackupException("La tarea «$title» tiene una descripción demasiado larga.")
+        }
+        val priority = obj.optionalString("prioridad")?.let { raw ->
+            Priority.fromStored(raw)
+                ?: throw BackupException("La tarea «$title» tiene una prioridad inválida.")
+        }
         val createdAt = obj.requireInstant("creado", "tarea «$title»")
         val updatedAt = obj.optionalInstant("actualizado") ?: createdAt
         return Task(
@@ -249,6 +260,8 @@ object BackupCodec {
             dueDate = dueDate,
             createdAt = createdAt,
             updatedAt = updatedAt,
+            description = description,
+            priority = priority,
         )
     }
 

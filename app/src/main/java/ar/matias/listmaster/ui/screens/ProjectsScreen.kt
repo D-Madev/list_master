@@ -17,6 +17,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Switch
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import ar.matias.listmaster.domain.model.ProjectFilter
+import ar.matias.listmaster.ui.sheets.ProjectFilterSheet
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -63,21 +71,25 @@ private data class CardTaskEditor(
 fun ProjectsScreen(
     projects: List<Project>,
     tasks: List<Task>,
+    filter: ProjectFilter,
+    onFilterChange: (ProjectFilter) -> Unit,
     onOpenProject: (String) -> Unit,
     onNewProject: (String?) -> Unit,
     onEditProject: (String) -> Unit,
     onSetStatus: (String, ProjectStatus) -> Unit,
     onSetPriority: (String, Priority?) -> Unit,
     onDeleteProject: (String) -> Unit,
+    showDoneTasks: Boolean,
+    onShowDoneTasksChange: (Boolean) -> Unit,
     onToggleTask: (Task) -> Unit,
-    onCreateTask: (String, String, LocalDate?) -> Unit,
-    onUpdateTask: (String, String, LocalDate?) -> Unit,
+    onCreateTask: (String, String, LocalDate?, String, Priority?) -> Unit,
+    onUpdateTask: (String, String, LocalDate?, String, Priority?) -> Unit,
     onDeleteTask: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var showClosed by rememberSaveable { mutableStateOf(false) }
     // Los ids abiertos se guardan para que el estado sobreviva a la rotación.
     var expandedIds by rememberSaveable { mutableStateOf(arrayListOf<String>()) }
+    var filterOpen by remember { mutableStateOf(false) }
     var menuProject by remember { mutableStateOf<Project?>(null) }
     var statusProject by remember { mutableStateOf<Project?>(null) }
     var priorityProject by remember { mutableStateOf<Project?>(null) }
@@ -85,17 +97,15 @@ fun ProjectsScreen(
     var taskEditor by remember { mutableStateOf<CardTaskEditor?>(null) }
     val haptics = LocalHapticFeedback.current
 
-    val roots = projects.filter { it.parentId == null }
+    val allRoots = projects.filter { it.parentId == null }
+    // Orden automático: Alta, Media, Baja y sin prioridad; a igual prioridad, el más viejo primero.
+    val roots = allRoots.filter(filter::matches).sortedWith(ProjectTree.byPriority)
     val active = roots.filter { it.status == ProjectStatus.ACTIVE }
     val paused = roots.filter {
         it.status == ProjectStatus.PAUSED || it.status == ProjectStatus.POSTPONED
     }
     val closed = roots.filter { it.status.isClosed }
-
-    val childrenByParent = projects.groupBy { it.parentId }
-    val tasksByProject = tasks.groupBy { it.projectId }
-
-    fun progressOf(id: String) = ProgressCalculator.calculate(id, projects, tasks)
+    val activeCount = allRoots.count { it.status == ProjectStatus.ACTIVE }
 
     val allExpanded = roots.isNotEmpty() && roots.all { it.id in expandedIds }
 
@@ -113,8 +123,28 @@ fun ProjectsScreen(
         }
     }
 
+    @Composable
+    fun CardItem(project: Project) {
+        ProjectCardItem(
+            project = project,
+            projects = projects,
+            tasks = tasks,
+            showDoneTasks = showDoneTasks,
+            onOpenProject = onOpenProject,
+            onMenu = { menuProject = project },
+            onStatusClick = { statusProject = project },
+            onPriorityClick = { priorityProject = project },
+            onToggleTask = { task ->
+                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                onToggleTask(task)
+            },
+            expanded = project.id in expandedIds,
+            onToggleExpanded = { toggleExpanded(project.id) },
+        )
+    }
+
     Box(modifier = modifier.fillMaxSize()) {
-        if (roots.isEmpty()) {
+        if (allRoots.isEmpty()) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -149,21 +179,54 @@ fun ProjectsScreen(
                     Column {
                         ScreenTitle(
                             text = stringResource(R.string.projects_title),
-                            subtitle = if (active.isEmpty()) {
+                            subtitle = if (activeCount == 0) {
                                 null
                             } else {
                                 pluralStringResource(
                                     R.plurals.projects_active_count,
-                                    active.size,
-                                    active.size,
+                                    activeCount,
+                                    activeCount,
                                 )
                             },
                             modifier = Modifier.padding(bottom = 4.dp),
                         )
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
+                            Text(
+                                text = if (filter.activeCount == 0) {
+                                    stringResource(R.string.filter_button)
+                                } else {
+                                    stringResource(R.string.filter_button_count, filter.activeCount)
+                                },
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier
+                                    .heightIn(min = 40.dp)
+                                    .clickable { filterOpen = true }
+                                    .padding(horizontal = 4.dp, vertical = 10.dp),
+                            )
+                            Row(
+                                modifier = Modifier
+                                    .heightIn(min = 40.dp)
+                                    .clickable { onShowDoneTasksChange(!showDoneTasks) },
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.done_toggle_short),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                                Switch(
+                                    checked = showDoneTasks,
+                                    onCheckedChange = onShowDoneTasksChange,
+                                    modifier = Modifier
+                                        .padding(start = 6.dp)
+                                        .scale(0.8f),
+                                )
+                            }
                             Text(
                                 text = stringResource(
                                     if (allExpanded) {
@@ -183,29 +246,40 @@ fun ProjectsScreen(
                     }
                 }
 
+                if (roots.isEmpty()) {
+                    item(key = "filter-empty") {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Text(
+                                text = stringResource(R.string.filter_empty_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                textAlign = TextAlign.Center,
+                            )
+                            Spacer(Modifier.height(6.dp))
+                            Text(
+                                text = stringResource(R.string.filter_empty_body),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                            )
+                            Spacer(Modifier.height(16.dp))
+                            TextButton(onClick = { onFilterChange(ProjectFilter.DEFAULT) }) {
+                                Text(stringResource(R.string.filter_clear))
+                            }
+                        }
+                    }
+                }
+
                 if (active.isNotEmpty()) {
                     item(key = "section-active") {
                         SectionHeader(stringResource(R.string.section_active))
                     }
-                    items(active, key = { it.id }) { project ->
-                        ProjectCardItem(
-                            project = project,
-                            projects = projects,
-                            tasksByProject = tasksByProject,
-                            childrenByParent = childrenByParent,
-                            progressOf = ::progressOf,
-                            onOpenProject = onOpenProject,
-                            onMenu = { menuProject = project },
-                            onStatusClick = { statusProject = project },
-                            onPriorityClick = { priorityProject = project },
-                            onToggleTask = { task ->
-                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                                onToggleTask(task)
-                            },
-                            expanded = project.id in expandedIds,
-                            onToggleExpanded = { toggleExpanded(project.id) },
-                        )
-                    }
+                    items(active, key = { it.id }) { project -> CardItem(project) }
                 }
 
                 if (paused.isNotEmpty()) {
@@ -215,67 +289,17 @@ fun ProjectsScreen(
                             modifier = Modifier.padding(top = 12.dp),
                         )
                     }
-                    items(paused, key = { it.id }) { project ->
-                        ProjectCardItem(
-                            project = project,
-                            projects = projects,
-                            tasksByProject = tasksByProject,
-                            childrenByParent = childrenByParent,
-                            progressOf = ::progressOf,
-                            onOpenProject = onOpenProject,
-                            onMenu = { menuProject = project },
-                            onStatusClick = { statusProject = project },
-                            onPriorityClick = { priorityProject = project },
-                            onToggleTask = { task ->
-                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                                onToggleTask(task)
-                            },
-                            expanded = project.id in expandedIds,
-                            onToggleExpanded = { toggleExpanded(project.id) },
-                        )
-                    }
+                    items(paused, key = { it.id }) { project -> CardItem(project) }
                 }
 
                 if (closed.isNotEmpty()) {
                     item(key = "section-closed") {
-                        Column(modifier = Modifier.padding(top = 12.dp)) {
-                            Text(
-                                text = if (showClosed) {
-                                    stringResource(R.string.section_hide_closed)
-                                } else {
-                                    stringResource(R.string.section_show_closed, closed.size)
-                                },
-                                style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .heightIn(min = 48.dp)
-                                    .clickable { showClosed = !showClosed }
-                                    .padding(vertical = 12.dp),
-                            )
-                        }
+                        SectionHeader(
+                            stringResource(R.string.section_closed),
+                            modifier = Modifier.padding(top = 12.dp),
+                        )
                     }
-                    if (showClosed) {
-                        items(closed, key = { it.id }) { project ->
-                            ProjectCardItem(
-                                project = project,
-                                projects = projects,
-                                tasksByProject = tasksByProject,
-                                childrenByParent = childrenByParent,
-                                progressOf = ::progressOf,
-                                onOpenProject = onOpenProject,
-                                onMenu = { menuProject = project },
-                                onStatusClick = { statusProject = project },
-                                onPriorityClick = { priorityProject = project },
-                                onToggleTask = { task ->
-                                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    onToggleTask(task)
-                                },
-                                expanded = project.id in expandedIds,
-                                onToggleExpanded = { toggleExpanded(project.id) },
-                            )
-                        }
-                    }
+                    items(closed, key = { it.id }) { project -> CardItem(project) }
                 }
             }
         }
@@ -294,6 +318,14 @@ fun ProjectsScreen(
                 contentDescription = stringResource(R.string.project_new),
             )
         }
+    }
+
+    if (filterOpen) {
+        ProjectFilterSheet(
+            filter = filter,
+            onChange = onFilterChange,
+            onDismiss = { filterOpen = false },
+        )
     }
 
     menuProject?.let { project ->
@@ -366,11 +398,11 @@ fun ProjectsScreen(
         TaskFormSheet(
             task = editor.task,
             onDismiss = { taskEditor = null },
-            onSave = { title, dueDate ->
+            onSave = { title, dueDate, description, priority ->
                 if (editor.task == null) {
-                    onCreateTask(editor.projectId, title, dueDate)
+                    onCreateTask(editor.projectId, title, dueDate, description, priority)
                 } else {
-                    onUpdateTask(editor.task.id, title, dueDate)
+                    onUpdateTask(editor.task.id, title, dueDate, description, priority)
                 }
                 taskEditor = null
             },
@@ -388,9 +420,8 @@ fun ProjectsScreen(
 private fun ProjectCardItem(
     project: Project,
     projects: List<Project>,
-    tasksByProject: Map<String, List<Task>>,
-    childrenByParent: Map<String?, List<Project>>,
-    progressOf: (String) -> ProjectProgress,
+    tasks: List<Task>,
+    showDoneTasks: Boolean,
     onOpenProject: (String) -> Unit,
     onMenu: () -> Unit,
     onStatusClick: () -> Unit,
@@ -399,16 +430,18 @@ private fun ProjectCardItem(
     expanded: Boolean,
     onToggleExpanded: () -> Unit,
 ) {
-    val children = childrenByParent[project.id].orEmpty()
-    val progress = progressOf(project.id)
+    val progress = remember(project.id, projects, tasks) {
+        ProgressCalculator.calculate(project.id, projects, tasks)
+    }
     Column(modifier = Modifier.animateContentSize()) {
         if (expanded) {
+            val rows = remember(project.id, projects, tasks, showDoneTasks) {
+                buildDetailRows(project, projects, tasks, showDoneTasks)
+            }
             ProjectCard(
                 project = project,
                 progress = progress,
-                directTasks = tasksByProject[project.id].orEmpty(),
-                subprojects = children,
-                subprojectProgress = children.associate { it.id to progressOf(it.id) },
+                rows = rows,
                 onOpen = { onOpenProject(project.id) },
                 onToggleTask = onToggleTask,
                 onMenu = onMenu,

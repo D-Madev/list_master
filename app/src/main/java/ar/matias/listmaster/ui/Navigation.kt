@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateListOf
 
 sealed interface Screen {
     data object Projects : Screen
+    data object Pending : Screen
     data object Lists : Screen
     data object Settings : Screen
 
@@ -20,7 +21,7 @@ sealed interface Screen {
  */
 class Navigator {
 
-    val stack = mutableStateListOf<Screen>(Screen.Projects)
+    val stack = mutableStateListOf<Screen>(Screen.Pending)
 
     val current: Screen get() = stack.last()
 

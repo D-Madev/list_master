@@ -119,14 +119,39 @@ class ListMasterRepository(
         )
     }
 
+    /**
+     * Cambia el padre de un subproyecto. El proyecto principal nunca cambia: el
+     * destino tiene que estar dentro del mismo árbol, fuera del propio subárbol
+     * y sin pasar el límite de niveles.
+     */
+    suspend fun moveProject(id: String, newParentId: String) {
+        val projects = projectDao.getAll().mapNotNull { it.toDomain() }
+        val project = projects.firstOrNull { it.id == id }
+            ?: throw IllegalArgumentException("El proyecto ya no existe.")
+        require(project.parentId != null) { "Un proyecto principal no puede cambiar de padre." }
+        if (project.parentId == newParentId) return
+        require(ProjectTree.validParents(id, projects).any { it.id == newParentId }) {
+            "Ese proyecto no puede ser el nuevo padre."
+        }
+        val existing = projectDao.getById(id) ?: return
+        projectDao.upsert(existing.copy(parentId = newParentId, updatedAt = now().toString()))
+    }
+
     suspend fun deleteProject(id: String) {
         projectDao.delete(id)
     }
 
     // Tareas
 
-    suspend fun createTask(projectId: String, title: String, dueDate: LocalDate?): String {
+    suspend fun createTask(
+        projectId: String,
+        title: String,
+        dueDate: LocalDate?,
+        description: String = "",
+        priority: Priority? = null,
+    ): String {
         val clean = Validation.title(title)
+        val cleanDescription = Validation.description(description)
         require(projectDao.getById(projectId) != null) { "El proyecto ya no existe." }
         val timestamp = now()
         val id = UUID.randomUUID().toString()
@@ -139,6 +164,8 @@ class ListMasterRepository(
                 dueDate = dueDate,
                 createdAt = timestamp,
                 updatedAt = timestamp,
+                description = cleanDescription,
+                priority = priority,
             ).toEntity(),
         )
         return id
@@ -148,13 +175,22 @@ class ListMasterRepository(
         taskDao.setDone(id, done, now().toString())
     }
 
-    suspend fun updateTask(id: String, title: String, dueDate: LocalDate?) {
+    suspend fun updateTask(
+        id: String,
+        title: String,
+        dueDate: LocalDate?,
+        description: String = "",
+        priority: Priority? = null,
+    ) {
         val existing = taskDao.getById(id) ?: throw IllegalArgumentException("La tarea ya no existe.")
         val clean = Validation.title(title)
+        val cleanDescription = Validation.description(description)
         taskDao.upsert(
             existing.copy(
                 title = clean,
                 dueDate = dueDate?.toString(),
+                description = cleanDescription.ifEmpty { null },
+                priority = priority?.storedValue,
                 updatedAt = now().toString(),
             ),
         )

@@ -6,12 +6,17 @@ Es una app Android propia. Los datos quedan en el celular, sin cuenta ni servido
 
 ## Estado
 
-**Versión 1.2.0.** La app está completa según el alcance acordado:
+**Versión 1.4.0.** La app está completa según el alcance acordado:
 
 - Proyectos con subproyectos hasta tres niveles, estados y prioridad opcional, con ícono propio o emoji.
 - Listado de proyectos y listas en registros compactos que se despliegan en el lugar, con “Expandir Todo” / “Colapsar Todo”.
-- Tareas con fecha opcional dentro de cada proyecto.
-- Listas simples, vinculadas o no a un proyecto.
+- Tareas con fecha opcional, descripción y prioridad (solo se ven y editan al abrir la tarea); dentro de cada proyecto y en Pendientes las más importantes van arriba.
+- Pendientes es la pantalla de inicio.
+- Pestaña **Pendientes**: todas las tareas sin hacer en una sola lista, agrupadas por proyecto y subproyecto; desde ahí se completan, editan, agregan (con “+” por proyecto, una tras otra) y borran.
+- Dentro de un proyecto, las pendientes van juntas y las hechas se ocultan con un interruptor (queda guardado).
+- Proyectos ordenados solos por prioridad (Alta, Media, Baja, sin prioridad) y filtro por estado y prioridad que queda guardado.
+- Los subproyectos se pueden pasar a otro padre, siempre dentro de su mismo proyecto principal.
+- Listas simples, vinculadas o no a un proyecto; las tareas hechas se ocultan con un interruptor y la vista previa muestra primero las pendientes.
 - Progreso calculado sobre el árbol de proyectos, sin contar listas.
 - Export e import JSON con nombres de campo en español, validado y atómico.
 - Tema claro, oscuro o del sistema, guardado en el celular.

@@ -18,6 +18,7 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,6 +27,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import ar.matias.listmaster.R
@@ -42,6 +44,8 @@ fun ListsScreen(
     onOpenList: (String) -> Unit,
     onNewList: () -> Unit,
     onToggleItem: (String, Boolean) -> Unit,
+    showDoneItems: Boolean,
+    onShowDoneItemsChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val projectsById = projects.associateBy { it.id }
@@ -103,8 +107,28 @@ fun ListsScreen(
                         )
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
+                            Row(
+                                modifier = Modifier
+                                    .heightIn(min = 40.dp)
+                                    .clickable { onShowDoneItemsChange(!showDoneItems) },
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.done_toggle_short),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                                Switch(
+                                    checked = showDoneItems,
+                                    onCheckedChange = onShowDoneItemsChange,
+                                    modifier = Modifier
+                                        .padding(start = 6.dp)
+                                        .scale(0.8f),
+                                )
+                            }
                             Text(
                                 text = stringResource(
                                     if (allExpanded) {
@@ -131,6 +155,7 @@ fun ListsScreen(
                         onToggle = { toggleExpanded(list.id) },
                         onOpen = { onOpenList(list.id) },
                         onToggleItem = { item, done -> onToggleItem(item.id, done) },
+                        showDoneItems = showDoneItems,
                     )
                 }
             }

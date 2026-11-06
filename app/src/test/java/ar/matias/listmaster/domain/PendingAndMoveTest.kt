@@ -1,0 +1,168 @@
+package ar.matias.listmaster.domain
+
+import ar.matias.listmaster.domain.model.Priority
+import ar.matias.listmaster.domain.model.Project
+import ar.matias.listmaster.domain.model.ProjectFilter
+import ar.matias.listmaster.domain.model.ProjectStatus
+import ar.matias.listmaster.domain.model.Task
+import ar.matias.listmaster.domain.model.TaskOrder
+import ar.matias.listmaster.ui.screens.DetailRow
+import ar.matias.listmaster.ui.screens.buildDetailRows
+import java.time.Instant
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class PendingAndMoveTest {
+
+    private val base = Instant.parse("2026-10-30T12:00:00Z")
+    private var tick = 0L
+
+    private fun project(
+        id: String,
+        parentId: String? = null,
+        priority: Priority? = null,
+        status: ProjectStatus = ProjectStatus.ACTIVE,
+    ) = Project(
+        id = id,
+        title = id,
+        status = status,
+        parentId = parentId,
+        priority = priority,
+        createdAt = base.plusSeconds(tick++),
+        updatedAt = base,
+    )
+
+    private fun task(id: String, projectId: String, done: Boolean = false, priority: Priority? = null) = Task(
+        id = id,
+        title = id,
+        done = done,
+        projectId = projectId,
+        dueDate = null,
+        createdAt = base.plusSeconds(tick++),
+        updatedAt = base,
+        priority = priority,
+    )
+
+    @Test
+    fun `las tareas se ordenan por prioridad y a igual prioridad por antiguedad`() {
+        val sin = task("sin", "P")
+        val baja = task("baja", "P", priority = Priority.LOW)
+        val alta2 = task("alta2", "P", priority = Priority.HIGH)
+        val alta1 = task("alta1", "P", priority = Priority.HIGH)
+
+        val sorted = listOf(sin, baja, alta1, alta2).sortedWith(TaskOrder)
+
+        assertEquals(listOf("alta2", "alta1", "baja", "sin"), sorted.map { it.id })
+    }
+
+    @Test
+    fun `los proyectos se ordenan por prioridad y los sin prioridad quedan al final`() {
+        val none = project("sin")
+        val low = project("baja", priority = Priority.LOW)
+        val high = project("alta", priority = Priority.HIGH)
+        val medium = project("media", priority = Priority.MEDIUM)
+
+        val sorted = listOf(none, low, high, medium).sortedWith(ProjectTree.byPriority)
+
+        assertEquals(listOf("alta", "media", "baja", "sin"), sorted.map { it.id })
+    }
+
+    @Test
+    fun `la vista de pendientes agrupa por proyecto, deja afuera lo hecho y lo cerrado`() {
+        val a = project("A", priority = Priority.HIGH)
+        val a1 = project("A1", parentId = "A")
+        val b = project("B")
+        val closed = project("C", status = ProjectStatus.DONE)
+        val empty = project("D")
+        val tasks = listOf(
+            task("a-1", "A"), task("a-2", "A", done = true), task("a1-1", "A1"),
+            task("b-1", "B"), task("c-1", "C"),
+        )
+
+        val groups = PendingTasks.groups(listOf(b, a, a1, closed, empty), tasks)
+
+        assertEquals(listOf("A", "A1", "B"), groups.map { it.project.id })
+        assertEquals(listOf(0, 1, 0), groups.map { it.depth })
+        assertEquals(listOf("a-1"), groups[0].tasks.map { it.id })
+        assertEquals(3, PendingTasks.count(groups))
+    }
+
+    @Test
+    fun `un subproyecto sin tareas propias aparece si tiene pendientes mas abajo`() {
+        val root = project("R")
+        val mid = project("M", parentId = "R")
+        val leaf = project("L", parentId = "M")
+
+        val groups = PendingTasks.groups(listOf(root, mid, leaf), listOf(task("l-1", "L")))
+
+        assertEquals(listOf("R", "M", "L"), groups.map { it.project.id })
+        assertTrue(groups[0].tasks.isEmpty())
+    }
+
+    @Test
+    fun `en el detalle las pendientes van juntas y las hechas solo si se piden`() {
+        val root = project("R")
+        val sub = project("S", parentId = "R")
+        val tasks = listOf(
+            task("hecha", "R", done = true), task("pend-1", "R"), task("pend-2", "R"),
+        )
+
+        fun titles(show: Boolean) = buildDetailRows(root, listOf(root, sub), tasks, show).map {
+            when (it) {
+                is DetailRow.TaskItem -> it.task.title
+                is DetailRow.ProjectItem -> it.project.title
+            }
+        }
+
+        assertEquals(listOf("pend-1", "pend-2", "S", "hecha"), titles(show = true))
+        assertEquals(listOf("pend-1", "pend-2", "S"), titles(show = false))
+    }
+
+    @Test
+    fun `un subproyecto solo se puede mover dentro de su propio arbol`() {
+        val a = project("a")
+        val a1 = project("a1", "a")
+        val a2 = project("a2", "a")
+        val a1x = project("a1x", "a1")
+        val b = project("b")
+        val b1 = project("b1", "b")
+        val all = listOf(a, a1, a2, a1x, b, b1)
+
+        val parents = ProjectTree.validParents("a1", all).map { it.id }
+
+        assertEquals(listOf("a", "a2"), parents) // ni su hijo, ni nada de b
+        assertTrue(ProjectTree.validParents("a", all).isEmpty()) // la raiz no se mueve
+        assertEquals(a.id, ProjectTree.rootOf("a1x", all)?.id)
+    }
+
+    @Test
+    fun `mover un subproyecto no puede pasar de tres niveles`() {
+        val r = project("r")
+        val l1 = project("l1", "r")
+        val l2 = project("l2", "l1")
+        val l3 = project("l3", "l2")
+        val branch = project("branch", "r")
+        val branchChild = project("branchChild", "branch")
+        val all = listOf(r, l1, l2, l3, branch, branchChild)
+
+        // branch tiene un hijo: bajo l2 quedaria a nivel 3 y su hijo a nivel 4.
+        assertFalse("l2" in ProjectTree.validParents("branch", all).map { it.id })
+        assertTrue("l1" in ProjectTree.validParents("branch", all).map { it.id })
+    }
+
+    @Test
+    fun `el filtro por defecto oculta terminados y cancelados y se puede acotar por prioridad`() {
+        val active = project("a", priority = Priority.HIGH)
+        val done = project("d", status = ProjectStatus.DONE)
+
+        assertTrue(ProjectFilter.DEFAULT.isDefault)
+        assertTrue(ProjectFilter.DEFAULT.matches(active))
+        assertFalse(ProjectFilter.DEFAULT.matches(done))
+
+        val onlyLow = ProjectFilter(priorities = setOf(Priority.LOW))
+        assertFalse(onlyLow.matches(active))
+        assertEquals(1, onlyLow.activeCount)
+    }
+}

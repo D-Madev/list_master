@@ -7,6 +7,7 @@ const val MAX_TITLE_LENGTH = 120
 const val MAX_ITEM_TITLE_LENGTH = 200
 const val MAX_SUBPROJECT_DEPTH = 3
 const val MAX_ICON_LENGTH = 32
+const val MAX_DESCRIPTION_LENGTH = 2000
 
 enum class ProjectStatus(val storedValue: String) {
     ACTIVE("Activo"),
@@ -36,6 +37,15 @@ enum class Priority(val storedValue: String) {
     }
 }
 
+/** Orden de los proyectos: Alta, Media, Baja y al final los que no tienen prioridad. */
+val Priority?.sortRank: Int
+    get() = when (this) {
+        Priority.HIGH -> 0
+        Priority.MEDIUM -> 1
+        Priority.LOW -> 2
+        null -> 3
+    }
+
 data class Project(
     val id: String,
     val title: String,
@@ -56,7 +66,15 @@ data class Task(
     val dueDate: LocalDate?,
     val createdAt: Instant,
     val updatedAt: Instant,
+    /** Texto libre que solo se ve al abrir la tarea. */
+    val description: String = "",
+    /** Solo se ve y se edita al abrir la tarea; define el orden dentro del proyecto. */
+    val priority: Priority? = null,
 )
+
+/** Alta primero, después Media, Baja y sin prioridad; a igual prioridad, la más antigua. */
+val TaskOrder: Comparator<Task> =
+    compareBy<Task>({ it.priority.sortRank }, { it.createdAt }, { it.id })
 
 data class TaskList(
     val id: String,

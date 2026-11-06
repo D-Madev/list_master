@@ -3,6 +3,7 @@
     <string name="app_name">List Master</string>
 
     <string name="nav_projects">Proyectos</string>
+    <string name="nav_pending">Pendientes</string>
     <string name="nav_lists">Listas</string>
     <string name="nav_settings">Ajustes</string>
 
@@ -76,6 +77,7 @@
     <string name="project_parent_none">Sin Proyecto Padre</string>
     <string name="priority_none">Sin Prioridad</string>
     <string name="title_required">El título no puede estar vacío.</string>
+    <string name="description_too_long">La descripción no puede superar los 2000 caracteres.</string>
     <string name="title_too_long">El título no puede superar los 120 caracteres.</string>
     <string name="project_delete_title">¿Borrar «%1$s»?</string>
     <string name="project_delete_body">También se van a borrar sus subproyectos y tareas. Las listas vinculadas quedan sueltas. Esto no se puede deshacer.</string>
@@ -91,6 +93,44 @@
     <string name="project_tree_title">Tareas y Subproyectos</string>
     <string name="project_empty_tasks_title">Este proyecto no tiene tareas.</string>
     <string name="project_empty_tasks_body">Agregá la primera para empezar a medir el progreso.</string>
+
+    <string name="done_toggle_label">Ver tareas hechas</string>
+    <string name="done_toggle_short">Hechas</string>
+    <string name="done_toggle_count">Ver Hechas (%1$d)</string>
+    <string name="done_toggle_items_count">Ver Hechos (%1$d)</string>
+    <string name="done_all_hidden_title">Todo lo que había está hecho.</string>
+    <string name="done_all_hidden_body">Las tareas hechas están ocultas. Activá «Ver Hechas» para verlas.</string>
+
+    <string name="filter_button">Filtros</string>
+    <string name="filter_button_count">Filtros · %1$d</string>
+    <string name="filter_title">Filtrar Proyectos</string>
+    <string name="filter_status">Estado</string>
+    <string name="filter_priority">Prioridad</string>
+    <string name="filter_reset">Restablecer</string>
+    <string name="filter_empty_title">Ningún proyecto coincide con el filtro.</string>
+    <string name="filter_empty_body">Probá con otros estados o prioridades.</string>
+    <string name="filter_clear">Quitar Filtros</string>
+
+    <string name="pending_title">Pendientes</string>
+    <plurals name="pending_summary">
+        <item quantity="one">%1$d tarea en %2$d proyectos.</item>
+        <item quantity="other">%1$d tareas en %2$d proyectos.</item>
+    </plurals>
+    <string name="pending_empty_title">No tenés nada pendiente.</string>
+    <string name="pending_empty_body">Cuando haya tareas sin hacer, las vas a ver todas juntas acá, por proyecto.</string>
+    <string name="pending_add_placeholder">Agregar tarea…</string>
+    <string name="pending_add_to">Agregar a «%1$s»</string>
+    <string name="pending_new_task">Nueva Tarea Pendiente</string>
+    <string name="pending_pick_project">Elegí el proyecto</string>
+    <string name="pending_project_label">Proyecto</string>
+    <string name="pending_no_project">Elegí un proyecto</string>
+    <string name="pending_open_project">Abrir «%1$s»</string>
+
+    <string name="task_description_label">Descripción</string>
+    <string name="task_description_placeholder">Notas, links, lo que quieras recordar</string>
+    <string name="project_parent_change">Cambiar el Proyecto Padre</string>
+    <string name="project_parent_pick_title">Nuevo Proyecto Padre</string>
+    <string name="project_parent_pick_help">Solo dentro de «%1$s».</string>
 
     <string name="progress_fraction">%1$d de %2$d</string>
     <string name="progress_description">%1$d de %2$d tareas hechas, %3$d por ciento</string>

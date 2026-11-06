@@ -12,6 +12,7 @@ import ar.matias.listmaster.data.BackupException
 import ar.matias.listmaster.data.ThemeMode
 import ar.matias.listmaster.domain.model.AppData
 import ar.matias.listmaster.domain.model.Priority
+import ar.matias.listmaster.domain.model.ProjectFilter
 import ar.matias.listmaster.domain.model.ProjectStatus
 import java.time.LocalDate
 import kotlinx.coroutines.CancellationException
@@ -46,6 +47,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         )
 
     val themeMode: StateFlow<ThemeMode> = preferences.themeMode
+    val showDoneTasks: StateFlow<Boolean> = preferences.showDoneTasks
+    val showDoneListItems: StateFlow<Boolean> = preferences.showDoneListItems
+    val projectFilter: StateFlow<ProjectFilter> = preferences.projectFilter
 
     val navigation = Navigator()
 
@@ -70,6 +74,18 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setThemeMode(mode: ThemeMode) {
         preferences.setThemeMode(mode)
+    }
+
+    fun setShowDoneTasks(show: Boolean) {
+        preferences.setShowDoneTasks(show)
+    }
+
+    fun setShowDoneListItems(show: Boolean) {
+        preferences.setShowDoneListItems(show)
+    }
+
+    fun setProjectFilter(filter: ProjectFilter) {
+        preferences.setProjectFilter(filter)
     }
 
     // Respaldo
@@ -209,8 +225,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         status: ProjectStatus,
         priority: Priority?,
         icon: String?,
+        newParentId: String? = null,
     ) {
         action {
+            // Primero el cambio de padre: si no es válido, no se guarda nada.
+            if (newParentId != null) repository.moveProject(id, newParentId)
             repository.updateProject(id, title, status, priority, icon)
             navigation.pop()
         }
@@ -237,10 +256,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         projectId: String,
         title: String,
         dueDate: LocalDate?,
+        description: String = "",
+        priority: Priority? = null,
         onSaved: () -> Unit = {},
     ) {
         action {
-            repository.createTask(projectId, title, dueDate)
+            repository.createTask(projectId, title, dueDate, description, priority)
             onSaved()
         }
     }
@@ -249,10 +270,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         id: String,
         title: String,
         dueDate: LocalDate?,
+        description: String = "",
+        priority: Priority? = null,
         onSaved: () -> Unit = {},
     ) {
         action {
-            repository.updateTask(id, title, dueDate)
+            repository.updateTask(id, title, dueDate, description, priority)
             onSaved()
         }
     }

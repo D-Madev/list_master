@@ -28,6 +28,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import ar.matias.listmaster.R
+import ar.matias.listmaster.domain.ProjectTree
 import ar.matias.listmaster.domain.model.MAX_TITLE_LENGTH
 import ar.matias.listmaster.domain.model.Priority
 import ar.matias.listmaster.domain.model.Project
@@ -40,6 +41,7 @@ import ar.matias.listmaster.ui.components.projectIconLabelRes
 import ar.matias.listmaster.ui.iconRes
 import ar.matias.listmaster.ui.labelRes
 import ar.matias.listmaster.ui.sheets.PriorityPickerSheet
+import ar.matias.listmaster.ui.sheets.ProjectPickerSheet
 import ar.matias.listmaster.ui.sheets.ProjectIconSheet
 import ar.matias.listmaster.ui.sheets.StatusPickerSheet
 
@@ -50,7 +52,7 @@ fun ProjectFormScreen(
     projects: List<Project>,
     onBack: () -> Unit,
     onCreate: (String, String?, ProjectStatus, Priority?, String?) -> Unit,
-    onUpdate: (String, String, ProjectStatus, Priority?, String?) -> Unit,
+    onUpdate: (String, String, ProjectStatus, Priority?, String?, String?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val existing = projectId?.let { id -> projects.firstOrNull { it.id == id } }
@@ -62,13 +64,23 @@ fun ProjectFormScreen(
     var statusOpen by remember { mutableStateOf(false) }
     var priorityOpen by remember { mutableStateOf(false) }
     var iconOpen by remember { mutableStateOf(false) }
+    var parentOpen by remember { mutableStateOf(false) }
+    // Solo los subproyectos cambian de padre, y siempre dentro de su propio árbol.
+    var selectedParentId by remember(projectId) { mutableStateOf(existing?.parentId) }
+    val parentOptions = remember(existing?.id, projects) {
+        existing?.let { project ->
+            ProjectTree.validParents(project.id, projects)
+                .map { it to ProjectTree.depthOf(it.id, projects) }
+        }.orEmpty()
+    }
+    val rootTitle = existing?.let { ProjectTree.rootOf(it.id, projects)?.title }
     val focusRequester = remember { FocusRequester() }
     val visibleTitleError = titleError ?: if (title.trim().length > MAX_TITLE_LENGTH) {
         R.string.title_too_long
     } else {
         null
     }
-    val effectiveParentId = existing?.parentId ?: parentId
+    val effectiveParentId = if (existing != null) selectedParentId else parentId
     val parentTitle = effectiveParentId?.let { id ->
         projects.firstOrNull { it.id == id }?.title
     }
@@ -153,7 +165,11 @@ fun ProjectFormScreen(
                     iconRes = R.drawable.ic_layers,
                     label = stringResource(R.string.project_parent_label),
                     value = parentTitle,
-                    onClick = null,
+                    onClick = if (parentOptions.size > 1) {
+                        { parentOpen = true }
+                    } else {
+                        null
+                    },
                 )
             }
 
@@ -166,7 +182,14 @@ fun ProjectFormScreen(
                         clean.isEmpty() -> titleError = R.string.title_required
                         clean.length > MAX_TITLE_LENGTH -> titleError = R.string.title_too_long
                         existing == null -> onCreate(clean, effectiveParentId, status, priority, icon)
-                        else -> onUpdate(existing.id, clean, status, priority, icon)
+                        else -> onUpdate(
+                            existing.id,
+                            clean,
+                            status,
+                            priority,
+                            icon,
+                            selectedParentId.takeIf { existing.parentId != null },
+                        )
                     }
                 },
                 enabled = title.isNotBlank() && visibleTitleError == null,
@@ -193,6 +216,20 @@ fun ProjectFormScreen(
             onSelect = {
                 priority = it
                 priorityOpen = false
+            },
+        )
+    }
+
+    if (parentOpen) {
+        ProjectPickerSheet(
+            title = stringResource(R.string.project_parent_pick_title),
+            help = rootTitle?.let { stringResource(R.string.project_parent_pick_help, it) },
+            options = parentOptions,
+            current = selectedParentId,
+            onDismiss = { parentOpen = false },
+            onSelect = {
+                selectedParentId = it.id
+                parentOpen = false
             },
         )
     }

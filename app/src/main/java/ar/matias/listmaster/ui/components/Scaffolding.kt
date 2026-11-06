@@ -174,8 +174,8 @@ fun SelectorRow(
 }
 
 /**
- * Fila de propiedad del detalle: icono y rótulo a la izquierda, chip a la
- * derecha. Es la misma estructura de la tarjeta de referencia.
+ * Fila de propiedad del detalle: icono y rótulo a la izquierda, chip pegado
+ * al rótulo. Es la misma estructura de la tarjeta de referencia.
  */
 @Composable
 fun PropertyRow(
@@ -203,9 +203,10 @@ fun PropertyRow(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.width(80.dp),
         )
         trailing()
+        Spacer(Modifier.weight(1f))
     }
 }
 
