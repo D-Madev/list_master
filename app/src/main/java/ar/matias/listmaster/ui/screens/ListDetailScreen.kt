@@ -458,7 +458,7 @@ fun ListDetailScreen(
                         shape = RoundedCornerShape(14.dp),
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Done,
-                            capitalization = KeyboardCapitalization.Words,
+                            capitalization = KeyboardCapitalization.Sentences,
                         ),
                         keyboardActions = KeyboardActions(
                             onDone = {

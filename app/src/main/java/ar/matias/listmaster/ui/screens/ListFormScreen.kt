@@ -109,7 +109,7 @@ fun ListFormScreen(
                 singleLine = true,
                 isError = visibleTitleError != null,
                 shape = RoundedCornerShape(14.dp),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, capitalization = KeyboardCapitalization.Words),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, capitalization = KeyboardCapitalization.Sentences),
                 supportingText = visibleTitleError?.let { error ->
                     { Text(stringResource(error)) }
                 },

@@ -161,7 +161,7 @@ fun ListItemDialog(
                     label = { Text(stringResource(R.string.list_item_title_label)) },
                     singleLine = true,
                     shape = RoundedCornerShape(14.dp),
-                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                     modifier = Modifier.fillMaxWidth(),
                 )
                 TextButton(

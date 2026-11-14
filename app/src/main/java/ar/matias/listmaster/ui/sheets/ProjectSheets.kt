@@ -390,7 +390,7 @@ fun TaskFormSheet(
                 singleLine = true,
                 isError = showError || tooLong,
                 shape = RoundedCornerShape(14.dp),
-                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 supportingText = when {
                     showError -> {
                         { Text(stringResource(R.string.title_required)) }
