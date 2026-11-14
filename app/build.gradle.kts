@@ -13,8 +13,8 @@ android {
         applicationId = "ar.matias.listmaster"
         minSdk = 28
         targetSdk = 34
-        versionCode = 12
-        versionName = "1.6.0"
+        versionCode = 13
+        versionName = "1.6.1"
     }
 
     // La app no va a Play Store: se instala desde el APK. Una release sin

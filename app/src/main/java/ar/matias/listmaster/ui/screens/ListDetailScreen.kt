@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +27,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,7 +48,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -66,6 +67,7 @@ import ar.matias.listmaster.ui.components.DetailHeader
 import ar.matias.listmaster.ui.components.IconTile
 import ar.matias.listmaster.ui.components.TaskCheck
 import ar.matias.listmaster.ui.components.ThinProgressBar
+import ar.matias.listmaster.ui.components.TreeRow
 import ar.matias.listmaster.ui.sheets.DeleteListDialog
 import ar.matias.listmaster.ui.sheets.ListItemDialog
 import ar.matias.listmaster.ui.sheets.ListMenuSheet
@@ -90,6 +92,7 @@ fun ListDetailScreen(
     onDeleteItem: (String) -> Unit,
     onReorderItems: (String, List<String>) -> Unit,
     onAddSublist: (String) -> Unit,
+    onOpenSublist: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val list = lists.firstOrNull { it.id == listId }
@@ -127,6 +130,9 @@ fun ListDetailScreen(
     val pendingItems = list.items.filter { !it.done }
     val doneItems = list.items.filter { it.done }
     val projectTitle = list.projectId?.let { id -> projects.firstOrNull { it.id == id }?.title }
+    val sublists = remember(lists, list.id) {
+        lists.filter { it.parentId == list.id }.sortedWith(ListTree.byAge)
+    }
     val extended = LocalExtendedColors.current
 
     // Drag-to-reorder state
@@ -140,12 +146,7 @@ fun ListDetailScreen(
         }
     }
 
-    // Scroll-to-dismiss
     val lazyListState = rememberLazyListState()
-    val focusManager = LocalFocusManager.current
-    LaunchedEffect(lazyListState.isScrollInProgress) {
-        if (lazyListState.isScrollInProgress) focusManager.clearFocus()
-    }
 
     Column(
         modifier = modifier
@@ -231,6 +232,17 @@ fun ListDetailScreen(
                         }
                     }
                     Spacer(Modifier.height(8.dp))
+                }
+            }
+
+            if (sublists.isNotEmpty()) {
+                items(sublists, key = { "sublist-${it.id}" }) { sublist ->
+                    val isLast = sublist.id == sublists.last().id
+                    SublistLinkRow(
+                        list = sublist,
+                        isLast = isLast,
+                        onClick = { onOpenSublist(sublist.id) },
+                    )
                 }
             }
 
@@ -507,5 +519,68 @@ private fun ListItemRow(
                 tint = scheme.onSurfaceVariant.copy(alpha = 0.35f),
             )
         }
+    }
+}
+
+/** Fila de sublista enlazada, con el mismo estilo de árbol que los subproyectos. */
+@Composable
+private fun SublistLinkRow(
+    list: TaskList,
+    isLast: Boolean,
+    onClick: () -> Unit,
+) {
+    val scheme = MaterialTheme.colorScheme
+    val extended = LocalExtendedColors.current
+    val done = list.items.count { it.done }
+    val total = list.items.size
+
+    TreeRow(
+        depth = 1,
+        isLast = isLast,
+        modifier = Modifier
+            .heightIn(min = 48.dp)
+            .clickable(onClick = onClick),
+        connectorInset = (-8).dp,
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_list),
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+            tint = scheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = list.title,
+            style = MaterialTheme.typography.bodyMedium,
+            color = scheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
+        )
+        Spacer(Modifier.width(8.dp))
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(999.dp))
+                .background(extended.surfaceAlt)
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+        ) {
+            Text(
+                text = if (total > 0) {
+                    stringResource(R.string.progress_fraction, done, total)
+                } else {
+                    stringResource(R.string.list_no_items_short)
+                },
+                style = MaterialTheme.typography.labelSmall,
+                color = if (total > 0 && done == total) extended.success else scheme.onSurfaceVariant,
+            )
+        }
+        Icon(
+            imageVector = Icons.Outlined.KeyboardArrowRight,
+            contentDescription = null,
+            modifier = Modifier
+                .padding(start = 2.dp)
+                .size(16.dp),
+            tint = scheme.onSurfaceVariant,
+        )
     }
 }

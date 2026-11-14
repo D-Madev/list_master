@@ -310,6 +310,7 @@ fun ListMasterApp(viewModel: AppViewModel = viewModel()) {
                                 viewModel.reorderListItems(listId, itemIds)
                             },
                             onAddSublist = { listId -> viewModel.newList(parentId = listId) },
+                            onOpenSublist = viewModel::openList,
                             modifier = contentModifier,
                         )
 

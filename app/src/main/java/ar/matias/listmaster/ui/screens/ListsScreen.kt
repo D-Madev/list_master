@@ -51,10 +51,10 @@ fun ListsScreen(
     modifier: Modifier = Modifier,
 ) {
     val projectsById = projects.associateBy { it.id }
-    val orderedLists = remember(lists) { ListTree.flatten(lists) }
+    val roots = remember(lists) { lists.filter { it.parentId == null }.sortedWith(ListTree.byAge) }
     var expandedIds by rememberSaveable { mutableStateOf(arrayListOf<String>()) }
 
-    val allExpanded = lists.isNotEmpty() && lists.all { it.id in expandedIds }
+    val allExpanded = roots.isNotEmpty() && roots.all { it.id in expandedIds }
 
     fun toggleExpanded(id: String) {
         expandedIds = ArrayList(expandedIds).also { ids ->
@@ -64,7 +64,7 @@ fun ListsScreen(
 
     fun setAllExpanded(expanded: Boolean) {
         expandedIds = if (expanded) {
-            ArrayList(lists.map { it.id })
+            ArrayList(roots.map { it.id })
         } else {
             arrayListOf()
         }
@@ -150,16 +150,20 @@ fun ListsScreen(
                         }
                     }
                 }
-                items(orderedLists, key = { (list, _) -> list.id }) { (list, depth) ->
+                items(roots, key = { it.id }) { root ->
+                    val rows = remember(lists, showDoneItems) {
+                        buildListDetailRows(root, lists, showDone = showDoneItems)
+                    }
                     ListCard(
-                        list = list,
-                        projectTitle = list.projectId?.let { projectsById[it]?.title },
-                        expanded = list.id in expandedIds,
-                        onToggle = { toggleExpanded(list.id) },
-                        onOpen = { onOpenList(list.id) },
+                        list = root,
+                        rows = rows,
+                        projectTitle = root.projectId?.let { projectsById[it]?.title },
+                        expanded = root.id in expandedIds,
+                        onToggle = { toggleExpanded(root.id) },
+                        onOpen = { onOpenList(root.id) },
                         onToggleItem = { item, done -> onToggleItem(item.id, done) },
+                        onOpenSublist = onOpenList,
                         showDoneItems = showDoneItems,
-                        modifier = Modifier.padding(start = (depth * 16).dp),
                     )
                 }
             }
@@ -180,4 +184,83 @@ fun ListsScreen(
             )
         }
     }
+}
+
+internal sealed interface ListDetailRow {
+    val depth: Int
+    val isLast: Boolean
+    val ancestorContinues: List<Boolean>
+
+    data class ItemRow(
+        val item: ar.matias.listmaster.domain.model.ListItem,
+        override val depth: Int,
+        override val isLast: Boolean,
+        override val ancestorContinues: List<Boolean>,
+    ) : ListDetailRow
+
+    data class SublistItem(
+        val list: TaskList,
+        val done: Int,
+        val total: Int,
+        val hasChildren: Boolean,
+        override val depth: Int,
+        override val isLast: Boolean,
+        override val ancestorContinues: List<Boolean>,
+    ) : ListDetailRow
+}
+
+/**
+ * Árbol de una lista: sus ítems pendientes, después sus sublistas (cada una
+ * con su propio subárbol) y al final los ítems hechos, si [showDone]. La raíz
+ * no se dibuja como fila; arranca en profundidad 1, igual que con proyectos.
+ */
+internal fun buildListDetailRows(
+    root: TaskList,
+    lists: List<TaskList>,
+    showDone: Boolean = true,
+): List<ListDetailRow> {
+    val childrenByParent = lists.groupBy { it.parentId }
+    val rows = mutableListOf<ListDetailRow>()
+
+    fun emitChildren(list: TaskList, depth: Int, ancestorContinues: List<Boolean>) {
+        val pending = list.items.filter { !it.done }
+        val done = list.items.filter { it.done }
+        val items = buildList<Any> {
+            addAll(pending)
+            addAll(childrenByParent[list.id].orEmpty().sortedWith(ListTree.byAge))
+            if (showDone) addAll(done)
+        }
+        items.forEachIndexed { index, item ->
+            val isLast = index == items.lastIndex
+            when (item) {
+                is ar.matias.listmaster.domain.model.ListItem -> rows.add(
+                    ListDetailRow.ItemRow(
+                        item = item,
+                        depth = depth,
+                        isLast = isLast,
+                        ancestorContinues = ancestorContinues,
+                    ),
+                )
+
+                is TaskList -> {
+                    rows.add(
+                        ListDetailRow.SublistItem(
+                            list = item,
+                            done = item.items.count { it.done },
+                            total = item.items.size,
+                            hasChildren = item.items.any { showDone || !it.done } ||
+                                childrenByParent[item.id].orEmpty().isNotEmpty(),
+                            depth = depth,
+                            isLast = isLast,
+                            ancestorContinues = ancestorContinues,
+                        ),
+                    )
+                    emitChildren(item, depth + 1, ancestorContinues + !isLast)
+                }
+            }
+        }
+    }
+
+    emitChildren(root, depth = 1, ancestorContinues = emptyList())
+    return rows
 }

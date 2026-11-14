@@ -42,18 +42,21 @@ import androidx.compose.ui.unit.dp
 import ar.matias.listmaster.R
 import ar.matias.listmaster.domain.model.ListItem
 import ar.matias.listmaster.domain.model.TaskList
+import ar.matias.listmaster.ui.screens.ListDetailRow
 import ar.matias.listmaster.ui.theme.LocalExtendedColors
 
 private const val MAX_LIST_ROWS = 6
 
 @Composable
-fun ListCard(
+internal fun ListCard(
     list: TaskList,
+    rows: List<ListDetailRow>,
     projectTitle: String?,
     expanded: Boolean,
     onToggle: () -> Unit,
     onOpen: () -> Unit,
     onToggleItem: (ListItem, Boolean) -> Unit,
+    onOpenSublist: (String) -> Unit,
     modifier: Modifier = Modifier,
     showDoneItems: Boolean = false,
 ) {
@@ -76,9 +79,8 @@ fun ListCard(
     val done = list.items.count { it.done }
     val total = list.items.size
     val fraction = if (total == 0) 0f else done.toFloat() / total
-    val shownItems = list.items.filter { !it.done } + if (showDoneItems) list.items.filter { it.done } else emptyList()
-    val visibleItems = shownItems.take(MAX_LIST_ROWS)
-    val hiddenCount = shownItems.size - visibleItems.size
+    val visibleRows = rows.take(MAX_LIST_ROWS)
+    val hiddenCount = rows.size - visibleRows.size
 
     Column(
         modifier = modifier
@@ -173,25 +175,44 @@ fun ListCard(
         }
 
         if (expanded) {
-            if (visibleItems.isNotEmpty()) {
+            if (visibleRows.isNotEmpty()) {
                 Spacer(Modifier.height(8.dp))
-                visibleItems.forEach { item ->
-                    ListPreviewRow(
-                        item = item,
-                        onToggle = { onToggleItem(item, !item.done) },
-                        onOpen = onOpen,
-                    )
+                visibleRows.forEach { row ->
+                    val isLast = row.isLast && !(hiddenCount > 0 && row.depth == 1)
+                    when (row) {
+                        is ListDetailRow.ItemRow -> ListPreviewRow(
+                            item = row.item,
+                            depth = row.depth,
+                            isLast = isLast,
+                            onToggle = { onToggleItem(row.item, !row.item.done) },
+                            onOpen = onOpen,
+                            ancestorContinues = row.ancestorContinues,
+                        )
+
+                        is ListDetailRow.SublistItem -> SublistRow(
+                            list = row.list,
+                            done = row.done,
+                            total = row.total,
+                            depth = row.depth,
+                            isLast = isLast,
+                            onClick = { onOpenSublist(row.list.id) },
+                            ancestorContinues = row.ancestorContinues,
+                            hasChildren = row.hasChildren,
+                        )
+                    }
                 }
                 if (hiddenCount > 0) {
-                    Text(
-                        text = stringResource(R.string.list_more_items, hiddenCount),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = scheme.primary,
-                        modifier = Modifier
-                            .heightIn(min = 40.dp)
-                            .clickable(onClick = onOpen)
-                            .padding(horizontal = 4.dp, vertical = 10.dp),
-                    )
+                    TreeRow(depth = 1, isLast = true, connectorInset = (-8).dp) {
+                        Text(
+                            text = stringResource(R.string.list_more_items, hiddenCount),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = scheme.primary,
+                            modifier = Modifier
+                                .heightIn(min = 40.dp)
+                                .clickable(onClick = onOpen)
+                                .padding(horizontal = 4.dp, vertical = 10.dp),
+                        )
+                    }
                 }
             } else {
                 Spacer(Modifier.height(8.dp))
@@ -233,18 +254,22 @@ fun ListCard(
 @Composable
 private fun ListPreviewRow(
     item: ListItem,
+    depth: Int,
+    isLast: Boolean,
     onToggle: () -> Unit,
     onOpen: () -> Unit,
+    ancestorContinues: List<Boolean> = emptyList(),
 ) {
     val contentDescription = stringResource(
         if (item.done) R.string.item_done_description else R.string.item_pending_description,
         item.title,
     )
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 44.dp),
-        verticalAlignment = Alignment.CenterVertically,
+    TreeRow(
+        depth = depth,
+        isLast = isLast,
+        modifier = Modifier.heightIn(min = 44.dp),
+        ancestorContinues = ancestorContinues,
+        connectorInset = 6.dp,
     ) {
         TaskCheck(
             done = item.done,
@@ -261,6 +286,73 @@ private fun ListPreviewRow(
                 .weight(1f)
                 .clickable(onClick = onOpen)
                 .padding(vertical = 8.dp),
+        )
+    }
+}
+
+@Composable
+private fun SublistRow(
+    list: TaskList,
+    done: Int,
+    total: Int,
+    depth: Int,
+    isLast: Boolean,
+    onClick: () -> Unit,
+    ancestorContinues: List<Boolean> = emptyList(),
+    hasChildren: Boolean = false,
+) {
+    val scheme = MaterialTheme.colorScheme
+    val extended = LocalExtendedColors.current
+
+    TreeRow(
+        depth = depth,
+        isLast = isLast,
+        modifier = Modifier
+            .heightIn(min = 48.dp)
+            .clickable(onClick = onClick),
+        ancestorContinues = ancestorContinues,
+        connectorInset = (-8).dp,
+        hasChildren = hasChildren,
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_list),
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+            tint = scheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = list.title,
+            style = MaterialTheme.typography.bodyMedium,
+            color = scheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
+        )
+        Spacer(Modifier.width(8.dp))
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(999.dp))
+                .background(extended.surfaceAlt)
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+        ) {
+            Text(
+                text = if (total > 0) {
+                    stringResource(R.string.progress_fraction, done, total)
+                } else {
+                    stringResource(R.string.list_no_items_short)
+                },
+                style = MaterialTheme.typography.labelSmall,
+                color = if (total > 0 && done == total) extended.success else scheme.onSurfaceVariant,
+            )
+        }
+        Icon(
+            imageVector = Icons.Outlined.KeyboardArrowRight,
+            contentDescription = null,
+            modifier = Modifier
+                .padding(start = 2.dp)
+                .size(16.dp),
+            tint = scheme.onSurfaceVariant,
         )
     }
 }
