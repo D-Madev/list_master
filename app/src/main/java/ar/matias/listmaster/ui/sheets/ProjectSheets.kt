@@ -21,6 +21,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
@@ -28,6 +29,7 @@ import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -388,6 +390,7 @@ fun TaskFormSheet(
                 singleLine = true,
                 isError = showError || tooLong,
                 shape = RoundedCornerShape(14.dp),
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
                 supportingText = when {
                     showError -> {
                         { Text(stringResource(R.string.title_required)) }
@@ -411,6 +414,7 @@ fun TaskFormSheet(
                 maxLines = 8,
                 isError = descriptionTooLong,
                 shape = RoundedCornerShape(14.dp),
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 supportingText = if (descriptionTooLong) {
                     { Text(stringResource(R.string.description_too_long)) }
                 } else {
@@ -638,7 +642,8 @@ fun ProjectIconSheet(
 
 /**
  * Elige un proyecto de una lista con sangría por nivel. Sirve para mover un
- * subproyecto de padre y para decidir dónde va una tarea nueva.
+ * proyecto de padre y para decidir dónde va una tarea nueva. Con [noneLabel]
+ * aparece una opción al inicio para indicar que no se quiere padre.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -647,8 +652,9 @@ fun ProjectPickerSheet(
     options: List<Pair<Project, Int>>,
     current: String?,
     onDismiss: () -> Unit,
-    onSelect: (Project) -> Unit,
+    onSelect: (Project?) -> Unit,
     help: String? = null,
+    noneLabel: String? = null,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -679,6 +685,30 @@ fun ProjectPickerSheet(
                     .verticalScroll(rememberScrollState())
                     .padding(bottom = 16.dp),
             ) {
+                if (noneLabel != null) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 52.dp)
+                            .clickable { onSelect(null) }
+                            .padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = noneLabel,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.weight(1f),
+                        )
+                        if (current == null) {
+                            Icon(
+                                imageVector = Icons.Outlined.Check,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    }
+                }
                 options.forEach { (project, depth) ->
                     Row(
                         modifier = Modifier

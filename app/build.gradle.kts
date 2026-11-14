@@ -13,8 +13,8 @@ android {
         applicationId = "ar.matias.listmaster"
         minSdk = 28
         targetSdk = 34
-        versionCode = 10
-        versionName = "1.4.0"
+        versionCode = 11
+        versionName = "1.5.0"
     }
 
     // La app no va a Play Store: se instala desde el APK. Una release sin
@@ -78,4 +78,5 @@ dependencies {
     testImplementation("androidx.test.ext:junit:1.1.5")
     testImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+    releaseImplementation("androidx.compose.ui:ui-test-manifest")
 }

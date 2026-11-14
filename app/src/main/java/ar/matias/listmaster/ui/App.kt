@@ -306,6 +306,9 @@ fun ListMasterApp(viewModel: AppViewModel = viewModel()) {
                             onToggleItem = viewModel::setListItemDone,
                             onUpdateItemTitle = viewModel::updateListItemTitle,
                             onDeleteItem = viewModel::deleteListItem,
+                            onReorderItems = { listId, itemIds ->
+                                viewModel.reorderListItems(listId, itemIds)
+                            },
                             modifier = contentModifier,
                         )
 

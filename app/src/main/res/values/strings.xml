@@ -130,7 +130,8 @@
     <string name="task_description_placeholder">Notas, links, lo que quieras recordar</string>
     <string name="project_parent_change">Cambiar el Proyecto Padre</string>
     <string name="project_parent_pick_title">Nuevo Proyecto Padre</string>
-    <string name="project_parent_pick_help">Solo dentro de «%1$s».</string>
+    <string name="project_parent_pick_help">Elegí cualquier proyecto como padre.</string>
+    <string name="cd_drag_handle">Mover Ítem</string>
 
     <string name="progress_fraction">%1$d de %2$d</string>
     <string name="progress_description">%1$d de %2$d tareas hechas, %3$d por ciento</string>

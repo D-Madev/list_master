@@ -24,6 +24,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import ar.matias.listmaster.R
 import ar.matias.listmaster.domain.model.MAX_TITLE_LENGTH
@@ -92,7 +93,7 @@ fun ListFormScreen(
                 singleLine = true,
                 isError = visibleTitleError != null,
                 shape = RoundedCornerShape(14.dp),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, capitalization = KeyboardCapitalization.Words),
                 supportingText = visibleTitleError?.let { error ->
                     { Text(stringResource(error)) }
                 },

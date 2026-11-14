@@ -108,22 +108,19 @@ object ProjectTree {
     }
 
     /**
-     * Padres posibles para un subproyecto: el proyecto principal de su árbol y
-     * cualquiera de sus subproyectos, menos él mismo y su descendencia, siempre
-     * que el subárbol movido no pase de [MAX_SUBPROJECT_DEPTH]. Los proyectos
-     * principales no se mueven: devuelve vacío.
+     * Padres posibles para un proyecto: cualquier proyecto fuera de su propio
+     * subárbol, siempre que el subárbol movido no pase de [MAX_SUBPROJECT_DEPTH].
+     * Ahora se permiten movimientos entre árboles y también convertir un proyecto
+     * raíz en subproyecto.
      */
     fun validParents(projectId: String, projects: List<Project>): List<Project> {
         val index = byId(projects)
-        val project = index[projectId] ?: return emptyList()
-        if (project.parentId == null) return emptyList()
-        val root = rootOf(projectId, projects) ?: return emptyList()
+        index[projectId] ?: return emptyList()
         val own = subtreeIds(projectId, projects)
         val height = subtreeHeight(projectId, projects)
-        return subtreeIds(root.id, projects)
+        return projects
             .asSequence()
-            .filter { it !in own }
-            .mapNotNull { index[it] }
+            .filter { it.id !in own }
             .filter { depthOf(it.id, projects) + 1 + height <= MAX_SUBPROJECT_DEPTH }
             .sortedWith(compareBy({ depthOf(it.id, projects) }, { it.createdAt }, { it.id }))
             .toList()

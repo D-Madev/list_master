@@ -46,7 +46,9 @@ import ar.matias.listmaster.domain.ProjectProgress
 import ar.matias.listmaster.domain.model.Project
 import ar.matias.listmaster.domain.model.ProjectStatus
 import ar.matias.listmaster.domain.model.Task
+import ar.matias.listmaster.ui.chipColors
 import ar.matias.listmaster.ui.formatShort
+import ar.matias.listmaster.ui.labelRes
 import ar.matias.listmaster.ui.screens.DetailRow
 import ar.matias.listmaster.ui.theme.LocalExtendedColors
 
@@ -386,6 +388,23 @@ fun TaskRow(
                         text = task.dueDate.formatShort(),
                         style = MaterialTheme.typography.labelSmall,
                         color = scheme.onSurfaceVariant,
+                    )
+                }
+            }
+            task.priority?.let { priority ->
+                val colors = priority.chipColors()
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_flag),
+                        contentDescription = null,
+                        modifier = Modifier.size(12.dp),
+                        tint = colors.content,
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(priority.labelRes()),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = colors.content,
                     )
                 }
             }

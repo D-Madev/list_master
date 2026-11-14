@@ -121,7 +121,7 @@ class PendingAndMoveTest {
     }
 
     @Test
-    fun `un subproyecto solo se puede mover dentro de su propio arbol`() {
+    fun `cualquier proyecto puede moverse entre arboles y los raiz pueden tener padre`() {
         val a = project("a")
         val a1 = project("a1", "a")
         val a2 = project("a2", "a")
@@ -132,8 +132,10 @@ class PendingAndMoveTest {
 
         val parents = ProjectTree.validParents("a1", all).map { it.id }
 
-        assertEquals(listOf("a", "a2"), parents) // ni su hijo, ni nada de b
-        assertTrue(ProjectTree.validParents("a", all).isEmpty()) // la raiz no se mueve
+        // a1 puede moverse a: a (d0), b (d0), a2 (d1), b1 (d1) — no su propio subárbol
+        assertEquals(listOf("a", "b", "a2", "b1"), parents)
+        // a (raíz, height=2) puede ir bajo b: b(d0)+1+2=3<=3 ✓; bajo b1: b1(d1)+1+2=4>3 ✗
+        assertEquals(listOf("b"), ProjectTree.validParents("a", all).map { it.id })
         assertEquals(a.id, ProjectTree.rootOf("a1x", all)?.id)
     }
 

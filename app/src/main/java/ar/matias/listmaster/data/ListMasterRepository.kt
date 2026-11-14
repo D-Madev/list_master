@@ -120,21 +120,37 @@ class ListMasterRepository(
     }
 
     /**
-     * Cambia el padre de un subproyecto. El proyecto principal nunca cambia: el
-     * destino tiene que estar dentro del mismo árbol, fuera del propio subárbol
-     * y sin pasar el límite de niveles.
+     * Cambia el padre de un proyecto. newParentId null convierte el proyecto en
+     * raíz independiente. Permite mover entre árboles y asignar padre a proyectos
+     * que eran raíz.
      */
-    suspend fun moveProject(id: String, newParentId: String) {
+    suspend fun moveProject(id: String, newParentId: String?) {
         val projects = projectDao.getAll().mapNotNull { it.toDomain() }
         val project = projects.firstOrNull { it.id == id }
             ?: throw IllegalArgumentException("El proyecto ya no existe.")
-        require(project.parentId != null) { "Un proyecto principal no puede cambiar de padre." }
         if (project.parentId == newParentId) return
-        require(ProjectTree.validParents(id, projects).any { it.id == newParentId }) {
-            "Ese proyecto no puede ser el nuevo padre."
+        if (newParentId != null) {
+            require(ProjectTree.validParents(id, projects).any { it.id == newParentId }) {
+                "Ese proyecto no puede ser el nuevo padre."
+            }
         }
         val existing = projectDao.getById(id) ?: return
         projectDao.upsert(existing.copy(parentId = newParentId, updatedAt = now().toString()))
+    }
+
+    /** Reordena los ítems pendientes de una lista y reajusta las posiciones. */
+    suspend fun reorderListItems(listId: String, orderedPendingIds: List<String>) {
+        val allItems = itemDao.getAll().filter { it.listId == listId }
+        val pendingSet = orderedPendingIds.toSet()
+        val doneItems = allItems.filter { it.id !in pendingSet }.sortedBy { it.position }
+        db.withTransaction {
+            orderedPendingIds.forEachIndexed { index, itemId ->
+                itemDao.updatePosition(itemId, index)
+            }
+            doneItems.forEachIndexed { index, item ->
+                itemDao.updatePosition(item.id, orderedPendingIds.size + index)
+            }
+        }
     }
 
     suspend fun deleteProject(id: String) {

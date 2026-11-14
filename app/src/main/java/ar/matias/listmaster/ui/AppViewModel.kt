@@ -228,8 +228,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         newParentId: String? = null,
     ) {
         action {
-            // Primero el cambio de padre: si no es válido, no se guarda nada.
-            if (newParentId != null) repository.moveProject(id, newParentId)
+            val currentParentId = data.value.projects.firstOrNull { it.id == id }?.parentId
+            if (currentParentId != newParentId) repository.moveProject(id, newParentId)
             repository.updateProject(id, title, status, priority, icon)
             navigation.pop()
         }
@@ -325,5 +325,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun deleteListItem(id: String) {
         action { repository.deleteListItem(id) }
+    }
+
+    fun reorderListItems(listId: String, orderedIds: List<String>) {
+        action { repository.reorderListItems(listId, orderedIds) }
     }
 }

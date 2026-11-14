@@ -1,6 +1,9 @@
 package ar.matias.listmaster.ui.screens
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -30,16 +34,24 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ar.matias.listmaster.R
@@ -56,6 +68,7 @@ import ar.matias.listmaster.ui.sheets.ListItemDialog
 import ar.matias.listmaster.ui.sheets.ListMenuSheet
 import ar.matias.listmaster.ui.theme.LocalExtendedColors
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ListDetailScreen(
     listId: String,
@@ -72,6 +85,7 @@ fun ListDetailScreen(
     onToggleItem: (String, Boolean) -> Unit,
     onUpdateItemTitle: (String, String) -> Unit,
     onDeleteItem: (String) -> Unit,
+    onReorderItems: (String, List<String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val list = lists.firstOrNull { it.id == listId }
@@ -106,9 +120,28 @@ fun ListDetailScreen(
 
     val done = list.items.count { it.done }
     val total = list.items.size
-    val shownItems = list.items.filter { !it.done } + if (showDoneItems) list.items.filter { it.done } else emptyList()
+    val pendingItems = list.items.filter { !it.done }
+    val doneItems = list.items.filter { it.done }
     val projectTitle = list.projectId?.let { id -> projects.firstOrNull { it.id == id }?.title }
     val extended = LocalExtendedColors.current
+
+    // Drag-to-reorder state
+    val dragPendingItems = remember { mutableStateListOf<ListItem>() }
+    var draggedId by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(pendingItems, draggedId) {
+        if (draggedId == null) {
+            dragPendingItems.clear()
+            dragPendingItems.addAll(pendingItems)
+        }
+    }
+
+    // Scroll-to-dismiss
+    val lazyListState = rememberLazyListState()
+    val focusManager = LocalFocusManager.current
+    LaunchedEffect(lazyListState.isScrollInProgress) {
+        if (lazyListState.isScrollInProgress) focusManager.clearFocus()
+    }
 
     Column(
         modifier = modifier
@@ -131,9 +164,11 @@ fun ListDetailScreen(
         )
 
         LazyColumn(
+            state = lazyListState,
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
+            userScrollEnabled = draggedId == null,
         ) {
             item(key = "summary") {
                 Column {
@@ -240,7 +275,12 @@ fun ListDetailScreen(
                     }
                 }
             } else {
-                items(shownItems, key = { it.id }) { item ->
+                // Pending items with drag handles
+                items(dragPendingItems, key = { it.id }) { item ->
+                    val density = LocalDensity.current
+                    var dragDelta by remember { mutableStateOf(0f) }
+                    val isDraggingThis = draggedId == item.id
+
                     ListItemRow(
                         item = item,
                         onToggle = {
@@ -248,7 +288,63 @@ fun ListDetailScreen(
                             onToggleItem(item.id, !item.done)
                         },
                         onOpen = { editingItem = item },
+                        modifier = if (!isDraggingThis) Modifier.animateItem() else Modifier,
+                        showDragHandle = true,
+                        isDragging = isDraggingThis,
+                        dragHandleModifier = Modifier.pointerInput(item.id) {
+                            val itemHeightPx = with(density) { 56.dp.toPx() }
+                            detectDragGesturesAfterLongPress(
+                                onDragStart = { _ ->
+                                    draggedId = item.id
+                                    dragDelta = 0f
+                                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                },
+                                onDrag = { change, dragAmount ->
+                                    change.consume()
+                                    dragDelta += dragAmount.y
+                                    val threshold = itemHeightPx * 0.5f
+                                    while (dragDelta > threshold) {
+                                        val idx = dragPendingItems.indexOfFirst { it.id == item.id }
+                                        if (idx < 0 || idx >= dragPendingItems.size - 1) break
+                                        dragPendingItems.add(idx + 1, dragPendingItems.removeAt(idx))
+                                        dragDelta -= itemHeightPx
+                                    }
+                                    while (dragDelta < -threshold) {
+                                        val idx = dragPendingItems.indexOfFirst { it.id == item.id }
+                                        if (idx <= 0) break
+                                        dragPendingItems.add(idx - 1, dragPendingItems.removeAt(idx))
+                                        dragDelta += itemHeightPx
+                                    }
+                                },
+                                onDragEnd = {
+                                    draggedId = null
+                                    dragDelta = 0f
+                                    onReorderItems(list.id, dragPendingItems.map { it.id })
+                                },
+                                onDragCancel = {
+                                    draggedId = null
+                                    dragDelta = 0f
+                                    dragPendingItems.clear()
+                                    dragPendingItems.addAll(pendingItems)
+                                },
+                            )
+                        },
                     )
+                }
+
+                // Done items (no drag handles)
+                if (showDoneItems) {
+                    items(doneItems, key = { it.id }) { item ->
+                        ListItemRow(
+                            item = item,
+                            onToggle = {
+                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onToggleItem(item.id, !item.done)
+                            },
+                            onOpen = { editingItem = item },
+                            modifier = Modifier.animateItem(),
+                        )
+                    }
                 }
             }
 
@@ -265,7 +361,10 @@ fun ListDetailScreen(
                         placeholder = { Text(stringResource(R.string.list_item_placeholder)) },
                         singleLine = true,
                         shape = RoundedCornerShape(14.dp),
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Done,
+                            capitalization = KeyboardCapitalization.Words,
+                        ),
                         keyboardActions = KeyboardActions(
                             onDone = {
                                 if (newItem.isNotBlank()) {
@@ -355,15 +454,22 @@ private fun ListItemRow(
     item: ListItem,
     onToggle: () -> Unit,
     onOpen: () -> Unit,
+    modifier: Modifier = Modifier,
+    showDragHandle: Boolean = false,
+    isDragging: Boolean = false,
+    dragHandleModifier: Modifier = Modifier,
 ) {
+    val scheme = MaterialTheme.colorScheme
+    val bg = if (isDragging) scheme.primaryContainer.copy(alpha = 0.4f) else Color.Unspecified
     val contentDescription = stringResource(
         if (item.done) R.string.item_done_description else R.string.item_pending_description,
         item.title,
     )
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 48.dp),
+            .heightIn(min = 48.dp)
+            .background(bg),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         TaskCheck(
@@ -375,9 +481,9 @@ private fun ListItemRow(
             text = item.title,
             style = MaterialTheme.typography.bodyLarge,
             color = if (item.done) {
-                MaterialTheme.colorScheme.onSurfaceVariant
+                scheme.onSurfaceVariant
             } else {
-                MaterialTheme.colorScheme.onSurface
+                scheme.onSurface
             },
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
@@ -386,5 +492,15 @@ private fun ListItemRow(
                 .clickable(onClick = onOpen)
                 .padding(vertical = 12.dp),
         )
+        if (showDragHandle) {
+            Icon(
+                painter = painterResource(R.drawable.ic_drag_handle),
+                contentDescription = stringResource(R.string.cd_drag_handle),
+                modifier = Modifier
+                    .size(24.dp)
+                    .then(dragHandleModifier),
+                tint = scheme.onSurfaceVariant,
+            )
+        }
     }
 }

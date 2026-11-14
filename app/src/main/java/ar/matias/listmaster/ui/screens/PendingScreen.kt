@@ -184,7 +184,7 @@ fun PendingScreen(
             onDismiss = { pickerOpen = false },
             onSelect = { project ->
                 pickerOpen = false
-                editor = PendingEditor(project.id, null)
+                if (project != null) editor = PendingEditor(project.id, null)
             },
         )
     }
