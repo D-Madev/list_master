@@ -226,13 +226,14 @@ private fun childPositionOf(child: Any): Int = when (child) {
 }
 
 /**
- * Árbol de una lista: sus ítems pendientes y sus sublistas comparten el mismo
- * orden (se pueden intercalar), y al final van los ítems hechos, si
- * [showDone]. Cada sublista trae su propio subárbol debajo, salvo que esté en
- * [collapsedIds]. [orderOverride] permite mostrar, para un dueño puntual, el
- * orden que se está arrastrando en vivo en vez del que viene de los datos. La
- * raíz no se dibuja como fila; arranca en profundidad 1, igual que con
- * proyectos.
+ * Árbol de una lista: ítems (pendientes y, si [showDone], hechos en su mismo
+ * lugar, para que se note la animación de completado) y sublistas comparten
+ * el mismo orden, así que se pueden intercalar. Cada sublista trae su propio
+ * subárbol debajo, salvo que esté en [collapsedIds]. [orderOverride] permite
+ * mostrar, para un dueño puntual, el orden de sus hijos arrastrables (ítems
+ * pendientes y sublistas) que se está arrastrando en vivo; los ítems hechos
+ * no se arrastran y quedan fijos en su lugar natural. La raíz no se dibuja
+ * como fila; arranca en profundidad 1, igual que con proyectos.
  */
 internal fun buildListDetailRows(
     root: TaskList,
@@ -245,19 +246,24 @@ internal fun buildListDetailRows(
     val rows = mutableListOf<ListDetailRow>()
 
     fun emitChildren(owner: TaskList, depth: Int, ancestorContinues: List<Boolean>) {
-        val pendingItems = owner.items.filter { !it.done }
-        val doneItems = owner.items.filter { it.done }
+        val visibleItems = owner.items.filter { showDone || !it.done }
         val sublists = childrenByParent[owner.id].orEmpty()
+        val baseline = (visibleItems + sublists).sortedWith(compareBy(::childPositionOf, ::childIdOf))
         val override = orderOverride[owner.id]
-        val pendingChildren: List<Any> = if (override != null) {
-            val byId = (pendingItems + sublists).associateBy(::childIdOf)
-            override.mapNotNull { byId[it] }
+        val items: List<Any> = if (override != null) {
+            val byId = baseline.associateBy(::childIdOf)
+            val draggableIds = override.toSet()
+            var next = 0
+            baseline.map { child ->
+                val id = childIdOf(child)
+                if (id in draggableIds) {
+                    byId[override[next]].also { next++ } ?: child
+                } else {
+                    child
+                }
+            }
         } else {
-            (pendingItems + sublists).sortedWith(compareBy(::childPositionOf, ::childIdOf))
-        }
-        val items = buildList<Any> {
-            addAll(pendingChildren)
-            if (showDone) addAll(doneItems)
+            baseline
         }
         items.forEachIndexed { index, item ->
             val isLast = index == items.lastIndex

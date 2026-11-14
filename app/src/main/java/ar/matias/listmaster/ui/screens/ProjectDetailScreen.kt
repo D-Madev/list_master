@@ -472,9 +472,10 @@ fun ProjectDetailScreen(
 }
 
 /**
- * Árbol completo del detalle. En cada nivel van juntas las tareas pendientes,
- * después los subproyectos (por prioridad, cada uno con su subárbol) y al final
- * las hechas, que solo aparecen si [showDone]. La raíz no se dibuja como fila.
+ * Árbol completo del detalle. En cada nivel van las tareas (pendientes y,
+ * si [showDone], las hechas en su mismo lugar, para que se vea la animación
+ * de completado) y después los subproyectos, por prioridad, cada uno con su
+ * subárbol. La raíz no se dibuja como fila.
  */
 internal fun buildDetailRows(
     root: Project,
@@ -491,11 +492,12 @@ internal fun buildDetailRows(
         depth: Int,
         ancestorContinues: List<Boolean>,
     ) {
-        val own = tasksByProject[project.id].orEmpty().sortedWith(TaskOrder)
+        val own = tasksByProject[project.id].orEmpty()
+            .filter { showDone || !it.done }
+            .sortedWith(TaskOrder)
         val items = buildList<Any> {
-            addAll(own.filter { !it.done })
+            addAll(own)
             addAll(childrenByParent[project.id].orEmpty().sortedWith(ProjectTree.byPriority))
-            if (showDone) addAll(own.filter { it.done })
         }
         items.forEachIndexed { index, item ->
             val isLast = index == items.lastIndex

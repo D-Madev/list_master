@@ -125,7 +125,7 @@ class PendingAndMoveTest {
     }
 
     @Test
-    fun `en el detalle las pendientes van juntas y las hechas solo si se piden`() {
+    fun `en el detalle las hechas quedan en su lugar y se ocultan solo si se pide`() {
         val root = project("R")
         val sub = project("S", parentId = "R")
         val tasks = listOf(
@@ -139,7 +139,8 @@ class PendingAndMoveTest {
             }
         }
 
-        assertEquals(listOf("pend-1", "pend-2", "S", "hecha"), titles(show = true))
+        // "hecha" quedó donde le toca por antigüedad, no al final.
+        assertEquals(listOf("hecha", "pend-1", "pend-2", "S"), titles(show = true))
         assertEquals(listOf("pend-1", "pend-2", "S"), titles(show = false))
     }
 
