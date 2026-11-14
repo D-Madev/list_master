@@ -434,9 +434,10 @@ fun TaskFormSheet(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 (listOf<Priority?>(null) + Priority.entries).forEach { option ->
-                    FilterToggle(
+                    PriorityFilterToggle(
                         label = stringResource(option?.labelRes() ?: R.string.priority_none),
                         selected = priority == option,
+                        tint = option?.chipColors()?.content ?: MaterialTheme.colorScheme.onSurfaceVariant,
                         onClick = { priority = option },
                     )
                 }
@@ -828,6 +829,45 @@ fun ProjectFilterSheet(
 
 private fun <T> Set<T>.toggled(value: T): Set<T> =
     if (value in this) this - value else this + value
+
+/** Como [FilterToggle] pero con el color de la prioridad elegida. */
+@Composable
+private fun PriorityFilterToggle(
+    label: String,
+    selected: Boolean,
+    tint: androidx.compose.ui.graphics.Color,
+    onClick: () -> Unit,
+) {
+    val scheme = MaterialTheme.colorScheme
+    val shape = RoundedCornerShape(12.dp)
+    Row(
+        modifier = Modifier
+            .heightIn(min = 48.dp)
+            .clip(shape)
+            .background(if (selected) tint.copy(alpha = 0.16f) else LocalExtendedColors.current.surfaceAlt)
+            .border(
+                width = if (selected) 1.5.dp else 1.dp,
+                color = if (selected) tint else scheme.outline,
+                shape = shape,
+            )
+            .clickable(onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_flag),
+            contentDescription = null,
+            modifier = Modifier.size(16.dp),
+            tint = tint,
+        )
+        Spacer(Modifier.width(6.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelLarge,
+            color = if (selected) tint else scheme.onSurface,
+        )
+    }
+}
 
 @Composable
 private fun FilterToggle(

@@ -296,7 +296,7 @@ fun ListMasterApp(viewModel: AppViewModel = viewModel()) {
                             onSetProject = { id, projectId ->
                                 val list = data.lists.firstOrNull { it.id == id }
                                 if (list != null) {
-                                    viewModel.updateList(id, list.title, projectId)
+                                    viewModel.updateList(id, list.title, projectId, list.parentId)
                                 }
                             },
                             onOpenProject = viewModel::openProject,
@@ -309,16 +309,22 @@ fun ListMasterApp(viewModel: AppViewModel = viewModel()) {
                             onReorderItems = { listId, itemIds ->
                                 viewModel.reorderListItems(listId, itemIds)
                             },
+                            onAddSublist = { listId -> viewModel.newList(parentId = listId) },
                             modifier = contentModifier,
                         )
 
                         is Screen.ListForm -> ListFormScreen(
                             listId = current.listId,
+                            parentId = current.parentId,
                             lists = data.lists,
                             projects = data.projects,
                             onBack = viewModel::back,
-                            onCreate = viewModel::createList,
-                            onUpdate = viewModel::updateList,
+                            onCreate = { title, projectId, newParentId ->
+                                viewModel.createList(title, projectId, newParentId)
+                            },
+                            onUpdate = { id, title, projectId, newParentId ->
+                                viewModel.updateList(id, title, projectId, newParentId)
+                            },
                             modifier = contentModifier,
                         )
                     }

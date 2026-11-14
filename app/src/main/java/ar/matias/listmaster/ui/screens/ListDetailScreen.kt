@@ -55,10 +55,13 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ar.matias.listmaster.R
+import ar.matias.listmaster.domain.ListTree
 import ar.matias.listmaster.domain.model.ListItem
+import ar.matias.listmaster.domain.model.MAX_SUBLIST_DEPTH
 import ar.matias.listmaster.domain.model.Project
 import ar.matias.listmaster.domain.model.TaskList
 import ar.matias.listmaster.ui.components.CenteredEmpty
+import ar.matias.listmaster.ui.components.CompletableText
 import ar.matias.listmaster.ui.components.DetailHeader
 import ar.matias.listmaster.ui.components.IconTile
 import ar.matias.listmaster.ui.components.TaskCheck
@@ -86,6 +89,7 @@ fun ListDetailScreen(
     onUpdateItemTitle: (String, String) -> Unit,
     onDeleteItem: (String) -> Unit,
     onReorderItems: (String, List<String>) -> Unit,
+    onAddSublist: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val list = lists.firstOrNull { it.id == listId }
@@ -401,6 +405,7 @@ fun ListDetailScreen(
     if (menuOpen) {
         ListMenuSheet(
             list = list,
+            canAddSublist = ListTree.depthOf(list.id, lists) in 0 until MAX_SUBLIST_DEPTH,
             onDismiss = { menuOpen = false },
             onEdit = {
                 menuOpen = false
@@ -413,6 +418,10 @@ fun ListDetailScreen(
                 } else {
                     onSetProject(list.id, null)
                 }
+            },
+            onAddSublist = {
+                menuOpen = false
+                onAddSublist(list.id)
             },
             onDelete = {
                 menuOpen = false
@@ -477,14 +486,10 @@ private fun ListItemRow(
             contentDescription = contentDescription,
             onToggle = onToggle,
         )
-        Text(
+        CompletableText(
             text = item.title,
+            done = item.done,
             style = MaterialTheme.typography.bodyLarge,
-            color = if (item.done) {
-                scheme.onSurfaceVariant
-            } else {
-                scheme.onSurface
-            },
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
@@ -499,7 +504,7 @@ private fun ListItemRow(
                 modifier = Modifier
                     .size(24.dp)
                     .then(dragHandleModifier),
-                tint = scheme.onSurfaceVariant,
+                tint = scheme.onSurfaceVariant.copy(alpha = 0.35f),
             )
         }
     }

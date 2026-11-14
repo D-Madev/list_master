@@ -368,10 +368,10 @@ fun TaskRow(
                 )
                 .padding(vertical = 4.dp),
         ) {
-            Text(
+            CompletableText(
                 text = task.title,
+                done = task.done,
                 style = MaterialTheme.typography.bodyMedium,
-                color = if (task.done) scheme.onSurfaceVariant else scheme.onSurface,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )

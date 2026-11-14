@@ -5,6 +5,7 @@ import ar.matias.listmaster.domain.model.Project
 import ar.matias.listmaster.domain.model.ProjectFilter
 import ar.matias.listmaster.domain.model.ProjectStatus
 import ar.matias.listmaster.domain.model.Task
+import ar.matias.listmaster.domain.model.TaskList
 import ar.matias.listmaster.domain.model.TaskOrder
 import ar.matias.listmaster.ui.screens.DetailRow
 import ar.matias.listmaster.ui.screens.buildDetailRows
@@ -43,6 +44,16 @@ class PendingAndMoveTest {
         createdAt = base.plusSeconds(tick++),
         updatedAt = base,
         priority = priority,
+    )
+
+    private fun list(id: String, parentId: String? = null) = TaskList(
+        id = id,
+        title = id,
+        projectId = null,
+        parentId = parentId,
+        createdAt = base.plusSeconds(tick++),
+        updatedAt = base,
+        items = emptyList(),
     )
 
     @Test
@@ -166,5 +177,46 @@ class PendingAndMoveTest {
         val onlyLow = ProjectFilter(priorities = setOf(Priority.LOW))
         assertFalse(onlyLow.matches(active))
         assertEquals(1, onlyLow.activeCount)
+    }
+
+    @Test
+    fun `cualquier lista puede moverse entre arboles y las raiz pueden tener padre`() {
+        val a = list("a")
+        val a1 = list("a1", "a")
+        val a2 = list("a2", "a")
+        val a1x = list("a1x", "a1")
+        val b = list("b")
+        val b1 = list("b1", "b")
+        val all = listOf(a, a1, a2, a1x, b, b1)
+
+        val parents = ListTree.validParents("a1", all).map { it.id }
+
+        assertEquals(listOf("a", "b", "a2", "b1"), parents)
+        assertEquals(listOf("b"), ListTree.validParents("a", all).map { it.id })
+    }
+
+    @Test
+    fun `mover una sublista no puede pasar de tres niveles`() {
+        val r = list("r")
+        val l1 = list("l1", "r")
+        val l2 = list("l2", "l1")
+        val l3 = list("l3", "l2")
+        val branch = list("branch", "r")
+        val branchChild = list("branchChild", "branch")
+        val all = listOf(r, l1, l2, l3, branch, branchChild)
+
+        assertFalse("l2" in ListTree.validParents("branch", all).map { it.id })
+        assertTrue("l1" in ListTree.validParents("branch", all).map { it.id })
+    }
+
+    @Test
+    fun `las listas en el árbol salen en orden con sus sublistas debajo`() {
+        val root = list("r")
+        val sub = list("s", "r")
+        val other = list("o")
+
+        val flattened = ListTree.flatten(listOf(other, root, sub))
+
+        assertEquals(listOf("r" to 0, "s" to 1, "o" to 0), flattened.map { it.first.id to it.second })
     }
 }

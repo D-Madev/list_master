@@ -190,8 +190,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         navigation.push(Screen.ListDetail(listId))
     }
 
-    fun newList() {
-        navigation.push(Screen.ListForm())
+    fun newList(parentId: String? = null) {
+        navigation.push(Screen.ListForm(parentId = parentId))
     }
 
     fun editList(listId: String) {
@@ -290,15 +290,17 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     // Listas
 
-    fun createList(title: String, projectId: String?) {
+    fun createList(title: String, projectId: String?, parentId: String? = null) {
         action {
-            repository.createList(title, projectId)
+            repository.createList(title, projectId, parentId)
             navigation.pop()
         }
     }
 
-    fun updateList(id: String, title: String, projectId: String?) {
+    fun updateList(id: String, title: String, projectId: String?, newParentId: String?) {
         action {
+            val currentParentId = data.value.lists.firstOrNull { it.id == id }?.parentId
+            if (currentParentId != newParentId) repository.moveList(id, newParentId)
             repository.updateList(id, title, projectId)
             navigation.pop()
         }

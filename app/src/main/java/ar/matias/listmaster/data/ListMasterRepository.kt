@@ -3,10 +3,12 @@ package ar.matias.listmaster.data
 import androidx.room.withTransaction
 import ar.matias.listmaster.data.local.ListItemEntity
 import ar.matias.listmaster.data.local.ListMasterDatabase
+import ar.matias.listmaster.domain.ListTree
 import ar.matias.listmaster.domain.ProjectTree
 import ar.matias.listmaster.domain.Validation
 import ar.matias.listmaster.domain.model.AppData
 import ar.matias.listmaster.domain.model.ListItem
+import ar.matias.listmaster.domain.model.MAX_SUBLIST_DEPTH
 import ar.matias.listmaster.domain.model.MAX_SUBPROJECT_DEPTH
 import ar.matias.listmaster.domain.model.Priority
 import ar.matias.listmaster.domain.model.Project
@@ -218,10 +220,17 @@ class ListMasterRepository(
 
     // Listas
 
-    suspend fun createList(title: String, projectId: String?): String {
+    suspend fun createList(title: String, projectId: String?, parentId: String? = null): String {
         val clean = Validation.title(title)
         if (projectId != null) {
             require(projectDao.getById(projectId) != null) { "El proyecto ya no existe." }
+        }
+        if (parentId != null) {
+            val lists = listDao.getAll().map { it.toDomain(emptyList()) }
+            val depth = ListTree.depthOf(parentId, lists)
+            require(depth in 0 until MAX_SUBLIST_DEPTH) {
+                "No se pueden anidar más de tres niveles de listas."
+            }
         }
         val timestamp = now()
         val id = UUID.randomUUID().toString()
@@ -230,6 +239,7 @@ class ListMasterRepository(
                 id = id,
                 title = clean,
                 projectId = projectId,
+                parentId = parentId,
                 createdAt = timestamp,
                 updatedAt = timestamp,
                 items = emptyList(),
@@ -251,6 +261,21 @@ class ListMasterRepository(
                 updatedAt = now().toString(),
             ),
         )
+    }
+
+    /** Cambia el padre de una lista. newParentId null la convierte en raíz independiente. */
+    suspend fun moveList(id: String, newParentId: String?) {
+        val lists = listDao.getAll().map { it.toDomain(emptyList()) }
+        val list = lists.firstOrNull { it.id == id }
+            ?: throw IllegalArgumentException("La lista ya no existe.")
+        if (list.parentId == newParentId) return
+        if (newParentId != null) {
+            require(ListTree.validParents(id, lists).any { it.id == newParentId }) {
+                "Esa lista no puede ser la nueva lista padre."
+            }
+        }
+        val existing = listDao.getById(id) ?: return
+        listDao.upsert(existing.copy(parentId = newParentId, updatedAt = now().toString()))
     }
 
     suspend fun deleteList(id: String) {
@@ -314,7 +339,11 @@ class ListMasterRepository(
             }
             projectDao.insertAll(orderedProjects.map { it.toEntity() })
             taskDao.insertAll(data.tasks.map { it.toEntity() })
-            listDao.insertAll(data.lists.map { it.toEntity() })
+
+            val orderedLists = data.lists.sortedBy {
+                ListTree.depthOf(it.id, data.lists).coerceAtLeast(0)
+            }
+            listDao.insertAll(orderedLists.map { it.toEntity() })
 
             val items = data.lists.flatMap { list ->
                 list.items.map { item ->

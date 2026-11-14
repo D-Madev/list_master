@@ -1,8 +1,11 @@
 package ar.matias.listmaster.ui.components
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
@@ -34,8 +37,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,7 +58,10 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ar.matias.listmaster.R
@@ -354,14 +363,58 @@ private fun Chip(
     }
 }
 
+/**
+ * Checkbox circular con una animación de completado: el círculo se rellena,
+ * el tilde aparece con un rebote y, si [done] pasa a true durante la vida del
+ * composable (no al entrar ya completado), un pulso de escala le da el toque
+ * satisfactorio de "listo".
+ */
 @Composable
 fun TaskCheck(
     done: Boolean,
     contentDescription: String,
     onToggle: () -> Unit,
     modifier: Modifier = Modifier,
-    tint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    tint: Color = LocalExtendedColors.current.success,
 ) {
+    val outline = MaterialTheme.colorScheme.outline
+    val fillColor by animateColorAsState(
+        targetValue = if (done) tint else Color.Transparent,
+        animationSpec = tween(durationMillis = 220, easing = EaseStandard),
+        label = "checkFill",
+    )
+    val borderColor by animateColorAsState(
+        targetValue = if (done) tint else outline,
+        animationSpec = tween(durationMillis = 220, easing = EaseStandard),
+        label = "checkBorder",
+    )
+    val checkAlpha by animateFloatAsState(
+        targetValue = if (done) 1f else 0f,
+        animationSpec = tween(durationMillis = 140, delayMillis = if (done) 90 else 0),
+        label = "checkAlpha",
+    )
+    val pulse = remember { Animatable(1f) }
+    var initialized by remember { mutableStateOf(false) }
+    LaunchedEffect(done) {
+        if (!initialized) {
+            initialized = true
+            return@LaunchedEffect
+        }
+        if (done) {
+            pulse.animateTo(
+                targetValue = 1f,
+                animationSpec = keyframes {
+                    durationMillis = 320
+                    1f at 0
+                    1.35f at 130 using EaseOut
+                    1f at 320 using EaseStandard
+                },
+            )
+        } else {
+            pulse.snapTo(1f)
+        }
+    }
+
     Box(
         modifier = modifier
             .size(48.dp)
@@ -377,24 +430,65 @@ fun TaskCheck(
         Box(
             modifier = Modifier
                 .size(20.dp)
-                .then(
-                    if (done) {
-                        Modifier.background(tint, CircleShape)
-                    } else {
-                        Modifier.border(1.5.dp, MaterialTheme.colorScheme.outline, CircleShape)
-                    },
-                ),
+                .graphicsLayer { scaleX = pulse.value; scaleY = pulse.value }
+                .background(fillColor, CircleShape)
+                .border(1.5.dp, borderColor, CircleShape),
             contentAlignment = Alignment.Center,
         ) {
-            if (done) {
-                Icon(
-                    imageVector = Icons.Outlined.Check,
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp),
-                    tint = MaterialTheme.colorScheme.surface,
-                )
-            }
+            Icon(
+                imageVector = Icons.Outlined.Check,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(14.dp)
+                    .graphicsLayer {
+                        alpha = checkAlpha
+                        scaleX = 0.6f + 0.4f * checkAlpha
+                        scaleY = 0.6f + 0.4f * checkAlpha
+                    },
+                tint = MaterialTheme.colorScheme.surface,
+            )
         }
+    }
+}
+
+/**
+ * Título de tarea o ítem que se tacha al completarse: el texto cruza a verde
+ * y el tachado aparece con un cruce suave entre ambos estados.
+ */
+@Composable
+fun CompletableText(
+    text: String,
+    done: Boolean,
+    style: TextStyle,
+    modifier: Modifier = Modifier,
+    pendingColor: Color = MaterialTheme.colorScheme.onSurface,
+    doneColor: Color = LocalExtendedColors.current.success,
+    maxLines: Int = Int.MAX_VALUE,
+    overflow: TextOverflow = TextOverflow.Clip,
+) {
+    val doneAlpha by animateFloatAsState(
+        targetValue = if (done) 1f else 0f,
+        animationSpec = tween(durationMillis = 260, easing = EaseStandard),
+        label = "strikeAlpha",
+    )
+    Box(modifier = modifier) {
+        Text(
+            text = text,
+            style = style,
+            color = pendingColor,
+            maxLines = maxLines,
+            overflow = overflow,
+            modifier = Modifier.graphicsLayer { alpha = 1f - doneAlpha },
+        )
+        Text(
+            text = text,
+            style = style,
+            color = doneColor,
+            textDecoration = TextDecoration.LineThrough,
+            maxLines = maxLines,
+            overflow = overflow,
+            modifier = Modifier.graphicsLayer { alpha = doneAlpha },
+        )
     }
 }
 

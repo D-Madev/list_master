@@ -1,11 +1,13 @@
 package ar.matias.listmaster.data
 
+import ar.matias.listmaster.domain.ListTree
 import ar.matias.listmaster.domain.ProjectTree
 import ar.matias.listmaster.domain.model.AppData
 import ar.matias.listmaster.domain.model.ListItem
 import ar.matias.listmaster.domain.model.MAX_DESCRIPTION_LENGTH
 import ar.matias.listmaster.domain.model.MAX_ICON_LENGTH
 import ar.matias.listmaster.domain.model.MAX_ITEM_TITLE_LENGTH
+import ar.matias.listmaster.domain.model.MAX_SUBLIST_DEPTH
 import ar.matias.listmaster.domain.model.MAX_SUBPROJECT_DEPTH
 import ar.matias.listmaster.domain.model.MAX_TITLE_LENGTH
 import ar.matias.listmaster.domain.model.Priority
@@ -89,6 +91,7 @@ object BackupCodec {
                     addProperty("id", list.id)
                     addProperty("titulo", list.title)
                     addProperty("proyecto_id", list.projectId)
+                    addProperty("lista_padre", list.parentId)
                     addProperty("creado", list.createdAt.toString())
                     addProperty("actualizado", list.updatedAt.toString())
                     add("items", JsonArray().apply {
@@ -165,6 +168,20 @@ object BackupCodec {
 
         val lists = obj.requireArray("listas").mapIndexed { index, element ->
             parseList(element, index, ids, projectIds)
+        }
+
+        val listIds = lists.map { it.id }.toSet()
+        lists.forEach { list ->
+            if (list.parentId != null && list.parentId !in listIds) {
+                throw BackupException("Una sublista apunta a una lista que no existe.")
+            }
+            val depth = ListTree.depthOf(list.id, lists)
+            if (depth < 0) {
+                throw BackupException("Las listas tienen un ciclo o una relación inválida.")
+            }
+            if (depth > MAX_SUBLIST_DEPTH) {
+                throw BackupException("Hay listas anidadas más de tres niveles.")
+            }
         }
 
         return AppData(projects = projects, tasks = tasks, lists = lists)
@@ -299,10 +316,15 @@ object BackupCodec {
             )
         }
 
+        val parentId = obj.optionalString("lista_padre")?.also { parent ->
+            validateUuid(parent, "lista «$title»")
+        }
+
         return TaskList(
             id = id,
             title = title,
             projectId = projectId,
+            parentId = parentId,
             createdAt = createdAt,
             updatedAt = updatedAt,
             items = items,

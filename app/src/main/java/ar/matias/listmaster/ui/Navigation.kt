@@ -11,7 +11,7 @@ sealed interface Screen {
     data class ProjectDetail(val projectId: String) : Screen
     data class ProjectForm(val parentId: String?, val projectId: String? = null) : Screen
     data class ListDetail(val listId: String) : Screen
-    data class ListForm(val listId: String? = null) : Screen
+    data class ListForm(val parentId: String? = null, val listId: String? = null) : Screen
 }
 
 /**

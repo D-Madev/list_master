@@ -40,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.outlined.Add
 import ar.matias.listmaster.R
 import ar.matias.listmaster.domain.ProjectTree
 import ar.matias.listmaster.domain.model.ListItem
@@ -51,9 +52,11 @@ import ar.matias.listmaster.ui.theme.LocalExtendedColors
 @Composable
 fun ListMenuSheet(
     list: TaskList,
+    canAddSublist: Boolean,
     onDismiss: () -> Unit,
     onEdit: () -> Unit,
     onToggleLink: () -> Unit,
+    onAddSublist: () -> Unit,
     onDelete: () -> Unit,
 ) {
     ModalBottomSheet(
@@ -88,6 +91,13 @@ fun ListMenuSheet(
                 onClick = onToggleLink,
                 icon = { Icon(painterResource(R.drawable.ic_layers), contentDescription = null) },
             )
+            if (canAddSublist) {
+                MenuRow(
+                    label = stringResource(R.string.list_add_sublist),
+                    onClick = onAddSublist,
+                    icon = { Icon(Icons.Outlined.Add, contentDescription = null) },
+                )
+            }
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 8.dp),
                 color = MaterialTheme.colorScheme.outlineVariant,
@@ -221,6 +231,59 @@ fun ProjectPickerSheet(
                     selected = current == project.id,
                     iconRes = if (depth == 0) R.drawable.ic_folder else R.drawable.ic_layers,
                     onClick = { onSelect(project.id) },
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Elige una lista padre con sangría por nivel. Con [noneLabel] aparece una
+ * opción al inicio para indicar que no se quiere lista padre.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ListPickerSheet(
+    title: String,
+    options: List<Pair<TaskList, Int>>,
+    current: String?,
+    onDismiss: () -> Unit,
+    onSelect: (TaskList?) -> Unit,
+    noneLabel: String? = null,
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        containerColor = MaterialTheme.colorScheme.surface,
+    ) {
+        Column(
+            modifier = Modifier
+                .navigationBarsPadding()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 16.dp),
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(bottom = 8.dp),
+            )
+            if (noneLabel != null) {
+                PickerRow(
+                    label = noneLabel,
+                    depth = 0,
+                    selected = current == null,
+                    iconRes = R.drawable.ic_list,
+                    onClick = { onSelect(null) },
+                )
+            }
+            options.forEach { (list, depth) ->
+                PickerRow(
+                    label = list.title,
+                    depth = depth,
+                    selected = current == list.id,
+                    iconRes = if (depth == 0) R.drawable.ic_list else R.drawable.ic_layers,
+                    onClick = { onSelect(list) },
                 )
             }
         }

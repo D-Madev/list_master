@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -31,6 +32,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import ar.matias.listmaster.R
+import ar.matias.listmaster.domain.ListTree
 import ar.matias.listmaster.domain.model.Project
 import ar.matias.listmaster.domain.model.TaskList
 import ar.matias.listmaster.ui.components.CenteredEmpty
@@ -49,6 +51,7 @@ fun ListsScreen(
     modifier: Modifier = Modifier,
 ) {
     val projectsById = projects.associateBy { it.id }
+    val orderedLists = remember(lists) { ListTree.flatten(lists) }
     var expandedIds by rememberSaveable { mutableStateOf(arrayListOf<String>()) }
 
     val allExpanded = lists.isNotEmpty() && lists.all { it.id in expandedIds }
@@ -147,7 +150,7 @@ fun ListsScreen(
                         }
                     }
                 }
-                items(lists, key = { it.id }) { list ->
+                items(orderedLists, key = { (list, _) -> list.id }) { (list, depth) ->
                     ListCard(
                         list = list,
                         projectTitle = list.projectId?.let { projectsById[it]?.title },
@@ -156,6 +159,7 @@ fun ListsScreen(
                         onOpen = { onOpenList(list.id) },
                         onToggleItem = { item, done -> onToggleItem(item.id, done) },
                         showDoneItems = showDoneItems,
+                        modifier = Modifier.padding(start = (depth * 16).dp),
                     )
                 }
             }

@@ -169,6 +169,10 @@
     <string name="list_link">Vincular a un Proyecto</string>
     <string name="list_unlink">Desvincular del Proyecto</string>
     <string name="list_linked_to">En «%1$s»</string>
+    <string name="list_add_sublist">Agregar Sublista</string>
+    <string name="list_parent_label">Lista Padre</string>
+    <string name="list_parent_none">Sin Lista Padre</string>
+    <string name="list_parent_pick_title">Nueva Lista Padre</string>
     <string name="list_delete_title">¿Borrar «%1$s»?</string>
     <string name="list_delete_body">Se van a borrar sus ítems. Esto no se puede deshacer.</string>
     <string name="list_add_item">Agregar Ítem</string>

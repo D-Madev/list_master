@@ -18,7 +18,7 @@ import org.robolectric.annotation.Config
 class MigrationTest {
 
     @Test
-    fun `migrar de la version 2 a la 4 conserva proyectos, tareas y listas`() = runBlocking {
+    fun `migrar de la version 2 a la 5 conserva proyectos, tareas y listas`() = runBlocking {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val name = "migration-test.db"
         context.deleteDatabase(name)
@@ -41,7 +41,12 @@ class MigrationTest {
         old.close()
 
         val db = Room.databaseBuilder(context, ListMasterDatabase::class.java, name)
-            .addMigrations(ListMasterDatabase.MIGRATION_1_2, ListMasterDatabase.MIGRATION_2_3, ListMasterDatabase.MIGRATION_3_4)
+            .addMigrations(
+                ListMasterDatabase.MIGRATION_1_2,
+                ListMasterDatabase.MIGRATION_2_3,
+                ListMasterDatabase.MIGRATION_3_4,
+                ListMasterDatabase.MIGRATION_4_5,
+            )
             .allowMainThreadQueries()
             .build()
         try {
@@ -52,6 +57,7 @@ class MigrationTest {
             assertTrue(data.tasks.all { it.description.isEmpty() && it.priority == null })
             assertEquals("MCU", data.lists.single().title)
             assertEquals("Iron Man", data.lists.single().items.single().title)
+            assertEquals(null, data.lists.single().parentId)
         } finally {
             db.close()
             context.deleteDatabase(name)

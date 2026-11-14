@@ -6,6 +6,7 @@ import java.time.LocalDate
 const val MAX_TITLE_LENGTH = 120
 const val MAX_ITEM_TITLE_LENGTH = 200
 const val MAX_SUBPROJECT_DEPTH = 3
+const val MAX_SUBLIST_DEPTH = 3
 const val MAX_ICON_LENGTH = 32
 const val MAX_DESCRIPTION_LENGTH = 2000
 
@@ -80,6 +81,7 @@ data class TaskList(
     val id: String,
     val title: String,
     val projectId: String?,
+    val parentId: String? = null,
     val createdAt: Instant,
     val updatedAt: Instant,
     val items: List<ListItem>,

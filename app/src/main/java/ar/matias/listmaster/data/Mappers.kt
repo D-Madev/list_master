@@ -66,6 +66,7 @@ fun ListEntity.toDomain(items: List<ListItemEntity>): TaskList = TaskList(
     id = id,
     title = title,
     projectId = projectId,
+    parentId = parentId,
     createdAt = Instant.parse(createdAt),
     updatedAt = Instant.parse(updatedAt),
     items = items
@@ -77,6 +78,7 @@ fun TaskList.toEntity(): ListEntity = ListEntity(
     id = id,
     title = title,
     projectId = projectId,
+    parentId = parentId,
     createdAt = createdAt.toString(),
     updatedAt = updatedAt.toString(),
 )

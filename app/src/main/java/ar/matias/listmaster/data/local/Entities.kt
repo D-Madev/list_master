@@ -62,13 +62,20 @@ data class TaskEntity(
             childColumns = ["project_id"],
             onDelete = ForeignKey.SET_NULL,
         ),
+        ForeignKey(
+            entity = ListEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["parent_id"],
+            onDelete = ForeignKey.CASCADE,
+        ),
     ],
-    indices = [Index("project_id")],
+    indices = [Index("project_id"), Index("parent_id")],
 )
 data class ListEntity(
     @PrimaryKey val id: String,
     val title: String,
     @ColumnInfo(name = "project_id") val projectId: String?,
+    @ColumnInfo(name = "parent_id") val parentId: String? = null,
     @ColumnInfo(name = "created_at") val createdAt: String,
     @ColumnInfo(name = "updated_at") val updatedAt: String,
 )

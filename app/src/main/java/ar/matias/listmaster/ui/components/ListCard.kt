@@ -251,14 +251,10 @@ private fun ListPreviewRow(
             contentDescription = contentDescription,
             onToggle = onToggle,
         )
-        Text(
+        CompletableText(
             text = item.title,
+            done = item.done,
             style = MaterialTheme.typography.bodyMedium,
-            color = if (item.done) {
-                MaterialTheme.colorScheme.onSurfaceVariant
-            } else {
-                MaterialTheme.colorScheme.onSurface
-            },
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
