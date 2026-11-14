@@ -7,8 +7,11 @@ import ar.matias.listmaster.domain.model.ProjectStatus
 import ar.matias.listmaster.domain.model.Task
 import ar.matias.listmaster.domain.model.TaskList
 import ar.matias.listmaster.domain.model.TaskOrder
+import ar.matias.listmaster.domain.model.ListItem
 import ar.matias.listmaster.ui.screens.DetailRow
+import ar.matias.listmaster.ui.screens.ListDetailRow
 import ar.matias.listmaster.ui.screens.buildDetailRows
+import ar.matias.listmaster.ui.screens.buildListDetailRows
 import java.time.Instant
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -46,15 +49,24 @@ class PendingAndMoveTest {
         priority = priority,
     )
 
-    private fun list(id: String, parentId: String? = null) = TaskList(
+    private fun list(
+        id: String,
+        parentId: String? = null,
+        position: Int = 0,
+        items: List<ListItem> = emptyList(),
+    ) = TaskList(
         id = id,
         title = id,
         projectId = null,
         parentId = parentId,
+        position = position,
         createdAt = base.plusSeconds(tick++),
         updatedAt = base,
-        items = emptyList(),
+        items = items,
     )
+
+    private fun listItem(id: String, done: Boolean = false, position: Int = 0) =
+        ListItem(id = id, title = id, done = done, position = position)
 
     @Test
     fun `las tareas se ordenan por prioridad y a igual prioridad por antiguedad`() {
@@ -218,5 +230,54 @@ class PendingAndMoveTest {
         val flattened = ListTree.flatten(listOf(other, root, sub))
 
         assertEquals(listOf("r" to 0, "s" to 1, "o" to 0), flattened.map { it.first.id to it.second })
+    }
+
+    @Test
+    fun `los items y las sublistas de una lista se intercalan por posicion`() {
+        val itemA = listItem("itemA", position = 0)
+        val itemB = listItem("itemB", position = 2)
+        val root = list("r", position = 0, items = listOf(itemA, itemB))
+        val sub = list("sub", "r", position = 1)
+
+        val rows = buildListDetailRows(root, listOf(root, sub))
+
+        val order = rows.map { row ->
+            when (row) {
+                is ListDetailRow.ItemRow -> row.item.id
+                is ListDetailRow.SublistItem -> row.list.id
+            }
+        }
+        assertEquals(listOf("itemA", "sub", "itemB"), order)
+    }
+
+    @Test
+    fun `una sublista replegada no muestra sus propios hijos`() {
+        val childItem = listItem("child", position = 0)
+        val sub = list("sub", "r", position = 0, items = listOf(childItem))
+        val root = list("r", position = 0)
+        val all = listOf(root, sub)
+
+        val expanded = buildListDetailRows(root, all)
+        val collapsed = buildListDetailRows(root, all, collapsedIds = setOf("sub"))
+
+        assertEquals(2, expanded.size)
+        assertEquals(1, collapsed.size)
+        assertTrue(collapsed.single() is ListDetailRow.SublistItem)
+    }
+
+    @Test
+    fun `el orden en vivo de un arrastre reemplaza el orden natural`() {
+        val itemA = listItem("itemA", position = 0)
+        val itemB = listItem("itemB", position = 1)
+        val root = list("r", position = 0, items = listOf(itemA, itemB))
+
+        val rows = buildListDetailRows(
+            root,
+            listOf(root),
+            orderOverride = mapOf("r" to listOf("itemB", "itemA")),
+        )
+
+        val order = rows.map { (it as ListDetailRow.ItemRow).item.id }
+        assertEquals(listOf("itemB", "itemA"), order)
     }
 }

@@ -330,6 +330,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun reorderListItems(listId: String, orderedIds: List<String>) {
-        action { repository.reorderListItems(listId, orderedIds) }
+        action { repository.reorderListChildren(listId, orderedIds) }
     }
 }

@@ -92,6 +92,7 @@ object BackupCodec {
                     addProperty("titulo", list.title)
                     addProperty("proyecto_id", list.projectId)
                     addProperty("lista_padre", list.parentId)
+                    addProperty("orden", list.position)
                     addProperty("creado", list.createdAt.toString())
                     addProperty("actualizado", list.updatedAt.toString())
                     add("items", JsonArray().apply {
@@ -325,6 +326,7 @@ object BackupCodec {
             title = title,
             projectId = projectId,
             parentId = parentId,
+            position = obj.optionalInt("orden") ?: index,
             createdAt = createdAt,
             updatedAt = updatedAt,
             items = items,

@@ -140,21 +140,6 @@ class ListMasterRepository(
         projectDao.upsert(existing.copy(parentId = newParentId, updatedAt = now().toString()))
     }
 
-    /** Reordena los ítems pendientes de una lista y reajusta las posiciones. */
-    suspend fun reorderListItems(listId: String, orderedPendingIds: List<String>) {
-        val allItems = itemDao.getAll().filter { it.listId == listId }
-        val pendingSet = orderedPendingIds.toSet()
-        val doneItems = allItems.filter { it.id !in pendingSet }.sortedBy { it.position }
-        db.withTransaction {
-            orderedPendingIds.forEachIndexed { index, itemId ->
-                itemDao.updatePosition(itemId, index)
-            }
-            doneItems.forEachIndexed { index, item ->
-                itemDao.updatePosition(item.id, orderedPendingIds.size + index)
-            }
-        }
-    }
-
     suspend fun deleteProject(id: String) {
         projectDao.delete(id)
     }
@@ -240,12 +225,55 @@ class ListMasterRepository(
                 title = clean,
                 projectId = projectId,
                 parentId = parentId,
+                position = nextChildPosition(parentId),
                 createdAt = timestamp,
                 updatedAt = timestamp,
                 items = emptyList(),
             ).toEntity(),
         )
         return id
+    }
+
+    /**
+     * Próxima posición para un hijo (ítem o sublista) de [ownerId]: items y
+     * sublistas de una misma lista comparten el mismo espacio de posiciones,
+     * para poder intercalarlos al arrastrar. Con [ownerId] null es una lista
+     * raíz y solo compite con otras raíces.
+     */
+    private suspend fun nextChildPosition(ownerId: String?): Int {
+        val siblingListsMax = listDao.getAll()
+            .filter { it.parentId == ownerId }
+            .maxOfOrNull { it.position } ?: -1
+        val siblingItemsMax = if (ownerId != null) {
+            itemDao.getAll().filter { it.listId == ownerId }.maxOfOrNull { it.position } ?: -1
+        } else {
+            -1
+        }
+        return maxOf(siblingListsMax, siblingItemsMax) + 1
+    }
+
+    /**
+     * Reordena los hijos pendientes de una lista: sus ítems y sus sublistas
+     * comparten el mismo orden, así que [orderedPendingIds] puede mezclar
+     * ambos tipos de id. Las hechas quedan siempre al final.
+     */
+    suspend fun reorderListChildren(ownerId: String, orderedPendingIds: List<String>) {
+        val allItems = itemDao.getAll().filter { it.listId == ownerId }
+        val allSublists = listDao.getAll().filter { it.parentId == ownerId }
+        val pendingSet = orderedPendingIds.toSet()
+        val doneItems = allItems.filter { it.id !in pendingSet }.sortedBy { it.position }
+        db.withTransaction {
+            orderedPendingIds.forEachIndexed { index, id ->
+                if (allItems.any { it.id == id }) {
+                    itemDao.updatePosition(id, index)
+                } else if (allSublists.any { it.id == id }) {
+                    listDao.updatePosition(id, index)
+                }
+            }
+            doneItems.forEachIndexed { index, item ->
+                itemDao.updatePosition(item.id, orderedPendingIds.size + index)
+            }
+        }
     }
 
     suspend fun updateList(id: String, title: String, projectId: String?) {
@@ -287,7 +315,7 @@ class ListMasterRepository(
     suspend fun addListItem(listId: String, title: String): String {
         val clean = Validation.itemTitle(title)
         require(listDao.getById(listId) != null) { "La lista ya no existe." }
-        val position = itemDao.maxPosition(listId) + 1
+        val position = nextChildPosition(listId)
         val id = UUID.randomUUID().toString()
         itemDao.upsert(
             ListItem(

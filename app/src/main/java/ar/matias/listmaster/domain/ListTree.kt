@@ -6,19 +6,19 @@ import ar.matias.listmaster.domain.model.TaskList
 /**
  * Reglas del árbol de listas. Es el mismo esquema que [ProjectTree] pero para
  * listas: la raíz es el nivel 0 y se permiten hasta [MAX_SUBLIST_DEPTH]
- * niveles de sublistas debajo. Como las listas no tienen prioridad, los
- * hermanos se ordenan por antigüedad.
+ * niveles de sublistas debajo. Los hermanos se ordenan por su posición propia
+ * (la que se arrastra en el detalle), y a igual posición, por antigüedad.
  */
 object ListTree {
 
     fun byId(lists: List<TaskList>): Map<String, TaskList> = lists.associateBy { it.id }
 
-    val byAge: Comparator<TaskList> = compareBy({ it.createdAt }, { it.id })
+    val byPosition: Comparator<TaskList> = compareBy({ it.position }, { it.createdAt }, { it.id })
 
     fun childrenOf(parentId: String?, lists: List<TaskList>): List<TaskList> =
         lists
             .filter { it.parentId == parentId }
-            .sortedWith(byAge)
+            .sortedWith(byPosition)
 
     /** Nivel de la lista: 0 para una raíz, 1..3 para sublistas. -1 si no existe o hay ciclo. */
     fun depthOf(listId: String, lists: List<TaskList>): Int {
@@ -84,7 +84,7 @@ object ListTree {
             .asSequence()
             .filter { it.id !in own }
             .filter { depthOf(it.id, lists) + 1 + height <= MAX_SUBLIST_DEPTH }
-            .sortedWith(compareBy({ depthOf(it.id, lists) }, { it.createdAt }, { it.id }))
+            .sortedWith(compareBy({ depthOf(it.id, lists) }, { it.position }, { it.createdAt }, { it.id }))
             .toList()
     }
 

@@ -51,7 +51,7 @@ fun ListsScreen(
     modifier: Modifier = Modifier,
 ) {
     val projectsById = projects.associateBy { it.id }
-    val roots = remember(lists) { lists.filter { it.parentId == null }.sortedWith(ListTree.byAge) }
+    val roots = remember(lists) { ListTree.childrenOf(null, lists) }
     var expandedIds by rememberSaveable { mutableStateOf(arrayListOf<String>()) }
 
     val allExpanded = roots.isNotEmpty() && roots.all { it.id in expandedIds }
@@ -187,12 +187,14 @@ fun ListsScreen(
 }
 
 internal sealed interface ListDetailRow {
+    val ownerId: String
     val depth: Int
     val isLast: Boolean
     val ancestorContinues: List<Boolean>
 
     data class ItemRow(
         val item: ar.matias.listmaster.domain.model.ListItem,
+        override val ownerId: String,
         override val depth: Int,
         override val isLast: Boolean,
         override val ancestorContinues: List<Boolean>,
@@ -203,32 +205,59 @@ internal sealed interface ListDetailRow {
         val done: Int,
         val total: Int,
         val hasChildren: Boolean,
+        val collapsed: Boolean,
+        override val ownerId: String,
         override val depth: Int,
         override val isLast: Boolean,
         override val ancestorContinues: List<Boolean>,
     ) : ListDetailRow
 }
 
+private fun childIdOf(child: Any): String = when (child) {
+    is ar.matias.listmaster.domain.model.ListItem -> child.id
+    is TaskList -> child.id
+    else -> ""
+}
+
+private fun childPositionOf(child: Any): Int = when (child) {
+    is ar.matias.listmaster.domain.model.ListItem -> child.position
+    is TaskList -> child.position
+    else -> 0
+}
+
 /**
- * Árbol de una lista: sus ítems pendientes, después sus sublistas (cada una
- * con su propio subárbol) y al final los ítems hechos, si [showDone]. La raíz
- * no se dibuja como fila; arranca en profundidad 1, igual que con proyectos.
+ * Árbol de una lista: sus ítems pendientes y sus sublistas comparten el mismo
+ * orden (se pueden intercalar), y al final van los ítems hechos, si
+ * [showDone]. Cada sublista trae su propio subárbol debajo, salvo que esté en
+ * [collapsedIds]. [orderOverride] permite mostrar, para un dueño puntual, el
+ * orden que se está arrastrando en vivo en vez del que viene de los datos. La
+ * raíz no se dibuja como fila; arranca en profundidad 1, igual que con
+ * proyectos.
  */
 internal fun buildListDetailRows(
     root: TaskList,
     lists: List<TaskList>,
     showDone: Boolean = true,
+    collapsedIds: Set<String> = emptySet(),
+    orderOverride: Map<String, List<String>> = emptyMap(),
 ): List<ListDetailRow> {
     val childrenByParent = lists.groupBy { it.parentId }
     val rows = mutableListOf<ListDetailRow>()
 
-    fun emitChildren(list: TaskList, depth: Int, ancestorContinues: List<Boolean>) {
-        val pending = list.items.filter { !it.done }
-        val done = list.items.filter { it.done }
+    fun emitChildren(owner: TaskList, depth: Int, ancestorContinues: List<Boolean>) {
+        val pendingItems = owner.items.filter { !it.done }
+        val doneItems = owner.items.filter { it.done }
+        val sublists = childrenByParent[owner.id].orEmpty()
+        val override = orderOverride[owner.id]
+        val pendingChildren: List<Any> = if (override != null) {
+            val byId = (pendingItems + sublists).associateBy(::childIdOf)
+            override.mapNotNull { byId[it] }
+        } else {
+            (pendingItems + sublists).sortedWith(compareBy(::childPositionOf, ::childIdOf))
+        }
         val items = buildList<Any> {
-            addAll(pending)
-            addAll(childrenByParent[list.id].orEmpty().sortedWith(ListTree.byAge))
-            if (showDone) addAll(done)
+            addAll(pendingChildren)
+            if (showDone) addAll(doneItems)
         }
         items.forEachIndexed { index, item ->
             val isLast = index == items.lastIndex
@@ -236,6 +265,7 @@ internal fun buildListDetailRows(
                 is ar.matias.listmaster.domain.model.ListItem -> rows.add(
                     ListDetailRow.ItemRow(
                         item = item,
+                        ownerId = owner.id,
                         depth = depth,
                         isLast = isLast,
                         ancestorContinues = ancestorContinues,
@@ -243,6 +273,7 @@ internal fun buildListDetailRows(
                 )
 
                 is TaskList -> {
+                    val collapsed = item.id in collapsedIds
                     rows.add(
                         ListDetailRow.SublistItem(
                             list = item,
@@ -250,12 +281,16 @@ internal fun buildListDetailRows(
                             total = item.items.size,
                             hasChildren = item.items.any { showDone || !it.done } ||
                                 childrenByParent[item.id].orEmpty().isNotEmpty(),
+                            collapsed = collapsed,
+                            ownerId = owner.id,
                             depth = depth,
                             isLast = isLast,
                             ancestorContinues = ancestorContinues,
                         ),
                     )
-                    emitChildren(item, depth + 1, ancestorContinues + !isLast)
+                    if (!collapsed) {
+                        emitChildren(item, depth + 1, ancestorContinues + !isLast)
+                    }
                 }
             }
         }

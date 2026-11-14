@@ -76,6 +76,7 @@ data class ListEntity(
     val title: String,
     @ColumnInfo(name = "project_id") val projectId: String?,
     @ColumnInfo(name = "parent_id") val parentId: String? = null,
+    val position: Int = 0,
     @ColumnInfo(name = "created_at") val createdAt: String,
     @ColumnInfo(name = "updated_at") val updatedAt: String,
 )

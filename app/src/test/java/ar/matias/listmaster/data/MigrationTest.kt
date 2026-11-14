@@ -18,7 +18,7 @@ import org.robolectric.annotation.Config
 class MigrationTest {
 
     @Test
-    fun `migrar de la version 2 a la 5 conserva proyectos, tareas y listas`() = runBlocking {
+    fun `migrar de la version 2 a la 6 conserva proyectos, tareas y listas`() = runBlocking {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val name = "migration-test.db"
         context.deleteDatabase(name)
@@ -46,6 +46,7 @@ class MigrationTest {
                 ListMasterDatabase.MIGRATION_2_3,
                 ListMasterDatabase.MIGRATION_3_4,
                 ListMasterDatabase.MIGRATION_4_5,
+                ListMasterDatabase.MIGRATION_5_6,
             )
             .allowMainThreadQueries()
             .build()

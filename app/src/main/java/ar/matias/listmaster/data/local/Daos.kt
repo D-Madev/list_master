@@ -75,6 +75,9 @@ interface ListDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(lists: List<ListEntity>)
 
+    @Query("UPDATE lists SET position = :position WHERE id = :id")
+    suspend fun updatePosition(id: String, position: Int)
+
     @Query("DELETE FROM lists WHERE id = :id")
     suspend fun delete(id: String)
 
@@ -98,9 +101,6 @@ interface ListItemDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(items: List<ListItemEntity>)
-
-    @Query("SELECT COALESCE(MAX(position), -1) FROM list_items WHERE list_id = :listId")
-    suspend fun maxPosition(listId: String): Int
 
     @Query("UPDATE list_items SET done = :done WHERE id = :id")
     suspend fun setDone(id: String, done: Boolean)

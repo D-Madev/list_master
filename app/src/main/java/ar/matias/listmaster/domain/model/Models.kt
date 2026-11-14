@@ -82,6 +82,7 @@ data class TaskList(
     val title: String,
     val projectId: String?,
     val parentId: String? = null,
+    val position: Int = 0,
     val createdAt: Instant,
     val updatedAt: Instant,
     val items: List<ListItem>,

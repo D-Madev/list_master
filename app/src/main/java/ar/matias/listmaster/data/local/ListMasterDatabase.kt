@@ -14,7 +14,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         ListEntity::class,
         ListItemEntity::class,
     ],
-    version = 5,
+    version = 6,
     exportSchema = true,
 )
 abstract class ListMasterDatabase : RoomDatabase() {
@@ -80,13 +80,29 @@ abstract class ListMasterDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * Las listas y sublistas ahora tienen una posición propia, para poder
+         * reordenarlas entre sí (y con los ítems) arrastrándolas.
+         */
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE lists ADD COLUMN position INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
         fun create(context: Context): ListMasterDatabase =
             Room.databaseBuilder(
                 context.applicationContext,
                 ListMasterDatabase::class.java,
                 NAME,
             )
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+                .addMigrations(
+                    MIGRATION_1_2,
+                    MIGRATION_2_3,
+                    MIGRATION_3_4,
+                    MIGRATION_4_5,
+                    MIGRATION_5_6,
+                )
                 .build()
     }
 }
