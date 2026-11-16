@@ -57,6 +57,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ar.matias.listmaster.R
+import ar.matias.listmaster.domain.ProjectTree
 import ar.matias.listmaster.domain.model.MAX_DESCRIPTION_LENGTH
 import ar.matias.listmaster.domain.model.MAX_ICON_LENGTH
 import ar.matias.listmaster.domain.model.MAX_TITLE_LENGTH
@@ -71,6 +72,7 @@ import ar.matias.listmaster.ui.iconRes
 import ar.matias.listmaster.ui.labelRes
 import ar.matias.listmaster.ui.components.PrimaryButton
 import ar.matias.listmaster.ui.components.ProjectIcon
+import ar.matias.listmaster.ui.components.SelectorRow
 import ar.matias.listmaster.ui.components.projectIconRes
 import ar.matias.listmaster.ui.theme.LocalExtendedColors
 import java.time.Instant
@@ -347,19 +349,26 @@ fun DeleteProjectDialog(
 @Composable
 fun TaskFormSheet(
     task: Task?,
+    projects: List<Project>,
+    initialProjectId: String,
     onDismiss: () -> Unit,
-    onSave: (String, LocalDate?, String, Priority?) -> Unit,
+    onSave: (String, LocalDate?, String, Priority?, String) -> Unit,
     onDelete: (() -> Unit)? = null,
 ) {
     var priority by remember(task?.id) { mutableStateOf(task?.priority) }
     var title by remember(task?.id) { mutableStateOf(task?.title.orEmpty()) }
     var description by remember(task?.id) { mutableStateOf(task?.description.orEmpty()) }
     var dueDate by remember(task?.id) { mutableStateOf(task?.dueDate) }
+    var selectedProjectId by remember(task?.id, initialProjectId) {
+        mutableStateOf(task?.projectId ?: initialProjectId)
+    }
     var showDatePicker by remember { mutableStateOf(false) }
+    var showProjectPicker by remember { mutableStateOf(false) }
     var showError by remember { mutableStateOf(false) }
     val tooLong = title.trim().length > MAX_TITLE_LENGTH
     val descriptionTooLong = description.trim().length > MAX_DESCRIPTION_LENGTH
     val extended = LocalExtendedColors.current
+    val selectedProject = projects.firstOrNull { it.id == selectedProjectId }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -477,6 +486,12 @@ fun TaskFormSheet(
                     }
                 }
             }
+            SelectorRow(
+                iconRes = R.drawable.ic_layers,
+                label = stringResource(R.string.task_project_label),
+                value = selectedProject?.title ?: stringResource(R.string.pending_no_project),
+                onClick = { showProjectPicker = true },
+            )
             Spacer(Modifier.height(20.dp))
             PrimaryButton(
                 text = stringResource(R.string.action_save),
@@ -484,7 +499,7 @@ fun TaskFormSheet(
                     if (title.isBlank()) {
                         showError = true
                     } else if (!tooLong && !descriptionTooLong) {
-                        onSave(title, dueDate, description, priority)
+                        onSave(title, dueDate, description, priority, selectedProjectId)
                     }
                 },
                 enabled = title.isNotBlank() && !tooLong && !descriptionTooLong,
@@ -535,6 +550,39 @@ fun TaskFormSheet(
             DatePicker(state = state)
         }
     }
+
+    if (showProjectPicker) {
+        val options = remember(projects) { projectOptions(projects) }
+        ProjectPickerSheet(
+            title = stringResource(
+                if (task == null) R.string.task_project_pick_title else R.string.task_project_move_title,
+            ),
+            options = options,
+            current = selectedProjectId,
+            onDismiss = { showProjectPicker = false },
+            onSelect = { project ->
+                if (project != null) selectedProjectId = project.id
+                showProjectPicker = false
+            },
+            help = if (task != null) stringResource(R.string.task_project_move_help) else null,
+        )
+    }
+}
+
+/** Proyectos en orden de árbol, con su nivel, para el selector de la tarea. */
+private fun projectOptions(projects: List<Project>): List<Pair<Project, Int>> {
+    val byParent = projects.groupBy { it.parentId }
+    val result = mutableListOf<Pair<Project, Int>>()
+    fun visit(project: Project, depth: Int) {
+        result.add(project to depth)
+        byParent[project.id].orEmpty()
+            .sortedWith(ProjectTree.byPriority)
+            .forEach { visit(it, depth + 1) }
+    }
+    byParent[null].orEmpty()
+        .sortedWith(ProjectTree.byPriority)
+        .forEach { visit(it, 0) }
+    return result
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)

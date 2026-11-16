@@ -149,6 +149,10 @@
     <string name="task_done_description">Tarea %1$s, hecha</string>
     <string name="task_pending_description">Tarea %1$s, pendiente</string>
     <string name="task_due_date">Vence el %1$s</string>
+    <string name="task_project_label">Proyecto</string>
+    <string name="task_project_pick_title">Elegí el Proyecto</string>
+    <string name="task_project_move_title">Mover a un Proyecto</string>
+    <string name="task_project_move_help">La tarea se mueve con su fecha, prioridad y descripción.</string>
 
     <string name="lists_title">Mis Listas</string>
     <string name="lists_empty_title">Todavía no tenés listas.</string>

@@ -272,10 +272,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         dueDate: LocalDate?,
         description: String = "",
         priority: Priority? = null,
+        newProjectId: String? = null,
         onSaved: () -> Unit = {},
     ) {
         action {
-            repository.updateTask(id, title, dueDate, description, priority)
+            repository.updateTask(id, title, dueDate, description, priority, newProjectId)
             onSaved()
         }
     }

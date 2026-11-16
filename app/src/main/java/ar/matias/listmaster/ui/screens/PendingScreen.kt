@@ -82,7 +82,7 @@ fun PendingScreen(
     onOpenProject: (String) -> Unit,
     onToggleTask: (Task) -> Unit,
     onCreateTask: (String, String, LocalDate?, String, Priority?) -> Unit,
-    onUpdateTask: (String, String, LocalDate?, String, Priority?) -> Unit,
+    onUpdateTask: (String, String, LocalDate?, String, Priority?, String) -> Unit,
     onDeleteTask: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -192,12 +192,14 @@ fun PendingScreen(
     editor?.let { current ->
         TaskFormSheet(
             task = current.task,
+            projects = projects,
+            initialProjectId = current.projectId,
             onDismiss = { editor = null },
-            onSave = { title, dueDate, description, priority ->
+            onSave = { title, dueDate, description, priority, targetProjectId ->
                 if (current.task == null) {
-                    onCreateTask(current.projectId, title, dueDate, description, priority)
+                    onCreateTask(targetProjectId, title, dueDate, description, priority)
                 } else {
-                    onUpdateTask(current.task.id, title, dueDate, description, priority)
+                    onUpdateTask(current.task.id, title, dueDate, description, priority, targetProjectId)
                 }
                 editor = null
             },

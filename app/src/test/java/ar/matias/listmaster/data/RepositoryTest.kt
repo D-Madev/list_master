@@ -129,6 +129,58 @@ class RepositoryTest {
     }
 
     @Test
+    fun `mover una tarea conserva sus datos y cambia solo el proyecto`() = runBlocking {
+        val origin = repository.createProject("Área")
+        tick()
+        val target = repository.createProject("Proyecto específico")
+        tick()
+        val task = repository.createTask(
+            origin,
+            "Definir la paleta",
+            LocalDate.parse("2026-11-05"),
+            description = "Notas",
+            priority = Priority.HIGH,
+        )
+        tick()
+        repository.setTaskDone(task, true)
+        tick()
+
+        repository.updateTask(
+            task,
+            "Definir la paleta",
+            LocalDate.parse("2026-11-05"),
+            description = "Notas",
+            priority = Priority.HIGH,
+            newProjectId = target,
+        )
+
+        val moved = repository.snapshot().tasks.single()
+        assertEquals(target, moved.projectId)
+        assertEquals("Definir la paleta", moved.title)
+        assertEquals(LocalDate.parse("2026-11-05"), moved.dueDate)
+        assertEquals("Notas", moved.description)
+        assertEquals(Priority.HIGH, moved.priority)
+        assertTrue(moved.done)
+        assertEquals(clock, moved.updatedAt)
+    }
+
+    @Test
+    fun `mover una tarea a un proyecto inexistente falla y no la toca`() = runBlocking {
+        val origin = repository.createProject("Área")
+        tick()
+        val task = repository.createTask(origin, "Tarea", null)
+        tick()
+
+        assertThrows(IllegalArgumentException::class.java) {
+            runBlocking {
+                repository.updateTask(task, "Tarea", null, newProjectId = "no-existe")
+            }
+        }
+
+        assertEquals(origin, repository.snapshot().tasks.single().projectId)
+    }
+
+    @Test
     fun `los items de lista conservan el orden y se pueden marcar`() = runBlocking {
         val list = repository.createList("Compras", projectId = null)
         repository.addListItem(list, "Leche")

@@ -184,8 +184,12 @@ class ListMasterRepository(
         dueDate: LocalDate?,
         description: String = "",
         priority: Priority? = null,
+        newProjectId: String? = null,
     ) {
         val existing = taskDao.getById(id) ?: throw IllegalArgumentException("La tarea ya no existe.")
+        if (newProjectId != null && newProjectId != existing.projectId) {
+            require(projectDao.getById(newProjectId) != null) { "El proyecto ya no existe." }
+        }
         val clean = Validation.title(title)
         val cleanDescription = Validation.description(description)
         taskDao.upsert(
@@ -194,6 +198,7 @@ class ListMasterRepository(
                 dueDate = dueDate?.toString(),
                 description = cleanDescription.ifEmpty { null },
                 priority = priority?.storedValue,
+                projectId = newProjectId ?: existing.projectId,
                 updatedAt = now().toString(),
             ),
         )

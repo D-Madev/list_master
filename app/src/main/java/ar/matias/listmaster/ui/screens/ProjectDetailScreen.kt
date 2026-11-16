@@ -112,7 +112,7 @@ fun ProjectDetailScreen(
     onShowDoneTasksChange: (Boolean) -> Unit,
     onToggleTask: (Task) -> Unit,
     onCreateTask: (String, String, LocalDate?, String, Priority?) -> Unit,
-    onUpdateTask: (String, String, LocalDate?, String, Priority?) -> Unit,
+    onUpdateTask: (String, String, LocalDate?, String, Priority?, String) -> Unit,
     onDeleteTask: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -452,12 +452,14 @@ fun ProjectDetailScreen(
     taskEditor?.let { editor ->
         TaskFormSheet(
             task = editor.task,
+            projects = projects,
+            initialProjectId = editor.projectId,
             onDismiss = { taskEditor = null },
-            onSave = { title, dueDate, description, priority ->
+            onSave = { title, dueDate, description, priority, targetProjectId ->
                 if (editor.task == null) {
-                    onCreateTask(editor.projectId, title, dueDate, description, priority)
+                    onCreateTask(targetProjectId, title, dueDate, description, priority)
                 } else {
-                    onUpdateTask(editor.task.id, title, dueDate, description, priority)
+                    onUpdateTask(editor.task.id, title, dueDate, description, priority, targetProjectId)
                 }
                 taskEditor = null
             },

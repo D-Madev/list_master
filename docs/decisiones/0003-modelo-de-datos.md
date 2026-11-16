@@ -7,7 +7,7 @@
 ## Lo que ya está decidido
 
 - Proyectos con subproyectos anidados hasta **3 niveles** debajo de la raíz (4 nodos en una cadena).
-- Tareas dentro de un proyecto, con fecha opcional.
+- Tareas dentro de un proyecto, con fecha opcional. Una tarea se puede mover a otro proyecto desde su detalle sin perder el resto de sus datos; su `proyecto_id` cambia y se actualiza `actualizado`.
 - Listas simples, con o sin proyecto vinculado.
 - Progreso **calculado**, nunca guardado a mano.
 - IDs **UUID** estables.
@@ -35,7 +35,7 @@
 | `id` | UUID | Sí | Estable |
 | `titulo` | texto | Sí | 1–120 caracteres |
 | `hecha` | booleano | Sí | |
-| `proyecto_id` | UUID | Sí | Debe existir |
+| `proyecto_id` | UUID | Sí | Debe existir; se puede cambiar desde el detalle de la tarea |
 | `fecha` | `YYYY-MM-DD` o `null` | No | Vencimiento, sin hora |
 | `creado` | ISO-8601 UTC | Sí | Orden estable |
 | `actualizado` | ISO-8601 UTC | Sí | Último cambio |

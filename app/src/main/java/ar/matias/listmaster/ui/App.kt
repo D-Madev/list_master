@@ -207,8 +207,8 @@ fun ListMasterApp(viewModel: AppViewModel = viewModel()) {
                             onCreateTask = { projectId, title, dueDate, description, priority ->
                                 viewModel.createTask(projectId, title, dueDate, description, priority)
                             },
-                            onUpdateTask = { id, title, dueDate, description, priority ->
-                                viewModel.updateTask(id, title, dueDate, description, priority)
+                            onUpdateTask = { id, title, dueDate, description, priority, projectId ->
+                                viewModel.updateTask(id, title, dueDate, description, priority, projectId)
                             },
                             onDeleteTask = viewModel::deleteTask,
                             modifier = contentModifier,
@@ -222,8 +222,8 @@ fun ListMasterApp(viewModel: AppViewModel = viewModel()) {
                             onCreateTask = { projectId, title, dueDate, description, priority ->
                                 viewModel.createTask(projectId, title, dueDate, description, priority)
                             },
-                            onUpdateTask = { id, title, dueDate, description, priority ->
-                                viewModel.updateTask(id, title, dueDate, description, priority)
+                            onUpdateTask = { id, title, dueDate, description, priority, projectId ->
+                                viewModel.updateTask(id, title, dueDate, description, priority, projectId)
                             },
                             onDeleteTask = viewModel::deleteTask,
                             modifier = contentModifier,
@@ -265,8 +265,8 @@ fun ListMasterApp(viewModel: AppViewModel = viewModel()) {
                             onCreateTask = { projectId, title, dueDate, description, priority ->
                                 viewModel.createTask(projectId, title, dueDate, description, priority)
                             },
-                            onUpdateTask = { id, title, dueDate, description, priority ->
-                                viewModel.updateTask(id, title, dueDate, description, priority)
+                            onUpdateTask = { id, title, dueDate, description, priority, projectId ->
+                                viewModel.updateTask(id, title, dueDate, description, priority, projectId)
                             },
                             onDeleteTask = viewModel::deleteTask,
                             modifier = contentModifier,
