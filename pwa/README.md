@@ -136,6 +136,12 @@ El service worker sirve el shell con estrategia cache-first. Si editás CSS o JS
 cambios viejos, subí `CACHE_VERSION` en `pwa/sw.js` o, durante el desarrollo,
 desregistrá el service worker y borrá las cachés desde DevTools.
 
+## Publicación
+
+El flujo completo —versión, tests, commit, push, APK y caché— está en el
+[README raíz](../README.md#flujo-de-cada-cambio). Para la PWA, la parte crítica es subir
+`CACHE_VERSION` en `sw.js` cada vez que cambie cualquier archivo del shell.
+
 ## Alcance
 
 - Pensada para iPhone en orientación vertical; también funciona en escritorio.
