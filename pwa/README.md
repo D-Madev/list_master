@@ -28,6 +28,17 @@ El detalle completo está en [PRIVACY.md](PRIVACY.md).
 > Instalá primero y cargá los datos desde el ícono. Si ya cargaste algo en una pestaña,
 > exportá ese JSON y luego importalo dentro de la app instalada.
 
+### Compartir con otra persona
+
+Pasale la URL y que la abra en Safari → **Compartir** → **Agregar a pantalla de inicio**.
+Cada iPhone guarda sus propios datos: esa persona no ve tus proyectos ni vos los suyos.
+No hay cuentas, invitaciones ni sincronización. Si querés que arranque con cierto
+contenido, mandale un JSON exportado e indicá que lo importe desde **Ajustes**.
+
+La URL no necesita login. Si el sitio está en GitHub Pages con repo privado, la app
+igual queda accesible para quien tenga el enlace; lo privado es el repositorio, no el
+sitio. Si necesitás restringir el acceso, usá Cloudflare Pages con Cloudflare Access.
+
 La PWA necesita HTTPS para instalar el service worker. Cualquier hosting estático con
 HTTPS sirve. Ver [DEPLOY.md](DEPLOY.md).
 

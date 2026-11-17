@@ -70,41 +70,38 @@ repositorio con:
 
 ## Opción C: GitHub Pages
 
-GitHub Pages en repositorios privados requiere un plan pago. Si ya lo tenés:
+> **Antes de elegir esta opción:** GitHub Pages solo publica desde repositorios
+> privados en planes **Pro, Team o Enterprise**. En el plan Free, el repositorio tiene
+> que ser público. Además, en Pro/Team el sitio publicado **es público**: cualquiera con
+> la URL puede abrir la app. Eso no expone tus tareas (viven en cada iPhone), pero sí el
+> código y la existencia del sitio. Solo GitHub Enterprise Cloud permite un Pages
+> privado con control de acceso.
+
+El repositorio ya incluye el workflow [`.github/workflows/pages.yml`](../.github/workflows/pages.yml).
+Pasos:
 
 1. **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-2. Publicá el contenido de `pwa/` como artefacto. Un workflow mínimo:
+2. Hacé push a `main` o corré el workflow **Publicar PWA en GitHub Pages** desde
+   **Actions**.
+3. La URL queda como `https://<usuario>.github.io/list_master/`.
 
-```yaml
-name: Deploy PWA
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-concurrency:
-  group: pages
-  cancel-in-progress: true
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: pwa
-      - id: deployment
-        uses: actions/deploy-pages@v4
-```
+El workflow publica únicamente `pwa/` como artefacto, sin build. La app usa rutas
+relativas (`./`, `sw.js`, manifest con `scope: "./"`), así que funciona bien en ese
+subdirectorio.
 
-GitHub Pages **no** lee `_headers`; la CSP del `index.html` sigue protegiendo la app,
-pero los encabezados HTTP extra no se aplican. Si te importa, usá Cloudflare o Netlify.
+Limitaciones de GitHub Pages:
+
+- No lee `_headers`: se pierden `X-Frame-Options`, `Permissions-Policy`,
+  `X-Robots-Tag` y los `Cache-Control` por archivo. La CSP del `index.html`, el
+  `referrer` y el `robots` meta siguen vigentes.
+- Los archivos se sirven con caché de unos 10 minutos. Después de un deploy, subí
+  `CACHE_VERSION` en `pwa/sw.js` y esperá a que GitHub publique.
+- GitHub registra la IP de cada visita en sus logs de seguridad (igual que cualquier
+  hosting).
+
+GitHub Pages **no** permite publicar desde la rama usando una subcarpeta distinta de
+`/` o `/docs`; por eso el workflow sube `pwa/` como artefacto en lugar de usar
+“Deploy from a branch”.
 
 ---
 

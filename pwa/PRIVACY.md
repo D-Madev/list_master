@@ -32,8 +32,8 @@ puede registrar metadatos técnicos de la conexión: dirección IP, fecha/hora, 
 solicitada y user agent. Esos registros no incluyen el contenido de tus tareas, porque
 el contenido nunca se transmite.
 
-Si usás Cloudflare, Netlify o un servidor propio, revisá su política de logs. La app no
-agrega ningún pedido adicional después de cargar.
+Si usás Cloudflare, Netlify, GitHub Pages o un servidor propio, revisá su política de
+logs. La app no agrega ningún pedido adicional después de cargar.
 
 ## Qué no hace la app
 
