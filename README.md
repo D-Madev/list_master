@@ -38,6 +38,16 @@ También se puede instalar por cable con `adb`:
 /d/src/tools/android-sdk/platform-tools/adb.exe install -r ListMaster.apk
 ```
 
+## Versión web (iPhone)
+
+En `pwa/` hay un gemelo web instalable en iPhone, con las mismas funciones y el mismo
+formato de respaldo JSON. No tiene backend ni cuentas: los datos quedan en el navegador
+del teléfono. Se instala desde Safari con **Compartir → Agregar a pantalla de inicio**.
+
+- [Cómo usar e instalar la PWA](pwa/README.md)
+- [Cómo desplegarla](pwa/DEPLOY.md)
+- [Privacidad](pwa/PRIVACY.md)
+
 ## Cómo compilar
 
 No hace falta Android Studio: alcanza con el JDK 17, Gradle 8.9 y el SDK de Android que ya están en esta PC.
