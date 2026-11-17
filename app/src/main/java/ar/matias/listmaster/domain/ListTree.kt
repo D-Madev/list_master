@@ -103,4 +103,24 @@ object ListTree {
         lists.filter { it.id !in seen }.forEach { result.add(it to 0) }
         return result
     }
+
+    /**
+     * Aplica un orden nuevo de hijos arrastrables sobre el orden natural de
+     * todos los hijos. Los hijos que no se arrastran (los ítems hechos) se
+     * quedan en su lugar y los arrastrables se permutan en los lugares libres.
+     * Así una tarea tachada nunca cambia de posición al reordenar.
+     */
+    fun mergeReorder(
+        allChildIds: List<String>,
+        draggableIds: List<String>,
+        requestedOrder: List<String>,
+    ): List<String> {
+        val draggable = draggableIds.toSet()
+        val requested = requestedOrder.filter { it in draggable }.distinct()
+        val order = requested + draggableIds.filter { it !in requested }
+        var cursor = 0
+        return allChildIds.map { id ->
+            if (id in draggable) order.getOrNull(cursor++) ?: id else id
+        }
+    }
 }

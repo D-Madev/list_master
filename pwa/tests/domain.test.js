@@ -12,6 +12,7 @@ import {
   listDepth,
   listProgress,
   listSubtreeIds,
+  mergeReorder,
   newId,
   normalizeDescription,
   normalizeTitle,
@@ -212,6 +213,13 @@ test('las filas de una lista intercalan ítems y sublistas por posición', () =>
     sortedItems(lists[0]).map((entry) => entry.id),
     ['a', 'b', 'done'],
   );
+});
+
+test('al reordenar los hechos conservan su lugar y los pendientes se permutan', () => {
+  const all = ['a', 'hecha', 'b', 'c'];
+  const draggable = ['a', 'b', 'c'];
+  assert.deepEqual(mergeReorder(all, draggable, ['b', 'a', 'c']), ['b', 'hecha', 'a', 'c']);
+  assert.deepEqual(mergeReorder(all, draggable, ['b', 'c', 'a']), ['b', 'hecha', 'c', 'a']);
 });
 
 test('los títulos y la descripción se validan', () => {

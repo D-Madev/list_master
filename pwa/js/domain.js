@@ -391,6 +391,25 @@ export function sortedItems(list) {
   });
 }
 
+/**
+ * Aplica un orden nuevo de hijos arrastrables sobre el orden natural de todos
+ * los hijos. Los que no se arrastran (ítems hechos) se quedan en su lugar y los
+ * arrastrables se permutan en los lugares libres, así una tarea tachada nunca
+ * cambia de posición al reordenar.
+ */
+export function mergeReorder(allIds, draggableIds, requestedOrder) {
+  const draggable = new Set(draggableIds);
+  const requested = [];
+  for (const id of requestedOrder) {
+    if (draggable.has(id) && !requested.includes(id)) requested.push(id);
+  }
+  for (const id of draggableIds) {
+    if (!requested.includes(id)) requested.push(id);
+  }
+  let cursor = 0;
+  return allIds.map((id) => (draggable.has(id) ? requested[cursor++] ?? id : id));
+}
+
 /** Filas del detalle: ítems y sublistas intercalados por posición. */
 export function buildListRows(list, lists, collapsedIds = new Set()) {
   const items = (list.items || []).map((item) => ({ kind: 'item', position: item.position, item }));

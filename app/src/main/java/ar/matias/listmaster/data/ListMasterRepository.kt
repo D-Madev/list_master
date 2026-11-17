@@ -260,23 +260,24 @@ class ListMasterRepository(
     /**
      * Reordena los hijos pendientes de una lista: sus ítems y sus sublistas
      * comparten el mismo orden, así que [orderedPendingIds] puede mezclar
-     * ambos tipos de id. Las hechas quedan siempre al final.
+     * ambos tipos de id. Los ítems hechos no se arrastran y conservan su
+     * lugar: se permutan solo los pendientes en los espacios libres.
      */
     suspend fun reorderListChildren(ownerId: String, orderedPendingIds: List<String>) {
         val allItems = itemDao.getAll().filter { it.listId == ownerId }
         val allSublists = listDao.getAll().filter { it.parentId == ownerId }
-        val pendingSet = orderedPendingIds.toSet()
-        val doneItems = allItems.filter { it.id !in pendingSet }.sortedBy { it.position }
+        val baseline = (allItems.map { it.id to it.position } + allSublists.map { it.id to it.position })
+            .sortedWith(compareBy({ it.second }, { it.first }))
+            .map { it.first }
+        val draggable = allItems.filter { !it.done }.map { it.id } + allSublists.map { it.id }
+        val ordered = ListTree.mergeReorder(baseline, draggable, orderedPendingIds)
         db.withTransaction {
-            orderedPendingIds.forEachIndexed { index, id ->
+            ordered.forEachIndexed { index, id ->
                 if (allItems.any { it.id == id }) {
                     itemDao.updatePosition(id, index)
                 } else if (allSublists.any { it.id == id }) {
                     listDao.updatePosition(id, index)
                 }
-            }
-            doneItems.forEachIndexed { index, item ->
-                itemDao.updatePosition(item.id, orderedPendingIds.size + index)
             }
         }
     }

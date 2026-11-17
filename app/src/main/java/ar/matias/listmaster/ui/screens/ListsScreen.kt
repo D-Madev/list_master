@@ -38,6 +38,7 @@ import ar.matias.listmaster.domain.model.TaskList
 import ar.matias.listmaster.ui.components.CenteredEmpty
 import ar.matias.listmaster.ui.components.ListCard
 import ar.matias.listmaster.ui.components.ScreenTitle
+import ar.matias.listmaster.ui.components.rememberCompletionReveal
 
 @Composable
 fun ListsScreen(
@@ -55,6 +56,7 @@ fun ListsScreen(
     var expandedIds by rememberSaveable { mutableStateOf(arrayListOf<String>()) }
 
     val allExpanded = roots.isNotEmpty() && roots.all { it.id in expandedIds }
+    val completionReveal = rememberCompletionReveal()
 
     fun toggleExpanded(id: String) {
         expandedIds = ArrayList(expandedIds).also { ids ->
@@ -151,8 +153,13 @@ fun ListsScreen(
                     }
                 }
                 items(roots, key = { it.id }) { root ->
-                    val rows = remember(lists, showDoneItems) {
-                        buildListDetailRows(root, lists, showDone = showDoneItems)
+                    val rows = remember(lists, showDoneItems, completionReveal.ids) {
+                        buildListDetailRows(
+                            root,
+                            lists,
+                            showDone = showDoneItems,
+                            extraVisibleIds = completionReveal.ids,
+                        )
                     }
                     ListCard(
                         list = root,
@@ -161,7 +168,10 @@ fun ListsScreen(
                         expanded = root.id in expandedIds,
                         onToggle = { toggleExpanded(root.id) },
                         onOpen = { onOpenList(root.id) },
-                        onToggleItem = { item, done -> onToggleItem(item.id, done) },
+                        onToggleItem = { item, done ->
+                            if (done && !showDoneItems) completionReveal.reveal(item.id)
+                            onToggleItem(item.id, done)
+                        },
                         onOpenSublist = onOpenList,
                         showDoneItems = showDoneItems,
                     )
@@ -241,12 +251,15 @@ internal fun buildListDetailRows(
     showDone: Boolean = true,
     collapsedIds: Set<String> = emptySet(),
     orderOverride: Map<String, List<String>> = emptyMap(),
+    extraVisibleIds: Set<String> = emptySet(),
 ): List<ListDetailRow> {
     val childrenByParent = lists.groupBy { it.parentId }
     val rows = mutableListOf<ListDetailRow>()
 
     fun emitChildren(owner: TaskList, depth: Int, ancestorContinues: List<Boolean>) {
-        val visibleItems = owner.items.filter { showDone || !it.done }
+        val visibleItems = owner.items.filter {
+            showDone || !it.done || it.id in extraVisibleIds
+        }
         val sublists = childrenByParent[owner.id].orEmpty()
         val baseline = (visibleItems + sublists).sortedWith(compareBy(::childPositionOf, ::childIdOf))
         val override = orderOverride[owner.id]
@@ -285,8 +298,9 @@ internal fun buildListDetailRows(
                             list = item,
                             done = item.items.count { it.done },
                             total = item.items.size,
-                            hasChildren = item.items.any { showDone || !it.done } ||
-                                childrenByParent[item.id].orEmpty().isNotEmpty(),
+                            hasChildren = item.items.any {
+                                showDone || !it.done || it.id in extraVisibleIds
+                            } || childrenByParent[item.id].orEmpty().isNotEmpty(),
                             collapsed = collapsed,
                             ownerId = owner.id,
                             depth = depth,

@@ -82,4 +82,4 @@ lado del servicio. El contenido que escribas es tuyo y queda en tu dispositivo.
 
 Si en el futuro la app incorpora sincronización o cualquier función que implique enviar
 datos, esta política y la app van a decirlo de forma explícita antes de activarla. La
-versión actual es **1.8.0** y es completamente local.
+versión actual es **1.9.0** y es completamente local.

@@ -1,11 +1,14 @@
 package ar.matias.listmaster.ui.screens
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +25,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,17 +43,24 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
@@ -57,6 +69,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import ar.matias.listmaster.R
 import ar.matias.listmaster.domain.ListTree
 import ar.matias.listmaster.domain.model.ListItem
@@ -66,8 +79,10 @@ import ar.matias.listmaster.domain.model.TaskList
 import ar.matias.listmaster.ui.components.CenteredEmpty
 import ar.matias.listmaster.ui.components.CompletableText
 import ar.matias.listmaster.ui.components.DetailHeader
+import ar.matias.listmaster.ui.components.EaseOut
 import ar.matias.listmaster.ui.components.IconTile
 import ar.matias.listmaster.ui.components.TaskCheck
+import ar.matias.listmaster.ui.components.rememberCompletionReveal
 import ar.matias.listmaster.ui.components.ThinProgressBar
 import ar.matias.listmaster.ui.components.TreeRow
 import ar.matias.listmaster.ui.sheets.DeleteListDialog
@@ -131,6 +146,7 @@ fun ListDetailScreen(
     val total = list.items.size
     val projectTitle = list.projectId?.let { id -> projects.firstOrNull { it.id == id }?.title }
     val extended = LocalExtendedColors.current
+    val completionReveal = rememberCompletionReveal()
 
     // Qué sublistas están replegadas (todas arrancan desplegadas).
     var collapsedIds by remember { mutableStateOf(setOf<String>()) }
@@ -140,65 +156,183 @@ fun ListDetailScreen(
 
     // Arrastre: se reordenan los hijos pendientes (ítems y sublistas mezclados)
     // de un único dueño a la vez, sea la lista misma o una de sus sublistas.
-    var dragOwnerId by remember { mutableStateOf<String?>(null) }
-    var draggedChildId by remember { mutableStateOf<String?>(null) }
-    val dragChildIds = remember { mutableStateListOf<String>() }
-    var dragDelta by remember { mutableStateOf(0f) }
+    // Los ítems hechos no se arrastran: su lugar queda fijo y los pendientes se
+    // permutan alrededor. Mientras dure el arrastre se mantiene el orden nuevo
+    // como override hasta que la base lo confirme, para que no parpadee.
+    var dragState by remember { mutableStateOf<ListDragState?>(null) }
+    var dropSettle by remember { mutableStateOf<DropSettle?>(null) }
+    val settleProgress = remember { Animatable(1f) }
+    var overrideOwnerId by remember { mutableStateOf<String?>(null) }
+    val overrideIds = remember { mutableStateListOf<String>() }
+    var listTopPx by remember { mutableFloatStateOf(0f) }
+
+    val lazyListState = rememberLazyListState()
+    val density = LocalDensity.current
 
     fun ownerById(ownerId: String): TaskList? =
         if (ownerId == list.id) list else lists.firstOrNull { it.id == ownerId }
 
-    fun naturalPendingChildIds(ownerId: String): List<String> {
+    fun naturalChildIds(ownerId: String): List<String> {
         val owner = ownerById(ownerId) ?: return emptyList()
-        val pendingItems = owner.items.filter { !it.done }
-        val sublists = lists.filter { it.parentId == ownerId }
-        return (pendingItems + sublists)
-            .sortedWith(
-                compareBy(
-                    { child -> if (child is ListItem) child.position else (child as TaskList).position },
-                    { child -> if (child is ListItem) child.id else (child as TaskList).id },
-                ),
-            )
-            .map { child -> if (child is ListItem) child.id else (child as TaskList).id }
+        val items = owner.items.map { it.id to it.position }
+        val sublists = lists.filter { it.parentId == ownerId }.map { it.id to it.position }
+        return (items + sublists)
+            .sortedWith(compareBy({ it.second }, { it.first }))
+            .map { it.first }
     }
 
-    fun startDrag(ownerId: String, childId: String) {
-        dragOwnerId = ownerId
-        draggedChildId = childId
-        dragChildIds.clear()
-        dragChildIds.addAll(naturalPendingChildIds(ownerId))
-        dragDelta = 0f
+    fun naturalPendingChildIds(ownerId: String): List<String> {
+        val owner = ownerById(ownerId) ?: return emptyList()
+        val pendingItems = owner.items.filter { !it.done }.map { it.id to it.position }
+        val sublists = lists.filter { it.parentId == ownerId }.map { it.id to it.position }
+        return (pendingItems + sublists)
+            .sortedWith(compareBy({ it.second }, { it.first }))
+            .map { it.first }
+    }
+
+    fun rowKeyOf(ownerId: String, childId: String): String {
+        val owner = ownerById(ownerId)
+        return if (owner?.items?.any { it.id == childId } == true) {
+            "item-$childId"
+        } else {
+            "sublist-$childId"
+        }
+    }
+
+    fun startDrag(rowKey: String, ownerId: String, childId: String) {
+        if (dragState != null) return
+        val pending = naturalPendingChildIds(ownerId)
+        if (childId !in pending) return
+        val info = lazyListState.layoutInfo.visibleItemsInfo.firstOrNull { it.key == rowKey } ?: return
+        overrideOwnerId = ownerId
+        overrideIds.clear()
+        overrideIds.addAll(pending)
+        dropSettle = null
+        dragState = ListDragState(
+            ownerId = ownerId,
+            childId = childId,
+            rowKey = rowKey,
+            startTopPx = listTopPx + info.offset,
+            rowHeightPx = info.size.toFloat(),
+            childIds = overrideIds,
+            keysById = naturalChildIds(ownerId).associateWith { rowKeyOf(ownerId, it) },
+        )
+    }
+
+    fun maybeReorder(state: ListDragState) {
+        val layout = lazyListState.layoutInfo
+        if (layout.visibleItemsInfo.none { it.key == state.rowKey }) return
+        val currentIndex = state.childIds.indexOf(state.childId)
+        if (currentIndex < 0) return
+        val visualCenter = state.startTopPx + state.dragDy + state.rowHeightPx / 2f
+        val indexById = HashMap<String, Int>(state.childIds.size)
+        state.childIds.forEachIndexed { index, id -> indexById[id] = index }
+        val idByKey = state.keysById.entries.associate { (id, key) -> key to id }
+        var target = currentIndex
+        layout.visibleItemsInfo.forEach { item ->
+            val id = idByKey[item.key] ?: return@forEach
+            if (id == state.childId) return@forEach
+            val index = indexById[id] ?: return@forEach
+            val center = listTopPx + item.offset + item.size / 2f
+            if (index > currentIndex && visualCenter > center) {
+                target = maxOf(target, index)
+            } else if (index < currentIndex && visualCenter < center) {
+                target = minOf(target, index)
+            }
+        }
+        if (target != currentIndex) {
+            state.childIds.removeAt(currentIndex)
+            state.childIds.add(target.coerceIn(0, state.childIds.size), state.childId)
+            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        }
     }
 
     fun endDrag() {
-        val ownerId = dragOwnerId
-        if (ownerId != null) onReorderItems(ownerId, dragChildIds.toList())
-        dragOwnerId = null
-        draggedChildId = null
-        dragDelta = 0f
+        val state = dragState ?: return
+        val info = lazyListState.layoutInfo.visibleItemsInfo.firstOrNull { it.key == state.rowKey }
+        val currentTop = info?.let { listTopPx + it.offset }
+        val translation = if (currentTop != null) {
+            state.startTopPx + state.dragDy - currentTop
+        } else {
+            0f
+        }
+        dragState = null
+        onReorderItems(state.ownerId, state.childIds.toList())
+        dropSettle = DropSettle(state.childId, translation)
     }
 
     fun cancelDrag() {
-        dragOwnerId = null
-        draggedChildId = null
-        dragDelta = 0f
+        if (dragState == null) return
+        dragState = null
+        dropSettle = null
+        overrideOwnerId = null
+        overrideIds.clear()
     }
 
-    val orderOverride = remember(dragOwnerId, dragChildIds.toList()) {
-        dragOwnerId?.let { mapOf(it to dragChildIds.toList()) } ?: emptyMap()
+    // Auto-scroll: cuanto más cerca del borde superior o inferior está el dedo,
+    // más rápido se desplaza la lista, para poder soltar lejos sin perderla.
+    LaunchedEffect(dragState?.childId) {
+        val state = dragState ?: return@LaunchedEffect
+        val zone = with(density) { 80.dp.toPx() }
+        val maxSpeed = with(density) { 13.dp.toPx() }
+        while (true) {
+            withFrameNanos { }
+            if (dragState !== state) break
+            maybeReorder(state)
+            val viewportHeight = lazyListState.layoutInfo.viewportSize.height.toFloat()
+            if (viewportHeight <= 0f) continue
+            val viewportTop = listTopPx
+            val pointerY = state.startTopPx + state.dragDy + state.rowHeightPx / 2f
+            val fromTop = pointerY - viewportTop
+            val fromBottom = viewportTop + viewportHeight - pointerY
+            val scroll = when {
+                fromTop < zone -> -maxSpeed * edgeIntensity(fromTop, zone)
+                fromBottom < zone -> maxSpeed * edgeIntensity(fromBottom, zone)
+                else -> 0f
+            }
+            if (scroll != 0f) {
+                lazyListState.scrollBy(scroll)
+            }
+        }
     }
-    val rows = remember(list, lists, showDoneItems, collapsedIds, orderOverride) {
+
+    LaunchedEffect(dropSettle) {
+        if (dropSettle == null) return@LaunchedEffect
+        settleProgress.snapTo(1f)
+        settleProgress.animateTo(0f, tween(durationMillis = 180))
+        dropSettle = null
+    }
+
+    // El override se suelta recién cuando la base ya tiene el orden nuevo.
+    LaunchedEffect(overrideOwnerId, lists, dragState) {
+        val ownerId = overrideOwnerId ?: return@LaunchedEffect
+        if (dragState != null) return@LaunchedEffect
+        if (naturalPendingChildIds(ownerId) == overrideIds.toList()) {
+            overrideOwnerId = null
+            overrideIds.clear()
+        }
+    }
+
+    val orderOverride = remember(overrideOwnerId, overrideIds.toList()) {
+        overrideOwnerId?.let { mapOf(it to overrideIds.toList()) } ?: emptyMap()
+    }
+    val rows = remember(
+        list,
+        lists,
+        showDoneItems,
+        collapsedIds,
+        orderOverride,
+        completionReveal.ids,
+    ) {
         buildListDetailRows(
             root = list,
             lists = lists,
             showDone = showDoneItems,
             collapsedIds = collapsedIds,
             orderOverride = orderOverride,
+            extraVisibleIds = completionReveal.ids,
         )
     }
-
-    val lazyListState = rememberLazyListState()
-    val density = LocalDensity.current
 
     Column(
         modifier = modifier
@@ -222,10 +356,12 @@ fun ListDetailScreen(
 
         LazyColumn(
             state = lazyListState,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .onGloballyPositioned { listTopPx = it.positionInRoot().y },
             contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
-            userScrollEnabled = draggedChildId == null,
+            userScrollEnabled = dragState == null,
         ) {
             item(key = "summary") {
                 Column {
@@ -344,7 +480,8 @@ fun ListDetailScreen(
                     when (row) {
                         is ListDetailRow.ItemRow -> {
                             val item = row.item
-                            val isDraggingThis = draggedChildId == item.id
+                            val rowKey = "item-${item.id}"
+                            val isDraggingThis = dragState?.childId == item.id
                             ListItemRow(
                                 item = item,
                                 depth = row.depth,
@@ -352,37 +489,37 @@ fun ListDetailScreen(
                                 ancestorContinues = row.ancestorContinues,
                                 onToggle = {
                                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    if (!item.done && !showDoneItems) completionReveal.reveal(item.id)
                                     onToggleItem(item.id, !item.done)
                                 },
                                 onOpen = { editingItem = item },
-                                modifier = if (!isDraggingThis) Modifier.animateItem() else Modifier,
+                                modifier = rowModifier(
+                                    rowKey = rowKey,
+                                    rowId = item.id,
+                                    isDragging = isDraggingThis,
+                                    dragState = dragState,
+                                    dropSettle = dropSettle,
+                                    settleProgress = settleProgress,
+                                    lazyListState = lazyListState,
+                                    listTop = { listTopPx },
+                                ),
                                 showDragHandle = !item.done,
                                 isDragging = isDraggingThis,
                                 dragHandleModifier = if (item.done) {
                                     Modifier
                                 } else {
                                     Modifier.pointerInput(item.id) {
-                                        val itemHeightPx = with(density) { 56.dp.toPx() }
                                         detectDragGesturesAfterLongPress(
                                             onDragStart = { _ ->
-                                                startDrag(row.ownerId, item.id)
+                                                startDrag(rowKey, row.ownerId, item.id)
                                                 haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                                             },
                                             onDrag = { change, dragAmount ->
                                                 change.consume()
-                                                dragDelta += dragAmount.y
-                                                val threshold = itemHeightPx * 0.5f
-                                                while (dragDelta > threshold) {
-                                                    val idx = dragChildIds.indexOf(item.id)
-                                                    if (idx < 0 || idx >= dragChildIds.size - 1) break
-                                                    dragChildIds.add(idx + 1, dragChildIds.removeAt(idx))
-                                                    dragDelta -= itemHeightPx
-                                                }
-                                                while (dragDelta < -threshold) {
-                                                    val idx = dragChildIds.indexOf(item.id)
-                                                    if (idx <= 0) break
-                                                    dragChildIds.add(idx - 1, dragChildIds.removeAt(idx))
-                                                    dragDelta += itemHeightPx
+                                                val state = dragState
+                                                if (state?.childId == item.id) {
+                                                    state.dragDy += dragAmount.y
+                                                    maybeReorder(state)
                                                 }
                                             },
                                             onDragEnd = { endDrag() },
@@ -395,7 +532,8 @@ fun ListDetailScreen(
 
                         is ListDetailRow.SublistItem -> {
                             val sublist = row.list
-                            val isDraggingThis = draggedChildId == sublist.id
+                            val rowKey = "sublist-${sublist.id}"
+                            val isDraggingThis = dragState?.childId == sublist.id
                             SublistHeaderRow(
                                 list = sublist,
                                 done = row.done,
@@ -406,31 +544,30 @@ fun ListDetailScreen(
                                 hasChildren = row.hasChildren,
                                 collapsed = row.collapsed,
                                 isDragging = isDraggingThis,
-                                modifier = if (!isDraggingThis) Modifier.animateItem() else Modifier,
+                                modifier = rowModifier(
+                                    rowKey = rowKey,
+                                    rowId = sublist.id,
+                                    isDragging = isDraggingThis,
+                                    dragState = dragState,
+                                    dropSettle = dropSettle,
+                                    settleProgress = settleProgress,
+                                    lazyListState = lazyListState,
+                                    listTop = { listTopPx },
+                                ),
                                 onOpen = { onOpenSublist(sublist.id) },
                                 onToggleCollapse = { toggleCollapsed(sublist.id) },
                                 dragHandleModifier = Modifier.pointerInput(sublist.id) {
-                                    val itemHeightPx = with(density) { 56.dp.toPx() }
                                     detectDragGesturesAfterLongPress(
                                         onDragStart = { _ ->
-                                            startDrag(row.ownerId, sublist.id)
+                                            startDrag(rowKey, row.ownerId, sublist.id)
                                             haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                                         },
                                         onDrag = { change, dragAmount ->
                                             change.consume()
-                                            dragDelta += dragAmount.y
-                                            val threshold = itemHeightPx * 0.5f
-                                            while (dragDelta > threshold) {
-                                                val idx = dragChildIds.indexOf(sublist.id)
-                                                if (idx < 0 || idx >= dragChildIds.size - 1) break
-                                                dragChildIds.add(idx + 1, dragChildIds.removeAt(idx))
-                                                dragDelta -= itemHeightPx
-                                            }
-                                            while (dragDelta < -threshold) {
-                                                val idx = dragChildIds.indexOf(sublist.id)
-                                                if (idx <= 0) break
-                                                dragChildIds.add(idx - 1, dragChildIds.removeAt(idx))
-                                                dragDelta += itemHeightPx
+                                            val state = dragState
+                                            if (state?.childId == sublist.id) {
+                                                state.dragDy += dragAmount.y
+                                                maybeReorder(state)
                                             }
                                         },
                                         onDragEnd = { endDrag() },
@@ -708,4 +845,81 @@ private fun SublistHeaderRow(
             tint = scheme.onSurfaceVariant.copy(alpha = 0.35f),
         )
     }
+}
+
+/**
+ * Estado del arrastre vivo: qué hijo se mueve, dónde empezó y el orden de los
+ * hijos arrastrables que se está mostrando. [childIds] es la misma lista que
+ * usa el override de la pantalla, así que moverla acá mueve la fila.
+ */
+private class ListDragState(
+    val ownerId: String,
+    val childId: String,
+    val rowKey: String,
+    val startTopPx: Float,
+    val rowHeightPx: Float,
+    val childIds: SnapshotStateList<String>,
+    val keysById: Map<String, String>,
+) {
+    var dragDy by mutableFloatStateOf(0f)
+}
+
+/** Animación corta al soltar: la fila baja desde el dedo hasta su lugar. */
+private class DropSettle(
+    val childId: String,
+    val startTranslation: Float,
+)
+
+private fun edgeIntensity(distance: Float, zone: Float): Float {
+    val progress = ((zone - distance) / zone).coerceIn(0f, 1f)
+    return progress * progress
+}
+
+/**
+ * Modifier de una fila reordenable: las demás se acomodan con [animateItem] y
+ * la que se arrastra se dibuja encima, siguiendo el dedo aunque la lista se
+ * desplace sola cerca de los bordes.
+ */
+@OptIn(ExperimentalFoundationApi::class)
+private fun LazyItemScope.rowModifier(
+    rowKey: String,
+    rowId: String,
+    isDragging: Boolean,
+    dragState: ListDragState?,
+    dropSettle: DropSettle?,
+    settleProgress: Animatable<Float, AnimationVector1D>,
+    lazyListState: LazyListState,
+    listTop: () -> Float,
+): Modifier {
+    val base = if (isDragging) {
+        Modifier
+    } else {
+        Modifier.animateItem(
+            fadeInSpec = null,
+            fadeOutSpec = null,
+            placementSpec = tween(durationMillis = 180, easing = EaseOut),
+        )
+    }
+    val settleStart = if (!isDragging && dropSettle?.childId == rowId) {
+        dropSettle.startTranslation
+    } else {
+        null
+    }
+    return base
+        .zIndex(if (isDragging) 1f else 0f)
+        .graphicsLayer {
+            val state = dragState
+            if (isDragging && state != null) {
+                val info = lazyListState.layoutInfo.visibleItemsInfo.firstOrNull { it.key == rowKey }
+                if (info != null) {
+                    translationY = state.startTopPx + state.dragDy - (listTop() + info.offset)
+                }
+                scaleX = 1.015f
+                scaleY = 1.015f
+                shadowElevation = 10.dp.toPx()
+            } else if (settleStart != null) {
+                translationY = settleStart * settleProgress.value
+                shadowElevation = 10.dp.toPx() * settleProgress.value
+            }
+        }
 }

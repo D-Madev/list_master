@@ -6,7 +6,7 @@ Es una app Android propia. Los datos quedan en el celular, sin cuenta ni servido
 
 ## Estado
 
-**Versión 1.8.0.** La app está completa según el alcance acordado:
+**Versión 1.9.0.** La app está completa según el alcance acordado:
 
 - Proyectos con subproyectos hasta tres niveles, estados y prioridad opcional, con ícono propio o emoji.
 - Listado de proyectos y listas en registros compactos que se despliegan en el lugar, con “Expandir Todo” / “Colapsar Todo”.
@@ -18,6 +18,7 @@ Es una app Android propia. Los datos quedan en el celular, sin cuenta ni servido
 - Proyectos ordenados solos por prioridad (Alta, Media, Baja, sin prioridad) y filtro por estado y prioridad que queda guardado.
 - Los subproyectos se pueden pasar a otro padre, siempre dentro de su mismo proyecto principal.
 - Listas simples, vinculadas o no a un proyecto; las tareas hechas se ocultan con un interruptor y la vista previa muestra primero las pendientes.
+- Las tareas de lista tachadas conservan su lugar: solo las pendientes se reordenan arrastrando, con scroll automático cerca de los bordes y un acomodo animado entre filas.
 - Progreso calculado sobre el árbol de proyectos, sin contar listas.
 - Export e import JSON con nombres de campo en español, validado y atómico.
 - Tema claro, oscuro o del sistema, guardado en el celular.
@@ -135,7 +136,7 @@ Regla: **un cambio terminado se versiona, se prueba, se commitea, se pushea y se
 | --- | --- | --- |
 | Android | `app/build.gradle.kts` | `versionCode` +1 y `versionName` nuevo |
 | PWA, cambio de producto | `pwa/js/app.js` y `pwa/package.json` | Misma `APP_VERSION` / `version` que Android |
-| Shell de la PWA | `pwa/sw.js` | Subir `CACHE_VERSION` (por ejemplo `1.8.1-r1`) |
+| Shell de la PWA | `pwa/sw.js` | Subir `CACHE_VERSION` (por ejemplo `1.9.0-r1`) |
 | Solo documentación | — | No se toca la versión |
 
 Reglas prácticas:
@@ -176,13 +177,13 @@ Antes de commitear, probar a mano lo que se tocó:
 
 ### 3. Commit y push
 
-- Un commit por cambio terminado, en español y en imperativo: `Sube la version a 1.8.1: ...`.
+- Un commit por cambio terminado, en español y en imperativo: `Sube la version a 1.9.0: ...`.
 - El commit incluye código, tests, versión y documentación en el mismo corte.
 - Nunca se commitea `ListMaster.apk` (está ignorado); el APK se regenera desde el código.
 
 ```bash
 git add -A
-git commit -m "Sube la version a 1.8.1: describe el cambio"
+git commit -m "Sube la version a 1.9.0: describe el cambio"
 git push origin main
 ```
 

@@ -15,6 +15,7 @@ import {
   flattenProjects,
   isClosed,
   listDepth,
+  mergeReorder,
   normalizeDescription,
   normalizeIcon,
   normalizeTitle,
@@ -31,7 +32,7 @@ import { loadData, loadSettings, saveData, saveSettings } from './store.js';
 import { ICON_KEYS, escapeHtml, icon } from './icons.js';
 import { formatLongDate, needsNav, renderNav, renderScreen } from './views.js';
 
-const APP_VERSION = '1.8.0';
+const APP_VERSION = '1.9.0';
 const DEFAULT_SETTINGS = {
   theme: 'system',
   showDoneTasks: false,
@@ -59,6 +60,7 @@ let toastClearTimer = null;
 let toastAction = null;
 let suppressClick = false;
 let dragState = null;
+let dragScrollFrame = null;
 
 const appRoot = document.getElementById('app');
 const navRoot = document.getElementById('nav-root');
@@ -1343,19 +1345,61 @@ function saveItemSheet(sheet) {
 function toggleTask(taskId) {
   const task = findTask(taskId);
   if (!task) return;
-  task.done = !task.done;
+  const done = !task.done;
+  task.done = done;
   task.updatedAt = nowIso();
   persist();
-  render({ preserveScroll: true });
+  const row = document
+    .querySelector(`[data-action="toggle-task"][data-id="${taskId}"]`)
+    ?.closest('.task-row');
+  if (row) {
+    animateCompletion(row, done);
+    setTimeout(() => render({ preserveScroll: true }), 380);
+  } else {
+    render({ preserveScroll: true });
+  }
 }
 
 function toggleItem(itemId) {
   const found = findItemById(itemId);
   if (!found) return;
-  found.item.done = !found.item.done;
+  const done = !found.item.done;
+  found.item.done = done;
   found.list.updatedAt = nowIso();
   persist();
-  render({ preserveScroll: true });
+  const row = document
+    .querySelector(`[data-action="toggle-item"][data-id="${itemId}"]`)
+    ?.closest('.item-row');
+  if (row) {
+    animateCompletion(row, done);
+    setTimeout(() => render({ preserveScroll: true }), 380);
+  } else {
+    render({ preserveScroll: true });
+  }
+}
+
+// Anima el check y el tachado en la fila que ya está en pantalla. Después se
+// vuelve a renderizar para que el progreso y los contadores queden al día.
+function animateCompletion(row, done) {
+  const check = row.querySelector('.task-check');
+  if (check) {
+    check.classList.toggle('is-checked', done);
+    check.innerHTML = done ? icon('check', 'check-mark') : '';
+  }
+  row.classList.toggle('is-done', done);
+  row.classList.add('is-completing');
+  const title = row.querySelector('.task-title, .item-title');
+  if (title) {
+    title.querySelector('.strike-overlay')?.remove();
+    if (done) {
+      const overlay = document.createElement('span');
+      overlay.className = 'strike-overlay';
+      overlay.setAttribute('aria-hidden', 'true');
+      overlay.textContent = title.textContent;
+      title.appendChild(overlay);
+    }
+  }
+  setTimeout(() => row.classList.remove('is-completing'), 380);
 }
 
 function setProjectStatus(projectId, status) {
@@ -1767,16 +1811,21 @@ function localDate() {
 
 // Arrastrar para ordenar ítems y sublistas
 
+function isDraggableRow(row) {
+  return !(row.classList.contains('item-row') && row.classList.contains('is-done'));
+}
+
 function onDragStart(event) {
   if (event.button !== undefined && event.button !== 0) return;
   const handle = event.target.closest('[data-drag-handle]');
   if (!handle) return;
   const row = handle.closest('[data-reorder-id]');
-  if (!row) return;
+  if (!row || !isDraggableRow(row)) return;
   const container = row.closest('[data-reorder-list], .sublist-children');
   if (!container) return;
   const rows = directReorderRows(container);
-  const index = rows.indexOf(row);
+  const pendingRows = rows.filter(isDraggableRow);
+  const index = pendingRows.indexOf(row);
   if (index < 0) return;
   const ownerId =
     container.dataset.reorderList || container.previousElementSibling?.dataset.reorderId || null;
@@ -1788,11 +1837,13 @@ function onDragStart(event) {
     row,
     container,
     rows,
+    pendingRows,
     index,
     ownerId,
     startY: event.clientY,
+    lastY: event.clientY,
     offsetY: event.clientY - rect.top,
-    target: null,
+    target: index,
   };
   row.classList.add('is-dragging');
   row.style.setProperty('--drag-y', '0px');
@@ -1804,37 +1855,82 @@ function onDragStart(event) {
       // Sin captura igual funciona con los listeners del documento.
     }
   }
+  startDragAutoScroll();
 }
 
 function onDragMove(event) {
-  if (!dragState || event.pointerId !== dragState.pointerId) return;
-  event.preventDefault();
-  const dy = event.clientY - dragState.startY;
+  if (!dragState) return;
+  if (event) {
+    if (event.pointerId !== dragState.pointerId) return;
+    event.preventDefault();
+    dragState.lastY = event.clientY;
+  }
+  updateDragTarget();
+}
+
+function updateDragTarget() {
+  if (!dragState) return;
+  const y = dragState.lastY;
+  const dy = y - dragState.startY;
   dragState.row.style.setProperty('--drag-y', `${dy}px`);
-  const others = dragState.rows.filter((row) => row !== dragState.row);
+  const others = dragState.pendingRows.filter((row) => row !== dragState.row);
   let target = 0;
   others.forEach((row) => {
     const rect = row.getBoundingClientRect();
-    if (event.clientY > rect.top + rect.height / 2) target += 1;
+    if (y > rect.top + rect.height / 2) target += 1;
   });
   dragState.target = Math.max(0, Math.min(others.length, target));
+}
+
+// Si el dedo se acerca al borde de la pantalla, la página se desplaza sola para
+// poder soltar la fila donde uno quiere sin tener que soltarla antes.
+function startDragAutoScroll() {
+  if (dragScrollFrame) cancelAnimationFrame(dragScrollFrame);
+  const step = () => {
+    if (!dragState) {
+      dragScrollFrame = null;
+      return;
+    }
+    const y = dragState.lastY;
+    const zone = 96;
+    const max = 16;
+    const height = window.innerHeight;
+    let delta = 0;
+    if (y < zone) {
+      delta = -max * Math.pow((zone - y) / zone, 2);
+    } else if (y > height - zone) {
+      delta = max * Math.pow((y - (height - zone)) / zone, 2);
+    }
+    if (delta !== 0) {
+      window.scrollBy(0, delta);
+      updateDragTarget();
+    }
+    dragScrollFrame = requestAnimationFrame(step);
+  };
+  dragScrollFrame = requestAnimationFrame(step);
+}
+
+function stopDragAutoScroll() {
+  if (dragScrollFrame) cancelAnimationFrame(dragScrollFrame);
+  dragScrollFrame = null;
 }
 
 function onDragEnd(event) {
   if (!dragState || (event && event.pointerId !== dragState.pointerId)) return;
   const state = dragState;
   dragState = null;
+  stopDragAutoScroll();
   state.row.classList.remove('is-dragging');
   state.row.style.removeProperty('--drag-y');
   setTimeout(() => {
     suppressClick = false;
   }, 0);
-  if (state.target === null) return;
   reorderListRows(state.ownerId, state.row.dataset.reorderId, state.target);
 }
 
 function onDragCancel() {
   if (!dragState) return;
+  stopDragAutoScroll();
   dragState.row.classList.remove('is-dragging');
   dragState.row.style.removeProperty('--drag-y');
   dragState = null;
@@ -1871,12 +1967,25 @@ function reorderListRows(ownerId, movingId, targetIndex) {
     if (a.kind !== b.kind) return a.kind === 'item' ? -1 : 1;
     return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
   });
-  const current = rows.findIndex((row) => row.id === movingId);
+
+  // Solo se reordenan los hijos arrastrables (pendientes y sublistas). Los
+  // ítems hechos conservan su lugar: se permutan los pendientes alrededor.
+  const draggable = rows.filter((row) => row.kind !== 'item' || !row.item.done);
+  const current = draggable.findIndex((row) => row.id === movingId);
   if (current < 0) return;
-  const [moved] = rows.splice(current, 1);
-  rows.splice(Math.max(0, Math.min(rows.length, targetIndex)), 0, moved);
+  const [moved] = draggable.splice(current, 1);
+  draggable.splice(Math.max(0, Math.min(draggable.length, targetIndex)), 0, moved);
+  const order = draggable.map((row) => row.id);
+  const mergedIds = mergeReorder(
+    rows.map((row) => row.id),
+    order,
+    order,
+  );
+  const byId = new Map(rows.map((row) => [row.id, row]));
+  const merged = mergedIds.map((id) => byId.get(id)).filter(Boolean);
+
   const timestamp = nowIso();
-  rows.forEach((row, index) => {
+  merged.forEach((row, index) => {
     if (row.kind === 'item') row.item.position = index;
     else {
       row.list.position = index;

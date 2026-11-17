@@ -152,4 +152,4 @@ El flujo completo —versión, tests, commit, push, APK y caché— está en el
 
 ## Versión
 
-La PWA acompaña la versión de Android: **1.8.0**.
+La PWA acompaña la versión de Android: **1.9.0**.

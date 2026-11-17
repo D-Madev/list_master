@@ -22,10 +22,14 @@ data class PendingGroup(
  */
 object PendingTasks {
 
-    fun groups(projects: List<Project>, tasks: List<Task>): List<PendingGroup> {
+    fun groups(
+        projects: List<Project>,
+        tasks: List<Task>,
+        extraDoneIds: Set<String> = emptySet(),
+    ): List<PendingGroup> {
         val childrenByParent = projects.groupBy { it.parentId }
         val pendingByProject = tasks
-            .filter { !it.done }
+            .filter { !it.done || it.id in extraDoneIds }
             .groupBy { it.projectId }
 
         val result = mutableListOf<PendingGroup>()

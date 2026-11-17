@@ -1,7 +1,7 @@
 {
   "name": "list-master-pwa",
   "private": true,
-  "version": "1.8.0",
+  "version": "1.9.0",
   "type": "module",
   "description": "List Master como PWA local, sin backend ni cuentas.",
   "scripts": {

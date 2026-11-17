@@ -49,6 +49,7 @@ import ar.matias.listmaster.domain.model.ProjectStatus
 import ar.matias.listmaster.domain.model.Task
 import ar.matias.listmaster.domain.model.TaskOrder
 import ar.matias.listmaster.ui.components.CenteredEmpty
+import ar.matias.listmaster.ui.components.rememberCompletionReveal
 import ar.matias.listmaster.ui.components.DetailHeader
 import ar.matias.listmaster.ui.components.ProjectIconTile
 import ar.matias.listmaster.ui.components.NoticeCard
@@ -148,8 +149,15 @@ fun ProjectDetailScreen(
     }
 
     val progress = ProgressCalculator.calculate(project.id, projects, tasks)
-    val rows = remember(project.id, projects, tasks, showDoneTasks) {
-        buildDetailRows(project, projects, tasks, showDoneTasks)
+    val completionReveal = rememberCompletionReveal()
+    val rows = remember(project.id, projects, tasks, showDoneTasks, completionReveal.ids) {
+        buildDetailRows(
+            project,
+            projects,
+            tasks,
+            showDoneTasks,
+            extraVisibleIds = completionReveal.ids,
+        )
     }
     val doneCount = progress.done
     val depth = ProjectTree.depthOf(project.id, projects)
@@ -346,6 +354,9 @@ fun ProjectDetailScreen(
                                     isLast = row.isLast,
                                     onToggle = {
                                         haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        if (!row.task.done && !showDoneTasks) {
+                                            completionReveal.reveal(row.task.id)
+                                        }
                                         onToggleTask(row.task)
                                     },
                                     onOpen = { taskEditor = TaskEditor(row.owner.id, row.task) },
@@ -484,6 +495,7 @@ internal fun buildDetailRows(
     projects: List<Project>,
     tasks: List<Task>,
     showDone: Boolean = true,
+    extraVisibleIds: Set<String> = emptySet(),
 ): List<DetailRow> {
     val tasksByProject = tasks.groupBy { it.projectId }
     val childrenByParent = projects.groupBy { it.parentId }
@@ -495,7 +507,7 @@ internal fun buildDetailRows(
         ancestorContinues: List<Boolean>,
     ) {
         val own = tasksByProject[project.id].orEmpty()
-            .filter { showDone || !it.done }
+            .filter { showDone || !it.done || it.id in extraVisibleIds }
             .sortedWith(TaskOrder)
         val items = buildList<Any> {
             addAll(own)
@@ -520,7 +532,7 @@ internal fun buildDetailRows(
                             project = item,
                             progress = ProgressCalculator.calculate(item.id, projects, tasks),
                             hasChildren = tasksByProject[item.id].orEmpty()
-                                .any { showDone || !it.done } ||
+                                .any { showDone || !it.done || it.id in extraVisibleIds } ||
                                 childrenByParent[item.id].orEmpty().isNotEmpty(),
                             depth = depth,
                             isLast = isLast,

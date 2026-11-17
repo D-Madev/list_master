@@ -60,6 +60,7 @@ import ar.matias.listmaster.ui.components.CenteredEmpty
 import ar.matias.listmaster.ui.components.ProjectIcon
 import ar.matias.listmaster.ui.components.ScreenTitle
 import ar.matias.listmaster.ui.components.TaskCheck
+import ar.matias.listmaster.ui.components.rememberCompletionReveal
 import ar.matias.listmaster.ui.formatShort
 import ar.matias.listmaster.ui.sheets.ProjectPickerSheet
 import ar.matias.listmaster.ui.sheets.TaskFormSheet
@@ -91,7 +92,10 @@ fun PendingScreen(
     var addingFor by remember { mutableStateOf<String?>(null) }
     var pickerOpen by remember { mutableStateOf(false) }
 
-    val groups = remember(projects, tasks) { PendingTasks.groups(projects, tasks) }
+    val completionReveal = rememberCompletionReveal()
+    val groups = remember(projects, tasks, completionReveal.ids) {
+        PendingTasks.groups(projects, tasks, completionReveal.ids)
+    }
     // Un bloque por proyecto principal, con sus subproyectos adentro.
     val blocks = remember(groups) {
         buildList<MutableList<PendingGroup>> {
@@ -152,6 +156,7 @@ fun PendingScreen(
                     onAdd = { projectId, title -> onCreateTask(projectId, title, null, "", null) },
                     onToggleTask = { task ->
                         haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        if (!task.done) completionReveal.reveal(task.id)
                         onToggleTask(task)
                     },
                     onOpenTask = { project, task -> editor = PendingEditor(project.id, task) },

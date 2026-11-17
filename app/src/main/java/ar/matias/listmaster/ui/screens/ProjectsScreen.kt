@@ -55,6 +55,7 @@ import ar.matias.listmaster.ui.components.ProjectCard
 import ar.matias.listmaster.ui.components.ProjectCompactRow
 import ar.matias.listmaster.ui.components.ScreenTitle
 import ar.matias.listmaster.ui.components.SectionHeader
+import ar.matias.listmaster.ui.components.rememberCompletionReveal
 import ar.matias.listmaster.ui.sheets.DeleteProjectDialog
 import ar.matias.listmaster.ui.sheets.PriorityPickerSheet
 import ar.matias.listmaster.ui.sheets.ProjectMenuSheet
@@ -435,17 +436,27 @@ private fun ProjectCardItem(
     val progress = remember(project.id, projects, tasks) {
         ProgressCalculator.calculate(project.id, projects, tasks)
     }
+    val completionReveal = rememberCompletionReveal()
     Column(modifier = Modifier.animateContentSize()) {
         if (expanded) {
-            val rows = remember(project.id, projects, tasks, showDoneTasks) {
-                buildDetailRows(project, projects, tasks, showDoneTasks)
+            val rows = remember(project.id, projects, tasks, showDoneTasks, completionReveal.ids) {
+                buildDetailRows(
+                    project,
+                    projects,
+                    tasks,
+                    showDoneTasks,
+                    extraVisibleIds = completionReveal.ids,
+                )
             }
             ProjectCard(
                 project = project,
                 progress = progress,
                 rows = rows,
                 onOpen = { onOpenProject(project.id) },
-                onToggleTask = onToggleTask,
+                onToggleTask = { task ->
+                    if (!task.done && !showDoneTasks) completionReveal.reveal(task.id)
+                    onToggleTask(task)
+                },
                 onMenu = onMenu,
                 onStatusClick = onStatusClick,
                 onPriorityClick = onPriorityClick,

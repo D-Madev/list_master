@@ -155,7 +155,7 @@ list-master.example.com {
 2. DevTools → **Application**:
    - **Manifest**: nombre, íconos y `start_url` correctos.
    - **Service Workers**: estado `activated`.
-   - **Cache Storage**: `list-master-shell-1.8.0-r2`.
+   - **Cache Storage**: `list-master-shell-1.9.0-r1`.
 3. Sin conexión (DevTools → Network → Offline) recargá: la app debe abrir.
 4. En iPhone: Safari → Compartir → **Agregar a pantalla de inicio**.
 5. Abrí desde el ícono: sin barra de Safari, con el tema y los datos propios del ícono.

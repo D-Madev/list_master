@@ -7,6 +7,7 @@ import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,7 +32,6 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -46,10 +46,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
@@ -58,9 +61,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -73,6 +76,7 @@ import ar.matias.listmaster.ui.chipColors
 import ar.matias.listmaster.ui.iconRes
 import ar.matias.listmaster.ui.labelRes
 import ar.matias.listmaster.ui.theme.LocalExtendedColors
+import kotlinx.coroutines.delay
 
 val EaseOut: CubicBezierEasing = CubicBezierEasing(0.23f, 1f, 0.32f, 1f)
 val EaseStandard: CubicBezierEasing = CubicBezierEasing(0.2f, 0f, 0f, 1f)
@@ -364,10 +368,9 @@ private fun Chip(
 }
 
 /**
- * Checkbox circular con una animación de completado: el círculo se rellena,
- * el tilde aparece con un rebote y, si [done] pasa a true durante la vida del
- * composable (no al entrar ya completado), un pulso de escala le da el toque
- * satisfactorio de "listo".
+ * Checkbox circular con una animación de completado: el círculo se rellena con
+ * un rebote corto, el tilde se dibuja de izquierda a derecha y un halo se
+ * expande y se apaga detrás. Si [done] ya viene en true al entrar no se anima.
  */
 @Composable
 fun TaskCheck(
@@ -388,30 +391,44 @@ fun TaskCheck(
         animationSpec = tween(durationMillis = 220, easing = EaseStandard),
         label = "checkBorder",
     )
-    val checkAlpha by animateFloatAsState(
-        targetValue = if (done) 1f else 0f,
-        animationSpec = tween(durationMillis = 140, delayMillis = if (done) 90 else 0),
-        label = "checkAlpha",
-    )
+
+    val drawProgress = remember { Animatable(0f) }
     val pulse = remember { Animatable(1f) }
+    val halo = remember { Animatable(1f) }
     var initialized by remember { mutableStateOf(false) }
     LaunchedEffect(done) {
         if (!initialized) {
             initialized = true
+            drawProgress.snapTo(if (done) 1f else 0f)
             return@LaunchedEffect
         }
         if (done) {
+            drawProgress.snapTo(0f)
+            drawProgress.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(durationMillis = 240, easing = EaseOut),
+            )
             pulse.animateTo(
                 targetValue = 1f,
                 animationSpec = keyframes {
-                    durationMillis = 320
+                    durationMillis = 300
                     1f at 0
-                    1.35f at 130 using EaseOut
-                    1f at 320 using EaseStandard
+                    1.18f at 110 using EaseOut
+                    1f at 300 using EaseStandard
                 },
             )
+            halo.snapTo(0f)
+            halo.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(durationMillis = 300, easing = EaseOut),
+            )
         } else {
+            drawProgress.animateTo(
+                targetValue = 0f,
+                animationSpec = tween(durationMillis = 100, easing = EaseStandard),
+            )
             pulse.snapTo(1f)
+            halo.snapTo(1f)
         }
     }
 
@@ -427,6 +444,23 @@ fun TaskCheck(
             .semantics { this.contentDescription = contentDescription },
         contentAlignment = Alignment.Center,
     ) {
+        Canvas(
+            modifier = Modifier
+                .size(36.dp)
+                .graphicsLayer {
+                    val progress = halo.value
+                    val scale = 0.72f + progress * 0.5f
+                    scaleX = scale
+                    scaleY = scale
+                    alpha = (1f - progress) * 0.45f
+                },
+        ) {
+            drawCircle(
+                color = tint,
+                radius = size.minDimension / 2f - 1.dp.toPx(),
+                style = Stroke(width = 1.5.dp.toPx()),
+            )
+        }
         Box(
             modifier = Modifier
                 .size(20.dp)
@@ -435,25 +469,35 @@ fun TaskCheck(
                 .border(1.5.dp, borderColor, CircleShape),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(
-                imageVector = Icons.Outlined.Check,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(14.dp)
-                    .graphicsLayer {
-                        alpha = checkAlpha
-                        scaleX = 0.6f + 0.4f * checkAlpha
-                        scaleY = 0.6f + 0.4f * checkAlpha
-                    },
-                tint = MaterialTheme.colorScheme.surface,
-            )
+            val checkColor = MaterialTheme.colorScheme.surface
+            Canvas(modifier = Modifier.size(14.dp)) {
+                val path = Path().apply {
+                    moveTo(size.width * 0.14f, size.height * 0.52f)
+                    lineTo(size.width * 0.4f, size.height * 0.78f)
+                    lineTo(size.width * 0.88f, size.height * 0.22f)
+                }
+                val progress = drawProgress.value
+                if (progress <= 0f) return@Canvas
+                val measure = PathMeasure().apply { setPath(path, false) }
+                val segment = Path()
+                measure.getSegment(0f, measure.length * progress, segment, true)
+                drawPath(
+                    path = segment,
+                    color = checkColor,
+                    style = Stroke(
+                        width = 2.dp.toPx(),
+                        cap = StrokeCap.Round,
+                        join = StrokeJoin.Round,
+                    ),
+                )
+            }
         }
     }
 }
 
 /**
- * Título de tarea o ítem que se tacha al completarse: el texto cruza a verde
- * y el tachado aparece con un cruce suave entre ambos estados.
+ * Título de tarea o ítem que se tacha al completarse: el color cruza al verde
+ * y el tachado se dibuja de izquierda a derecha, línea por línea.
  */
 @Composable
 fun CompletableText(
@@ -466,30 +510,61 @@ fun CompletableText(
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip,
 ) {
-    val doneAlpha by animateFloatAsState(
-        targetValue = if (done) 1f else 0f,
-        animationSpec = tween(durationMillis = 260, easing = EaseStandard),
-        label = "strikeAlpha",
+    val color by animateColorAsState(
+        targetValue = if (done) doneColor else pendingColor,
+        animationSpec = tween(durationMillis = 240, easing = EaseStandard),
+        label = "textColor",
     )
-    Box(modifier = modifier) {
-        Text(
-            text = text,
-            style = style,
-            color = pendingColor,
-            maxLines = maxLines,
-            overflow = overflow,
-            modifier = Modifier.graphicsLayer { alpha = 1f - doneAlpha },
-        )
-        Text(
-            text = text,
-            style = style,
-            color = doneColor,
-            textDecoration = TextDecoration.LineThrough,
-            maxLines = maxLines,
-            overflow = overflow,
-            modifier = Modifier.graphicsLayer { alpha = doneAlpha },
+    val strike = remember { Animatable(if (done) 1f else 0f) }
+    var layoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
+    LaunchedEffect(done) {
+        strike.animateTo(
+            targetValue = if (done) 1f else 0f,
+            animationSpec = tween(
+                durationMillis = if (done) 300 else 140,
+                easing = if (done) EaseOut else EaseStandard,
+            ),
         )
     }
+
+    Text(
+        text = text,
+        style = style,
+        color = color,
+        maxLines = maxLines,
+        overflow = overflow,
+        onTextLayout = { if (layoutResult !== it) layoutResult = it },
+        modifier = modifier.drawWithContent {
+            drawContent()
+            val layout = layoutResult ?: return@drawWithContent
+            val progress = strike.value
+            if (progress <= 0f) return@drawWithContent
+            val total = (0 until layout.lineCount).sumOf { line ->
+                (layout.getLineRight(line) - layout.getLineLeft(line)).toDouble()
+            }.toFloat()
+            if (total <= 0f) return@drawWithContent
+            var remaining = total * progress
+            val strokeWidth = 1.4.dp.toPx()
+            for (line in 0 until layout.lineCount) {
+                if (remaining <= 0f) break
+                val left = layout.getLineLeft(line)
+                val width = layout.getLineRight(line) - left
+                if (width <= 0f) continue
+                val drawn = width.coerceAtMost(remaining)
+                val top = layout.getLineTop(line)
+                val bottom = layout.getLineBottom(line)
+                val y = top + (bottom - top) * 0.56f
+                drawLine(
+                    color = doneColor,
+                    start = Offset(left, y),
+                    end = Offset(left + drawn, y),
+                    strokeWidth = strokeWidth,
+                    cap = StrokeCap.Round,
+                )
+                remaining -= drawn
+            }
+        },
+    )
 }
 
 /**
@@ -583,4 +658,26 @@ fun TreeRow(
         verticalAlignment = Alignment.CenterVertically,
         content = content,
     )
+}
+
+/**
+ * Deja visible una fila recién completada unos instantes aunque "Ver hechas"
+ * esté apagado, para que se alcancen a ver el check y el tachado antes de que
+ * la fila desaparezca. Después de [durationMillis] se limpia sola.
+ */
+class CompletionReveal(
+    val ids: Set<String>,
+    val reveal: (String) -> Unit,
+)
+
+@Composable
+fun rememberCompletionReveal(durationMillis: Long = 380L): CompletionReveal {
+    var ids by remember { mutableStateOf(emptySet<String>()) }
+    LaunchedEffect(ids) {
+        if (ids.isNotEmpty()) {
+            delay(durationMillis)
+            ids = emptySet()
+        }
+    }
+    return CompletionReveal(ids) { id -> ids = ids + id }
 }

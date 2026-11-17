@@ -298,7 +298,7 @@ La tarjeta muestra **un nivel**: primero las tareas directas del proyecto, despu
 
 - Indentación de 16 dp por nivel; el conector vertical se mantiene alineado con el padre.
 - Fila de 32–36 dp de alto; check de 20 dp; texto de 15 sp; gap de 10 dp.
-- Tarea hecha: check lleno `onSurfaceVariant`, texto `textSecondary`; **sin tachado**. El tachado ensucia la tarjeta y no aporta: el check ya dice todo. La barra y el porcentaje del proyecto siguen en `success`.
+- Tarea hecha: check lleno con color de éxito, texto `textSecondary` y tachado que se dibuja de izquierda a derecha. El check aparece con un trazo animado y un pulso corto del círculo; la barra y el porcentaje del proyecto siguen en `success`.
 - Tarea pendiente: círculo de 1.5 dp `outline`, texto `text`.
 - Subproyecto: su ícono (o `layers` si no tiene uno) de 18 dp, título, y una mini pastilla “2 de 5” a la derecha. Tocar la fila abre el subproyecto.
 - Fecha: si existe, va debajo del título en 12 sp `textSecondary`, con icono de calendario de 12 dp. Si no, no se muestra nada.
@@ -321,7 +321,8 @@ La tarjeta muestra **un nivel**: primero las tareas directas del proyecto, despu
 - “Expandir Todo” / “Colapsar Todo” en el encabezado abre o cierra todas las listas.
 - Sin chips de prioridad ni estado: una lista simple no tiene estado de proyecto.
 - Detalle: título, vínculo (si existe), ítems con check, campo para agregar al final (“Agregar Ítem”), menú con Editar, Vincular/Desvincular y Eliminar.
-- Marcar un ítem actualiza “4 de 7” con la misma animación de la barra; no hay celebración.
+- Marcar un ítem actualiza “4 de 7” con la misma animación de la barra; el check y el tachado acompañan el cambio, sin confeti.
+- Los ítems tachados quedan fijos en el lugar donde se completaron. Solo las pendientes se reordenan arrastrando desde su handle; cerca del borde superior o inferior la lista se desplaza sola para poder soltar más lejos.
 - Las listas sueltas viven en la pestaña Listas. Las vinculadas también, con su chip; no se duplican dentro del proyecto.
 
 ### 3.6 Botones, FAB y navegación
@@ -414,6 +415,8 @@ La tarjeta muestra **un nivel**: primero las tareas directas del proyecto, despu
 | Navegación a detalle | fade-through / shared axis | 220 ms | estándar |
 | Volver | reverso | 200 ms | estándar |
 | Presión de botón | `scale 0.97` | 120 ms | `ease-out` |
+| Completar tarea o ítem | relleno + pulso del check, trazo del tilde y tachado de izquierda a derecha | 240–300 ms | `ease-out` |
+| Reordenar | las demás filas se acomodan; la arrastrada sigue el dedo y se asienta al soltar | 180 ms | `ease-out` |
 | Agregar ítem | fade + 8 dp de abajo hacia arriba | 180 ms | `ease-out` |
 | Cambio de pestaña | **sin animación** | — | — |
 
@@ -425,7 +428,7 @@ Reglas:
 - No se anima `height`, `padding` ni `width` de layouts; solo transformaciones, opacidad y el ancho de la barra de progreso (que es una barra fina y no reordena la pantalla).
 - No hay animación en acciones de teclado ni en navegación repetida.
 - **Reduced motion:** si el sistema tiene “Quitar animaciones”, se reemplaza por crossfade de 120 ms o corte instantáneo; nunca se elimina el feedback de estado (el check y el color cambian igual).
-- No hay confeti, no hay rebotes exagerados, no hay animaciones de “celebración” al completar. La recompensa es el estado claro y el haptic.
+- No hay confeti ni rebotes exagerados: el pulso del check es corto y el resto es color, trazo y acomodo. La recompensa es el estado claro y el haptic.
 
 ### 5.2 Haptics
 

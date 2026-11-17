@@ -145,6 +145,21 @@ class PendingAndMoveTest {
     }
 
     @Test
+    fun `al reordenar los hechos conservan su lugar y los pendientes se permutan`() {
+        val all = listOf("a", "hecha", "b", "c")
+        val draggable = listOf("a", "b", "c")
+
+        assertEquals(
+            listOf("b", "hecha", "a", "c"),
+            ListTree.mergeReorder(all, draggable, listOf("b", "a", "c")),
+        )
+        assertEquals(
+            listOf("b", "hecha", "c", "a"),
+            ListTree.mergeReorder(all, draggable, listOf("b", "c", "a")),
+        )
+    }
+
+    @Test
     fun `cualquier proyecto puede moverse entre arboles y los raiz pueden tener padre`() {
         val a = project("a")
         val a1 = project("a1", "a")

@@ -1,7 +1,7 @@
 // Service worker mínimo: guarda el shell para que la app abra sin conexión.
 // No hay caché de datos: las tareas viven en IndexedDB, no acá.
 
-const CACHE_VERSION = '1.8.0-r2';
+const CACHE_VERSION = '1.9.0-r1';
 const CACHE = `list-master-shell-${CACHE_VERSION}`;
 const ASSETS = [
   './',
