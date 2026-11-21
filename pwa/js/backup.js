@@ -5,6 +5,7 @@ import {
   MAX_DESCRIPTION_LENGTH,
   MAX_ICON_LENGTH,
   MAX_ITEM_TITLE_LENGTH,
+  MAX_LOCATION_LENGTH,
   MAX_SUBLIST_DEPTH,
   MAX_SUBPROJECT_DEPTH,
   MAX_TITLE_LENGTH,
@@ -51,6 +52,7 @@ export function encodeBackup(data, exportedAt = new Date().toISOString()) {
         };
         if (task.description) item.descripcion = task.description;
         if (task.priority) item.prioridad = task.priority;
+        if (task.location) item.ubicacion = task.location;
         item.creado = task.createdAt;
         item.actualizado = task.updatedAt;
         return item;
@@ -196,6 +198,10 @@ function parseTask(element, index, ids, projectIds) {
   if (priority !== null && !PRIORITIES.some((item) => item.value === priority)) {
     throw new BackupError(`La tarea ${quote(title)} tiene una prioridad inválida.`);
   }
+  const location = (optionalString(object, 'ubicacion') ?? '').trim();
+  if (location.length > MAX_LOCATION_LENGTH) {
+    throw new BackupError(`La tarea ${quote(title)} tiene una ubicación demasiado larga.`);
+  }
   const createdAt = requireInstant(object, 'creado', `La tarea ${quote(title)}`);
   const updatedAt = optionalInstant(object, 'actualizado', 'actualizado') ?? createdAt;
   return {
@@ -206,6 +212,7 @@ function parseTask(element, index, ids, projectIds) {
     dueDate,
     description,
     priority,
+    location,
     createdAt,
     updatedAt,
   };

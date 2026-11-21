@@ -7,6 +7,7 @@ import ar.matias.listmaster.domain.model.ListItem
 import ar.matias.listmaster.domain.model.MAX_DESCRIPTION_LENGTH
 import ar.matias.listmaster.domain.model.MAX_ICON_LENGTH
 import ar.matias.listmaster.domain.model.MAX_ITEM_TITLE_LENGTH
+import ar.matias.listmaster.domain.model.MAX_LOCATION_LENGTH
 import ar.matias.listmaster.domain.model.MAX_SUBLIST_DEPTH
 import ar.matias.listmaster.domain.model.MAX_SUBPROJECT_DEPTH
 import ar.matias.listmaster.domain.model.MAX_TITLE_LENGTH
@@ -79,6 +80,7 @@ object BackupCodec {
                     addProperty("fecha", task.dueDate?.toString())
                     if (task.description.isNotEmpty()) addProperty("descripcion", task.description)
                     if (task.priority != null) addProperty("prioridad", task.priority.storedValue)
+                    if (task.location.isNotEmpty()) addProperty("ubicacion", task.location)
                     addProperty("creado", task.createdAt.toString())
                     addProperty("actualizado", task.updatedAt.toString())
                 })
@@ -268,6 +270,10 @@ object BackupCodec {
             Priority.fromStored(raw)
                 ?: throw BackupException("La tarea «$title» tiene una prioridad inválida.")
         }
+        val location = obj.optionalString("ubicacion")?.trim().orEmpty()
+        if (location.length > MAX_LOCATION_LENGTH) {
+            throw BackupException("La tarea «$title» tiene una ubicación demasiado larga.")
+        }
         val createdAt = obj.requireInstant("creado", "tarea «$title»")
         val updatedAt = obj.optionalInstant("actualizado") ?: createdAt
         return Task(
@@ -280,6 +286,7 @@ object BackupCodec {
             updatedAt = updatedAt,
             description = description,
             priority = priority,
+            location = location,
         )
     }
 

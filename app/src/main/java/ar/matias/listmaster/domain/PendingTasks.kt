@@ -1,6 +1,7 @@
 package ar.matias.listmaster.domain
 
 import ar.matias.listmaster.domain.model.Project
+import ar.matias.listmaster.domain.model.ProjectStatus
 import ar.matias.listmaster.domain.model.Task
 import ar.matias.listmaster.domain.model.TaskOrder
 
@@ -36,7 +37,9 @@ object PendingTasks {
 
         // Devuelve true si el subárbol aportó algo; si no, se descarta el encabezado.
         fun visit(project: Project, depth: Int, visited: Set<String>): Boolean {
-            if (project.status.isClosed) return false
+            // Pendientes es para lo que se puede trabajar ahora: pausados,
+            // postergados, terminados y cancelados no se muestran.
+            if (project.status != ProjectStatus.ACTIVE) return false
             val mark = result.size
             val own = pendingByProject[project.id]
                 .orEmpty()

@@ -93,18 +93,26 @@ class PendingAndMoveTest {
     }
 
     @Test
-    fun `la vista de pendientes agrupa por proyecto, deja afuera lo hecho y lo cerrado`() {
+    fun `la vista de pendientes agrupa por proyecto y solo muestra los activos`() {
         val a = project("A", priority = Priority.HIGH)
         val a1 = project("A1", parentId = "A")
         val b = project("B")
         val closed = project("C", status = ProjectStatus.DONE)
+        val paused = project("E", status = ProjectStatus.PAUSED)
+        val postponed = project("F", status = ProjectStatus.POSTPONED)
+        val cancelled = project("G", status = ProjectStatus.CANCELLED)
+        val pausedChild = project("H", parentId = "A", status = ProjectStatus.PAUSED)
         val empty = project("D")
         val tasks = listOf(
             task("a-1", "A"), task("a-2", "A", done = true), task("a1-1", "A1"),
-            task("b-1", "B"), task("c-1", "C"),
+            task("b-1", "B"), task("c-1", "C"), task("e-1", "E"),
+            task("f-1", "F"), task("g-1", "G"), task("h-1", "H"),
         )
 
-        val groups = PendingTasks.groups(listOf(b, a, a1, closed, empty), tasks)
+        val groups = PendingTasks.groups(
+            listOf(b, a, a1, closed, paused, postponed, cancelled, pausedChild, empty),
+            tasks,
+        )
 
         assertEquals(listOf("A", "A1", "B"), groups.map { it.project.id })
         assertEquals(listOf(0, 1, 0), groups.map { it.depth })

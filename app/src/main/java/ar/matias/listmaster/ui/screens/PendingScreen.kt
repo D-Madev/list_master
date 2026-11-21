@@ -43,10 +43,13 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ar.matias.listmaster.R
@@ -55,6 +58,7 @@ import ar.matias.listmaster.domain.PendingTasks
 import ar.matias.listmaster.domain.ProjectTree
 import ar.matias.listmaster.domain.model.Priority
 import ar.matias.listmaster.domain.model.Project
+import ar.matias.listmaster.domain.model.ProjectStatus
 import ar.matias.listmaster.domain.model.Task
 import ar.matias.listmaster.ui.components.CenteredEmpty
 import ar.matias.listmaster.ui.components.ProjectIcon
@@ -82,8 +86,8 @@ fun PendingScreen(
     tasks: List<Task>,
     onOpenProject: (String) -> Unit,
     onToggleTask: (Task) -> Unit,
-    onCreateTask: (String, String, LocalDate?, String, Priority?) -> Unit,
-    onUpdateTask: (String, String, LocalDate?, String, Priority?, String) -> Unit,
+    onCreateTask: (String, String, LocalDate?, String, Priority?, String) -> Unit,
+    onUpdateTask: (String, String, LocalDate?, String, Priority?, String, String) -> Unit,
     onDeleteTask: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -153,7 +157,12 @@ fun PendingScreen(
                     addingFor = addingFor,
                     onOpenProject = onOpenProject,
                     onStartAdd = { addingFor = if (addingFor == it) null else it },
-                    onAdd = { projectId, title -> onCreateTask(projectId, title, null, "", null) },
+                    onAdd = { projectId, title ->
+                        onCreateTask(projectId, title, null, "", null, "")
+                        // Se cierra el campo: para otra tarea hay que tocar "+".
+                        addingFor = null
+                    },
+                    onCloseAdd = { addingFor = null },
                     onToggleTask = { task ->
                         haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                         if (!task.done) completionReveal.reveal(task.id)
@@ -200,11 +209,19 @@ fun PendingScreen(
             projects = projects,
             initialProjectId = current.projectId,
             onDismiss = { editor = null },
-            onSave = { title, dueDate, description, priority, targetProjectId ->
+            onSave = { title, dueDate, description, priority, targetProjectId, location ->
                 if (current.task == null) {
-                    onCreateTask(targetProjectId, title, dueDate, description, priority)
+                    onCreateTask(targetProjectId, title, dueDate, description, priority, location)
                 } else {
-                    onUpdateTask(current.task.id, title, dueDate, description, priority, targetProjectId)
+                    onUpdateTask(
+                        current.task.id,
+                        title,
+                        dueDate,
+                        description,
+                        priority,
+                        targetProjectId,
+                        location,
+                    )
                 }
                 editor = null
             },
@@ -218,12 +235,12 @@ fun PendingScreen(
     }
 }
 
-/** Proyectos no cerrados, cada principal seguido de sus subproyectos, con su nivel. */
+/** Proyectos activos, cada principal seguido de sus subproyectos, con su nivel. */
 private fun openProjectsInOrder(projects: List<Project>): List<Pair<Project, Int>> {
     val byParent = projects.groupBy { it.parentId }
     val result = mutableListOf<Pair<Project, Int>>()
     fun visit(project: Project, depth: Int) {
-        if (project.status.isClosed) return
+        if (project.status != ProjectStatus.ACTIVE) return
         result.add(project to depth)
         byParent[project.id].orEmpty()
             .sortedWith(ProjectTree.byPriority)
@@ -240,6 +257,7 @@ private fun PendingBlock(
     onOpenProject: (String) -> Unit,
     onStartAdd: (String) -> Unit,
     onAdd: (String, String) -> Unit,
+    onCloseAdd: () -> Unit,
     onToggleTask: (Task) -> Unit,
     onOpenTask: (Project, Task) -> Unit,
 ) {
@@ -354,20 +372,24 @@ private fun PendingBlock(
                 InlineAdd(
                     modifier = Modifier.padding(start = indent + 4.dp, end = 8.dp, bottom = 4.dp),
                     onAdd = { title -> onAdd(project.id, title) },
+                    onClose = onCloseAdd,
                 )
             }
         }
     }
 }
 
-/** Campo para anotar tareas seguidas: Enter agrega y queda listo para la próxima. */
+/** Campo para anotar una tarea: Enter la agrega, cierra el campo y el teclado. */
 @Composable
 private fun InlineAdd(
     onAdd: (String) -> Unit,
+    onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var text by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -379,14 +401,18 @@ private fun InlineAdd(
         placeholder = { Text(stringResource(R.string.pending_add_placeholder)) },
         singleLine = true,
         shape = RoundedCornerShape(12.dp),
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.Sentences,
+            imeAction = ImeAction.Done,
+        ),
         keyboardActions = KeyboardActions(
             onDone = {
                 val clean = text.trim()
-                if (clean.isNotEmpty()) {
-                    onAdd(clean)
-                    text = ""
-                }
+                keyboard?.hide()
+                focusManager.clearFocus()
+                if (clean.isNotEmpty()) onAdd(clean)
+                text = ""
+                onClose()
             },
         ),
         modifier = modifier

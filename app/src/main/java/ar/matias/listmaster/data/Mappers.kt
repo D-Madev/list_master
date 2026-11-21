@@ -48,6 +48,7 @@ fun TaskEntity.toDomain(): Task = Task(
     updatedAt = Instant.parse(updatedAt),
     description = description.orEmpty(),
     priority = priority?.let(Priority::fromStored),
+    location = location.orEmpty(),
 )
 
 fun Task.toEntity(): TaskEntity = TaskEntity(
@@ -60,6 +61,7 @@ fun Task.toEntity(): TaskEntity = TaskEntity(
     updatedAt = updatedAt.toString(),
     description = description.ifEmpty { null },
     priority = priority?.storedValue,
+    location = location.ifEmpty { null },
 )
 
 fun ListEntity.toDomain(items: List<ListItemEntity>): TaskList = TaskList(

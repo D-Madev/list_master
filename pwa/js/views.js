@@ -112,7 +112,7 @@ function renderPendingBlock(block, ctx) {
           ${
             adding
               ? `<form class="inline-add" data-add-task data-project="${escapeHtml(project.id)}">
-                  <input class="inline-input" name="title" placeholder="Agregar tarea…" maxlength="120" autocomplete="off" enterkeyhint="done" aria-label="Nueva tarea en ${escapeHtml(project.title)}">
+                  <input class="inline-input" name="title" placeholder="Agregar tarea…" maxlength="120" autocomplete="off" autocapitalize="sentences" enterkeyhint="done" aria-label="Nueva tarea en ${escapeHtml(project.title)}">
                   <button class="inline-submit" type="submit">${icon('check')}</button>
                 </form>`
               : `<button class="inline-add-trigger" data-action="start-add-task" data-project="${escapeHtml(project.id)}">${icon('plus', 'tiny')} Agregar tarea…</button>`

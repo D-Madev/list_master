@@ -60,6 +60,7 @@ import ar.matias.listmaster.R
 import ar.matias.listmaster.domain.ProjectTree
 import ar.matias.listmaster.domain.model.MAX_DESCRIPTION_LENGTH
 import ar.matias.listmaster.domain.model.MAX_ICON_LENGTH
+import ar.matias.listmaster.domain.model.MAX_LOCATION_LENGTH
 import ar.matias.listmaster.domain.model.MAX_TITLE_LENGTH
 import ar.matias.listmaster.domain.model.Priority
 import ar.matias.listmaster.domain.model.Project
@@ -352,12 +353,13 @@ fun TaskFormSheet(
     projects: List<Project>,
     initialProjectId: String,
     onDismiss: () -> Unit,
-    onSave: (String, LocalDate?, String, Priority?, String) -> Unit,
+    onSave: (String, LocalDate?, String, Priority?, String, String) -> Unit,
     onDelete: (() -> Unit)? = null,
 ) {
     var priority by remember(task?.id) { mutableStateOf(task?.priority) }
     var title by remember(task?.id) { mutableStateOf(task?.title.orEmpty()) }
     var description by remember(task?.id) { mutableStateOf(task?.description.orEmpty()) }
+    var location by remember(task?.id) { mutableStateOf(task?.location.orEmpty()) }
     var dueDate by remember(task?.id) { mutableStateOf(task?.dueDate) }
     var selectedProjectId by remember(task?.id, initialProjectId) {
         mutableStateOf(task?.projectId ?: initialProjectId)
@@ -367,6 +369,7 @@ fun TaskFormSheet(
     var showError by remember { mutableStateOf(false) }
     val tooLong = title.trim().length > MAX_TITLE_LENGTH
     val descriptionTooLong = description.trim().length > MAX_DESCRIPTION_LENGTH
+    val locationTooLong = location.trim().length > MAX_LOCATION_LENGTH
     val extended = LocalExtendedColors.current
     val selectedProject = projects.firstOrNull { it.id == selectedProjectId }
 
@@ -426,6 +429,29 @@ fun TaskFormSheet(
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 supportingText = if (descriptionTooLong) {
                     { Text(stringResource(R.string.description_too_long)) }
+                } else {
+                    null
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(12.dp))
+            OutlinedTextField(
+                value = location,
+                onValueChange = { location = it },
+                label = { Text(stringResource(R.string.task_location_label)) },
+                placeholder = { Text(stringResource(R.string.task_location_placeholder)) },
+                singleLine = true,
+                isError = locationTooLong,
+                shape = RoundedCornerShape(14.dp),
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_place),
+                        contentDescription = null,
+                    )
+                },
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+                supportingText = if (locationTooLong) {
+                    { Text(stringResource(R.string.location_too_long)) }
                 } else {
                     null
                 },
@@ -498,11 +524,11 @@ fun TaskFormSheet(
                 onClick = {
                     if (title.isBlank()) {
                         showError = true
-                    } else if (!tooLong && !descriptionTooLong) {
-                        onSave(title, dueDate, description, priority, selectedProjectId)
+                    } else if (!tooLong && !descriptionTooLong && !locationTooLong) {
+                        onSave(title, dueDate, description, priority, selectedProjectId, location)
                     }
                 },
-                enabled = title.isNotBlank() && !tooLong && !descriptionTooLong,
+                enabled = title.isNotBlank() && !tooLong && !descriptionTooLong && !locationTooLong,
                 modifier = Modifier.fillMaxWidth(),
             )
             if (onDelete != null) {
@@ -552,7 +578,9 @@ fun TaskFormSheet(
     }
 
     if (showProjectPicker) {
-        val options = remember(projects) { projectOptions(projects) }
+        val options = remember(projects, selectedProjectId) {
+            projectOptions(projects, selectedProjectId)
+        }
         ProjectPickerSheet(
             title = stringResource(
                 if (task == null) R.string.task_project_pick_title else R.string.task_project_move_title,
@@ -569,19 +597,56 @@ fun TaskFormSheet(
     }
 }
 
-/** Proyectos en orden de árbol, con su nivel, para el selector de la tarea. */
-private fun projectOptions(projects: List<Project>): List<Pair<Project, Int>> {
+/**
+ * Proyectos en orden de árbol, con su nivel, para el selector de la tarea.
+ * El árbol del proyecto actual va primero: al agregar o mover una tarea lo más
+ * probable es elegir otro proyecto de la misma rama.
+ */
+private fun projectOptions(
+    projects: List<Project>,
+    currentId: String?,
+): List<Pair<Project, Int>> {
     val byParent = projects.groupBy { it.parentId }
+    val byId = projects.associateBy { it.id }
+    val roots = byParent[null].orEmpty().sortedWith(ProjectTree.byPriority)
+
+    // Cadena de ancestros del proyecto actual (incluido él). En cada nivel esa
+    // rama va primero, así sus subproyectos quedan arriba y a mano.
+    val branch = buildSet {
+        var node = currentId?.let { byId[it] }
+        while (node != null) {
+            add(node.id)
+            node = node.parentId?.let { byId[it] }
+        }
+    }
+
+    fun childrenOf(projectId: String): List<Project> {
+        val children = byParent[projectId].orEmpty().sortedWith(ProjectTree.byPriority)
+        if (branch.isEmpty()) return children
+        val first = children.firstOrNull { it.id in branch } ?: return children
+        return listOf(first) + children.filterNot { it.id == first.id }
+    }
+
+    val currentRoot = currentId
+        ?.let { byId[it] }
+        ?.let { project ->
+            generateSequence(project) { node ->
+                node.parentId?.let { parentId -> byId[parentId] }
+            }.last()
+        }
+        ?.takeIf { candidate -> roots.any { it.id == candidate.id } }
+    val orderedRoots = if (currentRoot == null) {
+        roots
+    } else {
+        listOf(currentRoot) + roots.filterNot { it.id == currentRoot.id }
+    }
+
     val result = mutableListOf<Pair<Project, Int>>()
     fun visit(project: Project, depth: Int) {
         result.add(project to depth)
-        byParent[project.id].orEmpty()
-            .sortedWith(ProjectTree.byPriority)
-            .forEach { visit(it, depth + 1) }
+        childrenOf(project.id).forEach { visit(it, depth + 1) }
     }
-    byParent[null].orEmpty()
-        .sortedWith(ProjectTree.byPriority)
-        .forEach { visit(it, 0) }
+    orderedRoots.forEach { visit(it, 0) }
     return result
 }
 
@@ -758,7 +823,21 @@ fun ProjectPickerSheet(
                         }
                     }
                 }
-                options.forEach { (project, depth) ->
+                options.forEachIndexed { index, (project, depth) ->
+                    // Un separador corto entre proyectos principales: agrupa
+                    // cada proyecto con sus subproyectos sin sumar ruido.
+                    if (depth == 0 && index > 0) {
+                        HorizontalDivider(
+                            modifier = Modifier.padding(
+                                start = 20.dp,
+                                end = 20.dp,
+                                top = 2.dp,
+                                bottom = 2.dp,
+                            ),
+                            thickness = 1.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                        )
+                    }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()

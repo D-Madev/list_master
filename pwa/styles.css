@@ -856,12 +856,30 @@ body.has-nav .fab {
   inset: 0;
   color: var(--text-secondary);
   text-decoration: line-through;
-  text-decoration-thickness: 1.5px;
+  text-decoration-thickness: 2px;
   pointer-events: none;
   white-space: inherit;
   overflow-wrap: inherit;
   clip-path: inset(0 100% 0 0);
-  animation: strike-sweep 300ms cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  animation: strike-sweep 360ms cubic-bezier(0.23, 1, 0.32, 1) 90ms forwards;
+}
+
+/* Salida suave: la fila se desvanece y se cierra en alto antes de re-renderizar. */
+.task-row,
+.item-row {
+  max-height: 400px;
+  transition:
+    max-height 260ms cubic-bezier(0.23, 1, 0.32, 1),
+    opacity 200ms ease;
+}
+
+.task-row.is-leaving,
+.item-row.is-leaving {
+  min-height: 0;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
 
 .item-title .strike-overlay {
@@ -919,6 +937,7 @@ body.has-nav .fab {
   color: var(--on-accent);
 }
 
+/* El relleno entra como una sombra interna: el círculo se llena desde el borde. */
 .task-check::before {
   content: '';
   position: absolute;
@@ -926,7 +945,10 @@ body.has-nav .fab {
   height: 20px;
   border: 1.5px solid var(--outline);
   border-radius: 50%;
-  transition: background-color 160ms ease, border-color 160ms ease;
+  box-shadow: inset 0 0 0 0 var(--accent);
+  transition:
+    border-color 180ms ease,
+    box-shadow 260ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .task-check .icon {
@@ -936,8 +958,8 @@ body.has-nav .fab {
 }
 
 .task-check.is-checked::before {
-  background: var(--accent);
   border-color: var(--accent);
+  box-shadow: inset 0 0 0 11px var(--accent);
 }
 
 .task-check::after {
@@ -952,17 +974,17 @@ body.has-nav .fab {
 }
 
 .is-completing .task-check::after {
-  animation: check-halo 300ms ease-out;
+  animation: check-halo 420ms ease-out;
 }
 
 .is-completing .task-check::before {
-  animation: check-pop 300ms cubic-bezier(0.34, 1.4, 0.64, 1);
+  animation: check-pop 360ms cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 
 .is-completing .check-mark {
   stroke-dasharray: 30;
   stroke-dashoffset: 30;
-  animation: check-draw 240ms cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  animation: check-draw 220ms cubic-bezier(0.23, 1, 0.32, 1) 120ms forwards;
 }
 
 .task-row.is-done .task-check::before,
@@ -1877,6 +1899,15 @@ body.has-nav .fab {
   background: var(--surface-alt);
 }
 
+/* Separador corto entre proyectos principales: agrupa cada uno con sus subproyectos. */
+.picker-divider {
+  width: calc(100% - 48px);
+  height: 1px;
+  margin: 2px 24px;
+  background: var(--outline);
+  opacity: 0.5;
+}
+
 .picker-icon {
   display: grid;
   place-items: center;
@@ -2058,3 +2089,68 @@ body.sheet-open #toast-root {
     scroll-behavior: auto !important;
   }
 }
+
+/* Sesión web: puerta de entrada y aviso de desconexión. */
+
+.remote-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--bg);
+}
+
+.remote-gate-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(100%, 360px);
+  padding: 24px;
+  border: 1px solid var(--outline);
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+.remote-gate-card h1 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+.remote-gate-card p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.remote-code {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-align: center;
+}
+
+.remote-gate-error {
+  min-height: 18px;
+  color: var(--danger);
+  font-size: 13px;
+}
+
+.remote-offline {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--nav-height) + 16px);
+  z-index: 800;
+  transform: translateX(-50%);
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: var(--shadow-float);
+}
+

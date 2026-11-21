@@ -13,8 +13,8 @@ android {
         applicationId = "ar.matias.listmaster"
         minSdk = 28
         targetSdk = 34
-        versionCode = 18
-        versionName = "1.9.0"
+        versionCode = 19
+        versionName = "2.0.0"
     }
 
     // La app no va a Play Store: se instala desde el APK. Una release sin
@@ -53,6 +53,32 @@ android {
 ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }
+
+// La sesión web sirve la misma PWA que GitHub Pages. Se copia a los assets al
+// compilar para que no existan dos versiones distintas.
+val syncPwaAssets by tasks.registering(Sync::class) {
+    from(rootProject.layout.projectDirectory.dir("pwa")) {
+        // sw.js no: la sesión web es temporal y no debe cachear el shell.
+        exclude(
+            "tests/**",
+            "tools/**",
+            "package.json",
+            "README.md",
+            "DEPLOY.md",
+            "PRIVACY.md",
+            "robots.txt",
+            "_headers",
+            "sw.js",
+        )
+    }
+    into(layout.buildDirectory.dir("generated/pwaAssets/pwa"))
+}
+
+android {
+    sourceSets.getByName("main").assets.srcDir(layout.buildDirectory.dir("generated/pwaAssets"))
+}
+
+tasks.named("preBuild").configure { dependsOn(syncPwaAssets) }
 
 dependencies {
     implementation(platform("androidx.compose:compose-bom:2024.09.03"))

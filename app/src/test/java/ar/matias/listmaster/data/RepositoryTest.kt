@@ -129,6 +129,27 @@ class RepositoryTest {
     }
 
     @Test
+    fun `la ubicacion se guarda y se puede cambiar`() = runBlocking {
+        val project = repository.createProject("Proyecto")
+        tick()
+        val task = repository.createTask(
+            project,
+            "Comprar filtros",
+            null,
+            location = "Ferretería",
+        )
+        assertEquals("Ferretería", repository.snapshot().tasks.single().location)
+
+        tick()
+        repository.updateTask(task, "Comprar filtros", null, location = "Casa")
+        assertEquals("Casa", repository.snapshot().tasks.single().location)
+
+        tick()
+        repository.updateTask(task, "Comprar filtros", null)
+        assertEquals("", repository.snapshot().tasks.single().location)
+    }
+
+    @Test
     fun `mover una tarea conserva sus datos y cambia solo el proyecto`() = runBlocking {
         val origin = repository.createProject("Área")
         tick()

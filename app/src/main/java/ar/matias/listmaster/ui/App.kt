@@ -78,6 +78,7 @@ fun ListMasterApp(viewModel: AppViewModel = viewModel()) {
         val showDoneTasks by viewModel.showDoneTasks.collectAsStateWithLifecycle()
         val showDoneListItems by viewModel.showDoneListItems.collectAsStateWithLifecycle()
         val projectFilter by viewModel.projectFilter.collectAsStateWithLifecycle()
+        val webSession by viewModel.webSession.collectAsStateWithLifecycle()
         val loaded by viewModel.loaded.collectAsStateWithLifecycle()
         val screen = viewModel.navigation.current
         val snackbarHostState = remember { SnackbarHostState() }
@@ -204,11 +205,26 @@ fun ListMasterApp(viewModel: AppViewModel = viewModel()) {
                             showDoneTasks = showDoneTasks,
                             onShowDoneTasksChange = viewModel::setShowDoneTasks,
                             onToggleTask = { task -> viewModel.setTaskDone(task.id, !task.done) },
-                            onCreateTask = { projectId, title, dueDate, description, priority ->
-                                viewModel.createTask(projectId, title, dueDate, description, priority)
+                            onCreateTask = { projectId, title, dueDate, description, priority, location ->
+                                viewModel.createTask(
+                                    projectId,
+                                    title,
+                                    dueDate,
+                                    description,
+                                    priority,
+                                    location,
+                                )
                             },
-                            onUpdateTask = { id, title, dueDate, description, priority, projectId ->
-                                viewModel.updateTask(id, title, dueDate, description, priority, projectId)
+                            onUpdateTask = { id, title, dueDate, description, priority, projectId, location ->
+                                viewModel.updateTask(
+                                    id,
+                                    title,
+                                    dueDate,
+                                    description,
+                                    priority,
+                                    projectId,
+                                    location,
+                                )
                             },
                             onDeleteTask = viewModel::deleteTask,
                             modifier = contentModifier,
@@ -219,11 +235,26 @@ fun ListMasterApp(viewModel: AppViewModel = viewModel()) {
                             tasks = data.tasks,
                             onOpenProject = viewModel::openProject,
                             onToggleTask = { task -> viewModel.setTaskDone(task.id, !task.done) },
-                            onCreateTask = { projectId, title, dueDate, description, priority ->
-                                viewModel.createTask(projectId, title, dueDate, description, priority)
+                            onCreateTask = { projectId, title, dueDate, description, priority, location ->
+                                viewModel.createTask(
+                                    projectId,
+                                    title,
+                                    dueDate,
+                                    description,
+                                    priority,
+                                    location,
+                                )
                             },
-                            onUpdateTask = { id, title, dueDate, description, priority, projectId ->
-                                viewModel.updateTask(id, title, dueDate, description, priority, projectId)
+                            onUpdateTask = { id, title, dueDate, description, priority, projectId, location ->
+                                viewModel.updateTask(
+                                    id,
+                                    title,
+                                    dueDate,
+                                    description,
+                                    priority,
+                                    projectId,
+                                    location,
+                                )
                             },
                             onDeleteTask = viewModel::deleteTask,
                             modifier = contentModifier,
@@ -245,6 +276,9 @@ fun ListMasterApp(viewModel: AppViewModel = viewModel()) {
                             onThemeChange = viewModel::setThemeMode,
                             onExport = { launchExport() },
                             onImport = { importDialogOpen = true },
+                            webSession = webSession,
+                            onStartWebSession = viewModel::startWebSession,
+                            onStopWebSession = viewModel::stopWebSession,
                             modifier = contentModifier,
                         )
 
@@ -262,11 +296,26 @@ fun ListMasterApp(viewModel: AppViewModel = viewModel()) {
                             showDoneTasks = showDoneTasks,
                             onShowDoneTasksChange = viewModel::setShowDoneTasks,
                             onToggleTask = { task -> viewModel.setTaskDone(task.id, !task.done) },
-                            onCreateTask = { projectId, title, dueDate, description, priority ->
-                                viewModel.createTask(projectId, title, dueDate, description, priority)
+                            onCreateTask = { projectId, title, dueDate, description, priority, location ->
+                                viewModel.createTask(
+                                    projectId,
+                                    title,
+                                    dueDate,
+                                    description,
+                                    priority,
+                                    location,
+                                )
                             },
-                            onUpdateTask = { id, title, dueDate, description, priority, projectId ->
-                                viewModel.updateTask(id, title, dueDate, description, priority, projectId)
+                            onUpdateTask = { id, title, dueDate, description, priority, projectId, location ->
+                                viewModel.updateTask(
+                                    id,
+                                    title,
+                                    dueDate,
+                                    description,
+                                    priority,
+                                    projectId,
+                                    location,
+                                )
                             },
                             onDeleteTask = viewModel::deleteTask,
                             modifier = contentModifier,

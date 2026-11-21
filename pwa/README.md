@@ -55,7 +55,16 @@ HTTPS sirve. Ver [DEPLOY.md](DEPLOY.md).
 ### Mover una tarea de proyecto
 
 Abrí la tarea, tocá **Proyecto** y elegí otro. La tarea se mueve completa: no se
-recrea ni pierde título, fecha, descripción, prioridad o estado.
+recrea ni pierde título, fecha, descripción, prioridad, ubicación o estado.
+
+### Sesión Web del celular
+
+Si tenés la app Android, desde **Ajustes → Sesión Web** podés abrir un enlace por 15
+minutos a 2 horas. Al abrirlo en la computadora, esta misma PWA arranca en **modo
+remoto**: lee y escribe contra el celular por la red local, en los dos sentidos. El
+celular sigue siendo la base; no hay cuenta ni servidor en internet y, al cerrar la
+sesión, no queda nada en la computadora. El detalle está en
+[`docs/decisiones/0004-sesion-web.md`](../docs/decisiones/0004-sesion-web.md).
 
 ### Diferencias con Android
 
@@ -123,6 +132,7 @@ pwa/
   js/domain.js          Reglas puras de proyectos, tareas y listas
   js/backup.js          Formato JSON compatible con Android
   js/store.js           IndexedDB + espejo en localStorage
+  js/remote.js          Modo remoto de la Sesión Web (solo lo sirve el celular)
   js/icons.js           Íconos SVG inline y escape de HTML
   tests/                Pruebas con node --test
   tools/make_icons.py   Generación reproducible de íconos PNG

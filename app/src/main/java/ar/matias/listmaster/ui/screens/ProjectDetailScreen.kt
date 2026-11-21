@@ -112,8 +112,8 @@ fun ProjectDetailScreen(
     showDoneTasks: Boolean,
     onShowDoneTasksChange: (Boolean) -> Unit,
     onToggleTask: (Task) -> Unit,
-    onCreateTask: (String, String, LocalDate?, String, Priority?) -> Unit,
-    onUpdateTask: (String, String, LocalDate?, String, Priority?, String) -> Unit,
+    onCreateTask: (String, String, LocalDate?, String, Priority?, String) -> Unit,
+    onUpdateTask: (String, String, LocalDate?, String, Priority?, String, String) -> Unit,
     onDeleteTask: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -289,6 +289,7 @@ fun ProjectDetailScreen(
                 item(key = "done-toggle") {
                     Row(
                         modifier = Modifier
+                            .animateItem()
                             .fillMaxWidth()
                             .heightIn(min = 48.dp)
                             .clickable { onShowDoneTasksChange(!showDoneTasks) },
@@ -344,35 +345,45 @@ fun ProjectDetailScreen(
                     }
                 }
             } else {
-                item(key = "tree") {
-                    Column {
-                        rows.forEach { row ->
-                            when (row) {
-                                is DetailRow.TaskItem -> TaskRow(
-                                    task = row.task,
-                                    depth = row.depth,
-                                    isLast = row.isLast,
-                                    onToggle = {
-                                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                                        if (!row.task.done && !showDoneTasks) {
-                                            completionReveal.reveal(row.task.id)
-                                        }
-                                        onToggleTask(row.task)
-                                    },
-                                    onOpen = { taskEditor = TaskEditor(row.owner.id, row.task) },
-                                    ancestorContinues = row.ancestorContinues,
-                                )
+                // Una fila por ítem: así el árbol se acomoda solo, sin saltos,
+                // cuando aparece el selector de hechas o se va una tarea.
+                rows.forEach { row ->
+                    when (row) {
+                        is DetailRow.TaskItem -> item(
+                            key = "task-${row.task.id}",
+                            contentType = "task",
+                        ) {
+                            TaskRow(
+                                task = row.task,
+                                depth = row.depth,
+                                isLast = row.isLast,
+                                onToggle = {
+                                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    if (!row.task.done && !showDoneTasks) {
+                                        completionReveal.reveal(row.task.id)
+                                    }
+                                    onToggleTask(row.task)
+                                },
+                                onOpen = { taskEditor = TaskEditor(row.owner.id, row.task) },
+                                ancestorContinues = row.ancestorContinues,
+                                modifier = Modifier.animateItem(),
+                            )
+                        }
 
-                                is DetailRow.ProjectItem -> SubprojectRow(
-                                    project = row.project,
-                                    progress = row.progress,
-                                    depth = row.depth,
-                                    isLast = row.isLast,
-                                    onClick = { onOpenProject(row.project.id) },
-                                    ancestorContinues = row.ancestorContinues,
-                                    hasChildren = row.hasChildren,
-                                )
-                            }
+                        is DetailRow.ProjectItem -> item(
+                            key = "project-${row.project.id}",
+                            contentType = "project",
+                        ) {
+                            SubprojectRow(
+                                project = row.project,
+                                progress = row.progress,
+                                depth = row.depth,
+                                isLast = row.isLast,
+                                onClick = { onOpenProject(row.project.id) },
+                                ancestorContinues = row.ancestorContinues,
+                                hasChildren = row.hasChildren,
+                                modifier = Modifier.animateItem(),
+                            )
                         }
                     }
                 }
@@ -466,11 +477,19 @@ fun ProjectDetailScreen(
             projects = projects,
             initialProjectId = editor.projectId,
             onDismiss = { taskEditor = null },
-            onSave = { title, dueDate, description, priority, targetProjectId ->
+            onSave = { title, dueDate, description, priority, targetProjectId, location ->
                 if (editor.task == null) {
-                    onCreateTask(targetProjectId, title, dueDate, description, priority)
+                    onCreateTask(targetProjectId, title, dueDate, description, priority, location)
                 } else {
-                    onUpdateTask(editor.task.id, title, dueDate, description, priority, targetProjectId)
+                    onUpdateTask(
+                        editor.task.id,
+                        title,
+                        dueDate,
+                        description,
+                        priority,
+                        targetProjectId,
+                        location,
+                    )
                 }
                 taskEditor = null
             },

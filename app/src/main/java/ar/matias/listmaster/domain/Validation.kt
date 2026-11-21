@@ -3,6 +3,7 @@ package ar.matias.listmaster.domain
 import ar.matias.listmaster.domain.model.MAX_DESCRIPTION_LENGTH
 import ar.matias.listmaster.domain.model.MAX_ICON_LENGTH
 import ar.matias.listmaster.domain.model.MAX_ITEM_TITLE_LENGTH
+import ar.matias.listmaster.domain.model.MAX_LOCATION_LENGTH
 import ar.matias.listmaster.domain.model.MAX_TITLE_LENGTH
 
 object Validation {
@@ -22,6 +23,14 @@ object Validation {
         val clean = raw?.trim().orEmpty()
         require(clean.length <= MAX_DESCRIPTION_LENGTH) {
             "La descripción no puede superar los $MAX_DESCRIPTION_LENGTH caracteres."
+        }
+        return clean
+    }
+
+    fun location(raw: String?): String {
+        val clean = raw?.trim().orEmpty()
+        require(clean.length <= MAX_LOCATION_LENGTH) {
+            "La ubicación no puede superar los $MAX_LOCATION_LENGTH caracteres."
         }
         return clean
     }

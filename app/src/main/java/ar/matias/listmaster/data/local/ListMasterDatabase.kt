@@ -14,7 +14,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         ListEntity::class,
         ListItemEntity::class,
     ],
-    version = 6,
+    version = 7,
     exportSchema = true,
 )
 abstract class ListMasterDatabase : RoomDatabase() {
@@ -90,6 +90,13 @@ abstract class ListMasterDatabase : RoomDatabase() {
             }
         }
 
+        /** Las tareas ahora pueden tener una ubicación. Solo agrega una columna. */
+        val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE tasks ADD COLUMN location TEXT")
+            }
+        }
+
         fun create(context: Context): ListMasterDatabase =
             Room.databaseBuilder(
                 context.applicationContext,
@@ -102,6 +109,7 @@ abstract class ListMasterDatabase : RoomDatabase() {
                     MIGRATION_3_4,
                     MIGRATION_4_5,
                     MIGRATION_5_6,
+                    MIGRATION_6_7,
                 )
                 .build()
     }

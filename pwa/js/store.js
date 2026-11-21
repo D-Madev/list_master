@@ -45,6 +45,9 @@ async function withStore(mode, action) {
 export const EMPTY_DATA = { projects: [], tasks: [], lists: [] };
 
 export async function loadData() {
+  // En sesión web los datos viven en el celular, no acá.
+  const bridge = globalThis.LM_REMOTE;
+  if (bridge) return bridge.load();
   try {
     const db = await openDb();
     const value = await new Promise((resolve, reject) => {
@@ -67,6 +70,11 @@ export async function loadData() {
 }
 
 export async function saveData(data) {
+  const bridge = globalThis.LM_REMOTE;
+  if (bridge) {
+    await bridge.save(data);
+    return;
+  }
   const value = {
     projects: data.projects,
     tasks: data.tasks,

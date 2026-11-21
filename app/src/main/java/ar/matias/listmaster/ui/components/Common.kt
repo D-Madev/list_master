@@ -76,7 +76,9 @@ import ar.matias.listmaster.ui.chipColors
 import ar.matias.listmaster.ui.iconRes
 import ar.matias.listmaster.ui.labelRes
 import ar.matias.listmaster.ui.theme.LocalExtendedColors
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 val EaseOut: CubicBezierEasing = CubicBezierEasing(0.23f, 1f, 0.32f, 1f)
 val EaseStandard: CubicBezierEasing = CubicBezierEasing(0.2f, 0f, 0f, 1f)
@@ -392,43 +394,74 @@ fun TaskCheck(
         label = "checkBorder",
     )
 
-    val drawProgress = remember { Animatable(0f) }
+    // El relleno crece desde el centro, como si el círculo se llenara.
+    val fill = remember { Animatable(if (done) 1f else 0f) }
+    val drawProgress = remember { Animatable(if (done) 1f else 0f) }
     val pulse = remember { Animatable(1f) }
     val halo = remember { Animatable(1f) }
     var initialized by remember { mutableStateOf(false) }
     LaunchedEffect(done) {
         if (!initialized) {
             initialized = true
+            fill.snapTo(if (done) 1f else 0f)
             drawProgress.snapTo(if (done) 1f else 0f)
             return@LaunchedEffect
         }
         if (done) {
-            drawProgress.snapTo(0f)
-            drawProgress.animateTo(
-                targetValue = 1f,
-                animationSpec = tween(durationMillis = 240, easing = EaseOut),
-            )
-            pulse.animateTo(
-                targetValue = 1f,
-                animationSpec = keyframes {
-                    durationMillis = 300
-                    1f at 0
-                    1.18f at 110 using EaseOut
-                    1f at 300 using EaseStandard
-                },
-            )
             halo.snapTo(0f)
-            halo.animateTo(
-                targetValue = 1f,
-                animationSpec = tween(durationMillis = 300, easing = EaseOut),
-            )
+            coroutineScope {
+                launch {
+                    fill.animateTo(
+                        targetValue = 1f,
+                        animationSpec = tween(durationMillis = 260, easing = EaseOut),
+                    )
+                }
+                launch {
+                    // El tilde aparece cuando el relleno ya tomó color.
+                    drawProgress.animateTo(
+                        targetValue = 1f,
+                        animationSpec = tween(
+                            durationMillis = 220,
+                            delayMillis = 120,
+                            easing = EaseOut,
+                        ),
+                    )
+                }
+                launch {
+                    pulse.animateTo(
+                        targetValue = 1f,
+                        animationSpec = keyframes {
+                            durationMillis = 360
+                            1f at 0
+                            1.14f at 120 using EaseOut
+                            1f at 360 using EaseStandard
+                        },
+                    )
+                }
+                launch {
+                    halo.animateTo(
+                        targetValue = 1f,
+                        animationSpec = tween(durationMillis = 420, easing = EaseOut),
+                    )
+                }
+            }
         } else {
-            drawProgress.animateTo(
-                targetValue = 0f,
-                animationSpec = tween(durationMillis = 100, easing = EaseStandard),
-            )
-            pulse.snapTo(1f)
-            halo.snapTo(1f)
+            coroutineScope {
+                launch {
+                    drawProgress.animateTo(
+                        targetValue = 0f,
+                        animationSpec = tween(durationMillis = 90, easing = EaseStandard),
+                    )
+                }
+                launch {
+                    fill.animateTo(
+                        targetValue = 0f,
+                        animationSpec = tween(durationMillis = 180, easing = EaseStandard),
+                    )
+                }
+                launch { pulse.snapTo(1f) }
+                launch { halo.snapTo(1f) }
+            }
         }
     }
 
@@ -444,33 +477,39 @@ fun TaskCheck(
             .semantics { this.contentDescription = contentDescription },
         contentAlignment = Alignment.Center,
     ) {
-        Canvas(
-            modifier = Modifier
-                .size(36.dp)
-                .graphicsLayer {
-                    val progress = halo.value
-                    val scale = 0.72f + progress * 0.5f
-                    scaleX = scale
-                    scaleY = scale
-                    alpha = (1f - progress) * 0.45f
-                },
-        ) {
+        Canvas(modifier = Modifier.size(36.dp)) {
+            val progress = halo.value
+            if (progress >= 1f) return@Canvas
+            val radius = (size.minDimension / 2f) * (0.55f + progress * 0.45f)
             drawCircle(
-                color = tint,
-                radius = size.minDimension / 2f - 1.dp.toPx(),
-                style = Stroke(width = 1.5.dp.toPx()),
+                color = tint.copy(alpha = (1f - progress) * 0.22f),
+                radius = radius,
             )
         }
         Box(
             modifier = Modifier
                 .size(20.dp)
-                .graphicsLayer { scaleX = pulse.value; scaleY = pulse.value }
-                .background(fillColor, CircleShape)
-                .border(1.5.dp, borderColor, CircleShape),
+                .graphicsLayer { scaleX = pulse.value; scaleY = pulse.value },
             contentAlignment = Alignment.Center,
         ) {
             val checkColor = MaterialTheme.colorScheme.surface
-            Canvas(modifier = Modifier.size(14.dp)) {
+            Canvas(modifier = Modifier.size(20.dp)) {
+                val stroke = 1.5.dp.toPx()
+                val radius = size.minDimension / 2f - stroke / 2f
+                val filled = fill.value
+                if (filled > 0f) {
+                    drawCircle(
+                        color = fillColor,
+                        radius = radius * filled,
+                    )
+                }
+                drawCircle(
+                    color = borderColor,
+                    radius = radius,
+                    style = Stroke(width = stroke),
+                )
+            }
+            Canvas(modifier = Modifier.size(13.dp)) {
                 val path = Path().apply {
                     moveTo(size.width * 0.14f, size.height * 0.52f)
                     lineTo(size.width * 0.4f, size.height * 0.78f)
@@ -521,7 +560,8 @@ fun CompletableText(
         strike.animateTo(
             targetValue = if (done) 1f else 0f,
             animationSpec = tween(
-                durationMillis = if (done) 300 else 140,
+                durationMillis = if (done) 360 else 150,
+                delayMillis = if (done) 90 else 0,
                 easing = if (done) EaseOut else EaseStandard,
             ),
         )
@@ -544,7 +584,7 @@ fun CompletableText(
             }.toFloat()
             if (total <= 0f) return@drawWithContent
             var remaining = total * progress
-            val strokeWidth = 1.4.dp.toPx()
+            val strokeWidth = 2.dp.toPx()
             for (line in 0 until layout.lineCount) {
                 if (remaining <= 0f) break
                 val left = layout.getLineLeft(line)
@@ -671,7 +711,7 @@ class CompletionReveal(
 )
 
 @Composable
-fun rememberCompletionReveal(durationMillis: Long = 380L): CompletionReveal {
+fun rememberCompletionReveal(durationMillis: Long = 900L): CompletionReveal {
     var ids by remember { mutableStateOf(emptySet<String>()) }
     LaunchedEffect(ids) {
         if (ids.isNotEmpty()) {

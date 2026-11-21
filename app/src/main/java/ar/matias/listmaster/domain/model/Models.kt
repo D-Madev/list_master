@@ -9,6 +9,7 @@ const val MAX_SUBPROJECT_DEPTH = 3
 const val MAX_SUBLIST_DEPTH = 3
 const val MAX_ICON_LENGTH = 32
 const val MAX_DESCRIPTION_LENGTH = 2000
+const val MAX_LOCATION_LENGTH = 200
 
 enum class ProjectStatus(val storedValue: String) {
     ACTIVE("Activo"),
@@ -71,6 +72,8 @@ data class Task(
     val description: String = "",
     /** Solo se ve y se edita al abrir la tarea; define el orden dentro del proyecto. */
     val priority: Priority? = null,
+    /** Dónde hay que hacerla: casa, oficina, una dirección. Opcional. */
+    val location: String = "",
 )
 
 /** Alta primero, después Media, Baja y sin prioridad; a igual prioridad, la más antigua. */

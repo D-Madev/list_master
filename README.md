@@ -6,14 +6,15 @@ Es una app Android propia. Los datos quedan en el celular, sin cuenta ni servido
 
 ## Estado
 
-**Versión 1.9.0.** La app está completa según el alcance acordado:
+**Versión 2.0.0.** La app está completa según el alcance acordado:
 
 - Proyectos con subproyectos hasta tres niveles, estados y prioridad opcional, con ícono propio o emoji.
 - Listado de proyectos y listas en registros compactos que se despliegan en el lugar, con “Expandir Todo” / “Colapsar Todo”.
-- Tareas con fecha opcional, descripción y prioridad (solo se ven y editan al abrir la tarea); dentro de cada proyecto y en Pendientes las más importantes van arriba.
-- Una tarea se puede mover a otro proyecto desde su detalle, sin perder título, fecha, descripción, prioridad ni estado.
+- Tareas con fecha opcional, descripción, prioridad y ubicación (solo se ven y editan al abrir la tarea); dentro de cada proyecto y en Pendientes las más importantes van arriba.
+- Una tarea se puede mover a otro proyecto desde su detalle, sin perder título, fecha, descripción, prioridad, ubicación ni estado.
 - Pendientes es la pantalla de inicio.
-- Pestaña **Pendientes**: todas las tareas sin hacer en una sola lista, agrupadas por proyecto y subproyecto; desde ahí se completan, editan, agregan (con “+” por proyecto, una tras otra) y borran.
+- Pestaña **Pendientes**: todas las tareas sin hacer en una sola lista, agrupadas por proyecto y subproyecto; desde ahí se completan, editan, agregan (con “+” por proyecto, una tras otra) y borran. Solo aparecen proyectos **Activos**: pausa, postergados, terminados y cancelados quedan afuera.
+- **Sesión Web** desde Ajustes: abre un enlace por 15 minutos a 2 horas y, desde el navegador de la computadora, se ve y se edita lo mismo que en el celular, en los dos sentidos. El celular sigue siendo la única base: no hay servidor ni cuenta en internet.
 - Dentro de un proyecto, las pendientes van juntas y las hechas se ocultan con un interruptor (queda guardado).
 - Proyectos ordenados solos por prioridad (Alta, Media, Baja, sin prioridad) y filtro por estado y prioridad que queda guardado.
 - Los subproyectos se pueden pasar a otro padre, siempre dentro de su mismo proyecto principal.
@@ -23,7 +24,7 @@ Es una app Android propia. Los datos quedan en el celular, sin cuenta ni servido
 - Export e import JSON con nombres de campo en español, validado y atómico.
 - Tema claro, oscuro o del sistema, guardado en el celular.
 - Base monocroma (blanco, negro y grises) con color semántico en prioridad, estado y progreso; detalle fiel a la tarjeta de referencia.
-- Sin cuenta, sin nube, sin analytics, sin permisos de red ni de almacenamiento.
+- Sin cuenta, sin nube, sin analytics ni permisos de almacenamiento. El permiso de red se usa solo para servir la Sesión Web dentro de la red local; la app no habla con ningún servidor de internet.
 
 El APK listo para instalar se genera en la raíz del proyecto como **`ListMaster.apk`**. No se versiona: `.gitignore` excluye `*.apk`. Si alguna vez hace falta adjuntarlo al repo, se agrega a mano con `git add -f ListMaster.apk`.
 
@@ -38,13 +39,13 @@ El archivo **`list-master-import.json`** es un respaldo listo para importar: tra
 | Pruebas | JUnit 4 + Robolectric + `kotlinx-coroutines-test` en Android; `node:test` en la PWA |
 | Publicación | APK Android firmado con la clave de debug; PWA estática en GitHub Pages mediante `.github/workflows/pages.yml` |
 
-No hay backend, cuentas, analytics ni CDN. La PWA no tiene dependencias: se sirve tal como está.
+No hay backend, cuentas, analytics ni CDN. La PWA no tiene dependencias: se sirve tal como está. La única excepción es la **Sesión Web**, donde el propio celular sirve la PWA dentro de la red local por un rato; no hay ningún servicio externo.
 
 ## Cómo está pensada
 
 **Una app, dos clientes.** Android es el cliente nativo y `pwa/` es un gemelo web para iPhone. Comparten el mismo modelo de datos, las mismas reglas y el mismo formato de respaldo JSON, así que un export de Android se importa en la PWA y viceversa.
 
-**Local-first.** No hay servidor que reciba datos. Android guarda en Room; la PWA en IndexedDB con espejo en `localStorage`. El hosting solo entrega archivos estáticos. La privacidad depende de que el dato nunca salga del dispositivo, no de una cuenta.
+**Local-first.** No hay servidor que reciba datos. Android guarda en Room; la PWA en IndexedDB con espejo en `localStorage`. El hosting solo entrega archivos estáticos. La privacidad depende de que el dato nunca salga del dispositivo, no de una cuenta. En la Sesión Web el celular es el servidor y la base: el navegador pide y manda el JSON por la red local, y al cerrar la sesión no queda nada del lado de la computadora.
 
 **Separación por capas.** En Android: dominio puro (`domain/`), persistencia (`data/`, Room), UI (`ui/`, Compose) y respaldo (`BackupCodec`). En la PWA: `domain.js` (reglas puras), `store.js` (persistencia), `views.js` + `app.js` (UI y acciones) y `backup.js` (JSON). Las reglas importantes —progreso, árboles, ciclos, profundidad, validación— viven en el dominio y se prueban sin UI.
 
@@ -136,7 +137,7 @@ Regla: **un cambio terminado se versiona, se prueba, se commitea, se pushea y se
 | --- | --- | --- |
 | Android | `app/build.gradle.kts` | `versionCode` +1 y `versionName` nuevo |
 | PWA, cambio de producto | `pwa/js/app.js` y `pwa/package.json` | Misma `APP_VERSION` / `version` que Android |
-| Shell de la PWA | `pwa/sw.js` | Subir `CACHE_VERSION` (por ejemplo `1.9.0-r1`) |
+| Shell de la PWA | `pwa/sw.js` | Subir `CACHE_VERSION` (por ejemplo `2.0.0-r1`) |
 | Solo documentación | — | No se toca la versión |
 
 Reglas prácticas:
@@ -177,13 +178,13 @@ Antes de commitear, probar a mano lo que se tocó:
 
 ### 3. Commit y push
 
-- Un commit por cambio terminado, en español y en imperativo: `Sube la version a 1.9.0: ...`.
+- Un commit por cambio terminado, en español y en imperativo: `Sube la version a 2.0.0: ...`.
 - El commit incluye código, tests, versión y documentación en el mismo corte.
 - Nunca se commitea `ListMaster.apk` (está ignorado); el APK se regenera desde el código.
 
 ```bash
 git add -A
-git commit -m "Sube la version a 1.9.0: describe el cambio"
+git commit -m "Sube la version a 2.0.0: describe el cambio"
 git push origin main
 ```
 

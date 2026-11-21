@@ -7,6 +7,7 @@ export const MAX_SUBPROJECT_DEPTH = 3;
 export const MAX_SUBLIST_DEPTH = 3;
 export const MAX_ICON_LENGTH = 32;
 export const MAX_DESCRIPTION_LENGTH = 2000;
+export const MAX_LOCATION_LENGTH = 200;
 
 export const PROJECT_STATUSES = [
   { value: 'Activo', label: 'Activo', tone: 'active', icon: 'status-active' },
@@ -267,7 +268,9 @@ export function pendingGroups(projects, tasks) {
   const result = [];
 
   function visit(project, depth, visited) {
-    if (isClosed(project)) return false;
+    // Pendientes es para lo que se puede trabajar ahora: pausados,
+    // postergados, terminados y cancelados no se muestran.
+    if (project.status !== 'Activo') return false;
     const mark = result.length;
     const own = sortTasks(pendingByProject.get(project.id) || []);
     result.push({ project, depth, tasks: own });
@@ -468,6 +471,14 @@ export function normalizeDescription(raw) {
   const clean = String(raw ?? '').trim();
   if (clean.length > MAX_DESCRIPTION_LENGTH) {
     throw new DomainError(`La descripción no puede superar los ${MAX_DESCRIPTION_LENGTH} caracteres.`);
+  }
+  return clean;
+}
+
+export function normalizeLocation(raw) {
+  const clean = String(raw ?? '').trim();
+  if (clean.length > MAX_LOCATION_LENGTH) {
+    throw new DomainError(`La ubicación no puede superar los ${MAX_LOCATION_LENGTH} caracteres.`);
   }
   return clean;
 }

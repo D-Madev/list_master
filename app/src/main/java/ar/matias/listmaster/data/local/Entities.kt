@@ -51,6 +51,7 @@ data class TaskEntity(
     @ColumnInfo(name = "updated_at") val updatedAt: String,
     val description: String? = null,
     val priority: String? = null,
+    val location: String? = null,
 )
 
 @Entity(

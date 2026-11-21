@@ -57,6 +57,7 @@ function fixture() {
         projectId: ids.root,
         dueDate: '2026-02-01',
         description: 'Color blanco',
+        location: 'Ferretería de la esquina',
         priority: 'Alta',
         createdAt: AT,
         updatedAt: AT,
@@ -68,6 +69,7 @@ function fixture() {
         projectId: ids.child,
         dueDate: null,
         description: '',
+        location: '',
         priority: null,
         createdAt: AT,
         updatedAt: AT,
@@ -116,6 +118,7 @@ test('el export usa el formato de la app Android', () => {
     'fecha',
     'descripcion',
     'prioridad',
+    'ubicacion',
     'creado',
     'actualizado',
   ]);
@@ -143,6 +146,10 @@ test('encode/decode conserva proyectos, tareas y listas', () => {
   const doneTask = decoded.tasks.find((task) => task.id === ids.taskChild);
   assert.equal(doneTask.done, true);
   assert.equal(doneTask.dueDate, null);
+  assert.equal(doneTask.location, '');
+
+  const rootTask = decoded.tasks.find((task) => task.id === ids.taskRoot);
+  assert.equal(rootTask.location, 'Ferretería de la esquina');
 
   const list = decoded.lists[0];
   assert.equal(list.projectId, ids.root);
@@ -198,6 +205,10 @@ test('decode valida referencias, ids repetidos y fechas', () => {
   const childProject = badParent.proyectos.find((entry) => entry.id === ids.child);
   childProject.proyecto_padre = crypto.randomUUID();
   assert.throws(() => decodeBackup(JSON.stringify(badParent)), /proyecto que no existe/);
+
+  const longLocation = JSON.parse(encodeBackup(fixture()));
+  longLocation.tareas[0].ubicacion = 'x'.repeat(201);
+  assert.throws(() => decodeBackup(JSON.stringify(longLocation)), /ubicación demasiado larga/);
 });
 
 test('decode rechaza listas con ciclos o demasiada profundidad', () => {
@@ -225,6 +236,7 @@ test('decode aplica valores por defecto honestos', () => {
   const rawTask = raw.tareas.find((entry) => entry.id === ids.taskRoot);
   delete rawTask.descripcion;
   delete rawTask.prioridad;
+  delete rawTask.ubicacion;
   delete rawTask.fecha;
   delete raw.listas[0].orden;
   delete raw.listas[0].items[0].orden;
@@ -232,6 +244,7 @@ test('decode aplica valores por defecto honestos', () => {
   const task = decoded.tasks.find((entry) => entry.id === ids.taskRoot);
   assert.equal(task.description, '');
   assert.equal(task.priority, null);
+  assert.equal(task.location, '');
   assert.equal(task.dueDate, null);
   assert.equal(decoded.lists[0].position, 0);
   assert.equal(decoded.lists[0].items[0].position, 0);

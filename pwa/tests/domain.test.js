@@ -15,6 +15,7 @@ import {
   mergeReorder,
   newId,
   normalizeDescription,
+  normalizeLocation,
   normalizeTitle,
   pendingCount,
   pendingGroups,
@@ -115,12 +116,15 @@ test('las tareas se ordenan por prioridad, antigüedad e id', () => {
   assert.ok(compareTasks(tasks[2], tasks[1]) < 0);
 });
 
-test('Pendientes agrupa por proyecto y descarta proyectos cerrados', () => {
+test('Pendientes agrupa por proyecto y solo muestra proyectos activos', () => {
   const projects = [
     project('a'),
     project('b', { parentId: 'a' }),
     project('c', { status: 'Terminado' }),
     project('d', { parentId: 'a', status: 'Cancelado' }),
+    project('e', { status: 'Pausa' }),
+    project('f', { status: 'Postergado' }),
+    project('g', { parentId: 'a', status: 'Pausa' }),
   ];
   const tasks = [
     task('t1', 'a'),
@@ -128,6 +132,9 @@ test('Pendientes agrupa por proyecto y descarta proyectos cerrados', () => {
     task('t3', 'b'),
     task('t4', 'c'),
     task('t5', 'd'),
+    task('t6', 'e'),
+    task('t7', 'f'),
+    task('t8', 'g'),
   ];
   const groups = pendingGroups(projects, tasks);
   assert.deepEqual(
@@ -222,12 +229,15 @@ test('al reordenar los hechos conservan su lugar y los pendientes se permutan', 
   assert.deepEqual(mergeReorder(all, draggable, ['b', 'c', 'a']), ['b', 'hecha', 'c', 'a']);
 });
 
-test('los títulos y la descripción se validan', () => {
+test('los títulos, la descripción y la ubicación se validan', () => {
   assert.equal(normalizeTitle('  Hola  '), 'Hola');
   assert.throws(() => normalizeTitle('   '), DomainError);
   assert.throws(() => normalizeTitle('x'.repeat(121)), DomainError);
   assert.equal(normalizeDescription('  detalle  '), 'detalle');
   assert.throws(() => normalizeDescription('x'.repeat(2001)), DomainError);
+  assert.equal(normalizeLocation('  Ferretería  '), 'Ferretería');
+  assert.equal(normalizeLocation(null), '');
+  assert.throws(() => normalizeLocation('x'.repeat(201)), DomainError);
 });
 
 test('newId genera UUID válidos', () => {

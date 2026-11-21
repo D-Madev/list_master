@@ -3,6 +3,7 @@ package ar.matias.listmaster.ui.screens
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
@@ -23,20 +25,34 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import ar.matias.listmaster.BuildConfig
 import ar.matias.listmaster.R
 import ar.matias.listmaster.data.ThemeMode
+import ar.matias.listmaster.data.remote.WebSession
+import ar.matias.listmaster.ui.components.PrimaryButton
 import ar.matias.listmaster.ui.components.ScreenTitle
+import ar.matias.listmaster.ui.components.SecondaryButton
 import ar.matias.listmaster.ui.components.SectionHeader
 import ar.matias.listmaster.ui.components.SurfaceBlock
 import ar.matias.listmaster.ui.theme.LocalExtendedColors
+import kotlinx.coroutines.delay
 
 @Composable
 fun SettingsScreen(
@@ -44,6 +60,9 @@ fun SettingsScreen(
     onThemeChange: (ThemeMode) -> Unit,
     onExport: () -> Unit,
     onImport: () -> Unit,
+    webSession: WebSession.Snapshot?,
+    onStartWebSession: (Int) -> Unit,
+    onStopWebSession: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -120,6 +139,22 @@ fun SettingsScreen(
         }
 
         SectionHeader(
+            text = stringResource(R.string.settings_web_session),
+            modifier = Modifier.padding(top = 24.dp),
+        )
+        Text(
+            text = stringResource(R.string.settings_web_session_help),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = 12.dp),
+        )
+        WebSessionBlock(
+            session = webSession,
+            onStart = onStartWebSession,
+            onStop = onStopWebSession,
+        )
+
+        SectionHeader(
             text = stringResource(R.string.settings_about),
             modifier = Modifier.padding(top = 24.dp),
         )
@@ -155,6 +190,125 @@ fun SettingsScreen(
         }
 
         Spacer(Modifier.height(32.dp))
+    }
+}
+
+@Composable
+private fun WebSessionBlock(
+    session: WebSession.Snapshot?,
+    onStart: (Int) -> Unit,
+    onStop: () -> Unit,
+) {
+    var duration by rememberSaveable { mutableIntStateOf(30) }
+    SurfaceBlock {
+        if (session == null) {
+            Text(
+                text = stringResource(R.string.web_session_duration),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                DurationOption(15, duration, stringResource(R.string.web_session_15)) { duration = it }
+                DurationOption(30, duration, stringResource(R.string.web_session_30)) { duration = it }
+                DurationOption(60, duration, stringResource(R.string.web_session_60)) { duration = it }
+                DurationOption(120, duration, stringResource(R.string.web_session_120)) { duration = it }
+            }
+            Spacer(Modifier.height(16.dp))
+            PrimaryButton(
+                text = stringResource(R.string.web_session_start),
+                onClick = { onStart(duration) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+        } else {
+            WebSessionActive(session = session, onStop = onStop)
+        }
+    }
+}
+
+@Composable
+private fun DurationOption(
+    minutes: Int,
+    selected: Int,
+    label: String,
+    onSelect: (Int) -> Unit,
+) {
+    val scheme = MaterialTheme.colorScheme
+    val isSelected = minutes == selected
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(999.dp))
+            .background(if (isSelected) scheme.primary else LocalExtendedColors.current.surfaceAlt)
+            .clickable { onSelect(minutes) }
+            .padding(horizontal = 14.dp, vertical = 9.dp),
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelLarge,
+            color = if (isSelected) scheme.onPrimary else scheme.onSurfaceVariant,
+        )
+    }
+}
+
+@Composable
+private fun WebSessionActive(session: WebSession.Snapshot, onStop: () -> Unit) {
+    val clipboard = LocalClipboardManager.current
+    var copied by remember { mutableStateOf(false) }
+    val remaining by produceState(initialValue = session.remainsMillis(), key1 = session.expiresAt) {
+        while (value > 0) {
+            delay(1_000)
+            value = session.remainsMillis()
+        }
+    }
+
+    Text(
+        text = stringResource(R.string.web_session_link_help),
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    Spacer(Modifier.height(8.dp))
+    SelectionContainer {
+        Text(
+            text = session.url,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary,
+        )
+    }
+    Spacer(Modifier.height(6.dp))
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            text = stringResource(R.string.web_session_code, session.code),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f),
+        )
+        Text(
+            text = if (remaining > 60_000) {
+                stringResource(R.string.web_session_remaining_minutes, (remaining / 60_000).toInt() + 1)
+            } else {
+                stringResource(R.string.web_session_remaining_soon)
+            },
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+    Spacer(Modifier.height(12.dp))
+    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        SecondaryButton(
+            text = if (copied) {
+                stringResource(R.string.web_session_copied)
+            } else {
+                stringResource(R.string.web_session_copy)
+            },
+            onClick = {
+                clipboard.setText(AnnotatedString(session.url))
+                copied = true
+            },
+            modifier = Modifier.weight(1f),
+        )
+        TextButton(onClick = onStop, modifier = Modifier.heightIn(min = 48.dp)) {
+            Text(stringResource(R.string.web_session_stop))
+        }
     }
 }
 

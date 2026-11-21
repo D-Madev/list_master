@@ -83,8 +83,8 @@ fun ProjectsScreen(
     showDoneTasks: Boolean,
     onShowDoneTasksChange: (Boolean) -> Unit,
     onToggleTask: (Task) -> Unit,
-    onCreateTask: (String, String, LocalDate?, String, Priority?) -> Unit,
-    onUpdateTask: (String, String, LocalDate?, String, Priority?, String) -> Unit,
+    onCreateTask: (String, String, LocalDate?, String, Priority?, String) -> Unit,
+    onUpdateTask: (String, String, LocalDate?, String, Priority?, String, String) -> Unit,
     onDeleteTask: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -401,11 +401,19 @@ fun ProjectsScreen(
             projects = projects,
             initialProjectId = editor.projectId,
             onDismiss = { taskEditor = null },
-            onSave = { title, dueDate, description, priority, targetProjectId ->
+            onSave = { title, dueDate, description, priority, targetProjectId, location ->
                 if (editor.task == null) {
-                    onCreateTask(targetProjectId, title, dueDate, description, priority)
+                    onCreateTask(targetProjectId, title, dueDate, description, priority, location)
                 } else {
-                    onUpdateTask(editor.task.id, title, dueDate, description, priority, targetProjectId)
+                    onUpdateTask(
+                        editor.task.id,
+                        title,
+                        dueDate,
+                        description,
+                        priority,
+                        targetProjectId,
+                        location,
+                    )
                 }
                 taskEditor = null
             },

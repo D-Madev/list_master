@@ -18,6 +18,7 @@ import {
   mergeReorder,
   normalizeDescription,
   normalizeIcon,
+  normalizeLocation,
   normalizeTitle,
   nowIso,
   newId,
@@ -32,7 +33,10 @@ import { loadData, loadSettings, saveData, saveSettings } from './store.js';
 import { ICON_KEYS, escapeHtml, icon } from './icons.js';
 import { formatLongDate, needsNav, renderNav, renderScreen } from './views.js';
 
-const APP_VERSION = '1.9.0';
+const APP_VERSION = '2.0.0';
+// Tachar tarda en verse y la fila se va suave: se re-renderiza al final.
+const COMPLETION_LEAVE_MS = 620;
+const COMPLETION_TOTAL_MS = 900;
 const DEFAULT_SETTINGS = {
   theme: 'system',
   showDoneTasks: false,
@@ -80,7 +84,24 @@ async function boot() {
     route = parseRoute(location.hash);
   }
   render();
-  registerServiceWorker();
+  if (globalThis.LM_REMOTE) {
+    // Modo remoto: el celular avisa cuando cambió algo y se vuelve a pintar,
+    // salvo que haya una hoja abierta o alguien escribiendo.
+    document.body.classList.add('is-remote');
+    window.addEventListener('lm-remote-updated', async () => {
+      const active = document.activeElement;
+      if (sheets.length) return;
+      if (active && active.matches('input, textarea, select')) return;
+      try {
+        data = await globalThis.LM_REMOTE.load();
+        render({ preserveScroll: true });
+      } catch {
+        // Se reintenta en el próximo sondeo.
+      }
+    });
+  } else {
+    registerServiceWorker();
+  }
 }
 
 // Ruteo
@@ -241,6 +262,10 @@ function renderTaskSheet(sheet, index) {
     <label class="field">
       <span class="field-label">Descripción <span class="optional">Opcional</span></span>
       <textarea class="input textarea" name="description" maxlength="2000" rows="3" autocapitalize="sentences" placeholder="Un detalle que no querés olvidar">${escapeHtml(draft.description)}</textarea>
+    </label>
+    <label class="field">
+      <span class="field-label">Ubicación <span class="optional">Opcional</span></span>
+      <input class="input" name="location" value="${escapeHtml(draft.location || '')}" maxlength="200" autocomplete="off" autocapitalize="sentences" placeholder="Casa, oficina, una dirección">
     </label>
     <div class="field">
       <span class="field-label">Prioridad</span>
@@ -431,7 +456,8 @@ function renderProjectPicker(sheet, index) {
   const body = options.length
     ? options
         .map(
-          (row) => `<button type="button" class="picker-row" data-action="choose-project" data-id="${escapeHtml(row.project.id)}" style="--picker-indent:${row.depth * 16}px">
+          (row) => `${row.divider ? '<div class="picker-divider" role="separator"></div>' : ''}
+          <button type="button" class="picker-row" data-action="choose-project" data-id="${escapeHtml(row.project.id)}" style="--picker-indent:${row.depth * 16}px">
             <span class="picker-icon">${icon(row.project.parentId ? 'layers' : 'folder', 'small-icon')}</span>
             <span class="picker-title">${escapeHtml(row.project.title)}</span>
             ${isClosed(row.project) ? `<span class="muted small">${escapeHtml(row.project.status)}</span>` : ''}
@@ -526,14 +552,86 @@ function priorityOptions(action, current) {
 
 function projectPickerOptions(sheet) {
   if (sheet.excludeId) {
-    return validProjectParents(sheet.excludeId, data.projects).map((project) => ({
-      project,
-      depth: projectDepth(project.id, data.projects),
-    }));
+    return withPickerDividers(
+      validProjectParents(sheet.excludeId, data.projects).map((project) => ({
+        project,
+        depth: projectDepth(project.id, data.projects),
+      })),
+    );
   }
-  return flattenProjects(data.projects).filter(
+  const rows = flattenProjects(data.projects).filter(
     (row) => !sheet.onlyParents || canHaveSubproject(row.project.id, data.projects),
   );
+  // Al agregar o mover una tarea lo más probable es elegir otro proyecto de la
+  // misma rama, así que el proyecto actual y sus subproyectos van primero.
+  return withPickerDividers(branchFirstRows(rows, sheet.currentId));
+}
+
+/**
+ * Reordena las filas del árbol para que la rama del proyecto actual quede
+ * arriba en cada nivel: el proyecto actual, sus subproyectos y después el resto.
+ * No toca el orden de prioridad dentro de cada grupo.
+ */
+function branchFirstRows(rows, currentId) {
+  if (!currentId) return rows;
+  const byId = new Map(rows.map((row) => [row.project.id, row]));
+  if (!byId.has(currentId)) return rows;
+
+  const branch = new Set();
+  let node = byId.get(currentId);
+  while (node) {
+    branch.add(node.project.id);
+    node = node.project.parentId ? byId.get(node.project.parentId) : null;
+  }
+
+  const byParent = new Map();
+  for (const row of rows) {
+    const key = row.project.parentId ?? null;
+    if (!byParent.has(key)) byParent.set(key, []);
+    byParent.get(key).push(row);
+  }
+  const branchFirst = (list) =>
+    list
+      .slice()
+      .sort(
+        (a, b) =>
+          Number(branch.has(b.project.id)) - Number(branch.has(a.project.id)),
+      );
+
+  const result = [];
+  const emit = (row) => {
+    result.push(row);
+    branchFirst(byParent.get(row.project.id) || []).forEach(emit);
+  };
+  branchFirst(byParent.get(null) || []).forEach(emit);
+
+  const emitted = new Set(result.map((row) => row.project.id));
+  rows.forEach((row) => {
+    if (!emitted.has(row.project.id)) result.push(row);
+  });
+  return result;
+}
+
+/** Marca qué filas arrancan un proyecto principal, para separarlas visualmente. */
+function withPickerDividers(rows) {
+  let previousRoot = null;
+  return rows.map((row) => {
+    const root = rootProjectId(row.project.id);
+    const divider = row.depth === 0 && previousRoot !== null && root !== previousRoot;
+    previousRoot = root;
+    return { ...row, divider };
+  });
+}
+
+function rootProjectId(projectId) {
+  const byId = new Map(data.projects.map((project) => [project.id, project]));
+  let current = byId.get(projectId) || null;
+  const seen = new Set();
+  while (current && current.parentId && !seen.has(current.id)) {
+    seen.add(current.id);
+    current = byId.get(current.parentId) || null;
+  }
+  return current ? current.id : null;
 }
 
 function listPickerOptions(sheet) {
@@ -616,8 +714,9 @@ function onSubmit(event) {
       });
       persist();
       input.value = '';
+      // Se cierra el campo: para otra tarea hay que tocar "+" de nuevo.
+      ui.addingProjectId = null;
       render({ preserveScroll: true });
-      focusInline('task', projectId);
     } catch (error) {
       showToast(error.message || 'No pudimos agregar la tarea.');
     }
@@ -1073,6 +1172,7 @@ function openTaskSheet(taskId, fallbackProjectId = null) {
     draft: {
       title: task?.title || '',
       description: task?.description || '',
+      location: task?.location || '',
       dueDate: task?.dueDate || '',
       priority: task?.priority || null,
       projectId: task?.projectId || fallbackProjectId || data.projects[0]?.id || '',
@@ -1173,6 +1273,7 @@ function saveTaskSheet(sheet) {
   const draft = sheet.draft;
   const title = normalizeTitle(draft.title);
   const description = normalizeDescription(draft.description);
+  const location = normalizeLocation(draft.location);
   const dueDate = draft.dueDate ? String(draft.dueDate) : null;
   const priority = draft.priority || null;
   if (!draft.projectId || !findProject(draft.projectId)) {
@@ -1184,6 +1285,7 @@ function saveTaskSheet(sheet) {
     if (!task) throw new DomainError('Esa tarea ya no existe.');
     task.title = title;
     task.description = description;
+    task.location = location;
     task.dueDate = dueDate;
     task.priority = priority;
     task.projectId = draft.projectId;
@@ -1201,6 +1303,7 @@ function saveTaskSheet(sheet) {
     projectId: draft.projectId,
     dueDate,
     description,
+    location,
     priority,
     createdAt: timestamp,
     updatedAt: timestamp,
@@ -1354,7 +1457,7 @@ function toggleTask(taskId) {
     ?.closest('.task-row');
   if (row) {
     animateCompletion(row, done);
-    setTimeout(() => render({ preserveScroll: true }), 380);
+    setTimeout(() => render({ preserveScroll: true }), COMPLETION_TOTAL_MS);
   } else {
     render({ preserveScroll: true });
   }
@@ -1372,7 +1475,7 @@ function toggleItem(itemId) {
     ?.closest('.item-row');
   if (row) {
     animateCompletion(row, done);
-    setTimeout(() => render({ preserveScroll: true }), 380);
+    setTimeout(() => render({ preserveScroll: true }), COMPLETION_TOTAL_MS);
   } else {
     render({ preserveScroll: true });
   }
@@ -1399,7 +1502,11 @@ function animateCompletion(row, done) {
       title.appendChild(overlay);
     }
   }
-  setTimeout(() => row.classList.remove('is-completing'), 380);
+  setTimeout(() => row.classList.remove('is-completing'), COMPLETION_TOTAL_MS);
+  if (done) {
+    // Se va desvaneciendo antes del re-render para que no desaparezca de golpe.
+    setTimeout(() => row.classList.add('is-leaving'), COMPLETION_LEAVE_MS);
+  }
 }
 
 function setProjectStatus(projectId, status) {
@@ -1687,17 +1794,23 @@ function registerServiceWorker() {
 // Persistencia y utilidades
 
 function persist({ immediate = false } = {}) {
+  const saveError = () =>
+    showToast(
+      globalThis.LM_REMOTE
+        ? 'No pudimos guardar en el celular.'
+        : 'No pudimos guardar los datos en este iPhone.',
+    );
   if (saveTimer) {
     clearTimeout(saveTimer);
     saveTimer = null;
   }
   if (immediate) {
-    saveData(data).catch(() => showToast('No pudimos guardar los datos en este iPhone.'));
+    saveData(data).catch(saveError);
     return;
   }
   saveTimer = setTimeout(() => {
     saveTimer = null;
-    saveData(data).catch(() => showToast('No pudimos guardar los datos en este iPhone.'));
+    saveData(data).catch(saveError);
   }, 120);
 }
 

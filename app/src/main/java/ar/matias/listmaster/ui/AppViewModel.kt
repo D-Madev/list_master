@@ -10,6 +10,7 @@ import ar.matias.listmaster.R
 import ar.matias.listmaster.data.BackupCodec
 import ar.matias.listmaster.data.BackupException
 import ar.matias.listmaster.data.ThemeMode
+import ar.matias.listmaster.data.remote.WebSession
 import ar.matias.listmaster.domain.model.AppData
 import ar.matias.listmaster.domain.model.Priority
 import ar.matias.listmaster.domain.model.ProjectFilter
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -51,13 +53,50 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val showDoneListItems: StateFlow<Boolean> = preferences.showDoneListItems
     val projectFilter: StateFlow<ProjectFilter> = preferences.projectFilter
 
+    val webSession: StateFlow<WebSession.Snapshot?> = container.webSession.snapshot
+
     val navigation = Navigator()
 
     private val _messages = MutableSharedFlow<String>(extraBufferCapacity = 8)
     val messages: SharedFlow<String> = _messages.asSharedFlow()
 
+    init {
+        // Con una sesión web abierta, cada cambio hecho en el celular avisa al
+        // navegador para que vuelva a leer.
+        viewModelScope.launch {
+            data.drop(1).collect { container.webSession.notifyLocalChange() }
+        }
+    }
+
     fun notify(message: String) {
         _messages.tryEmit(message)
+    }
+
+    // Sesión web
+
+    fun startWebSession(minutes: Int) {
+        viewModelScope.launch {
+            val context = getApplication<Application>()
+            when (val result = container.webSession.start(minutes * 60_000L)) {
+                is WebSession.Result.Failed -> {
+                    _messages.emit(
+                        context.getString(
+                            if (result.reason == WebSession.Reason.NO_NETWORK) {
+                                R.string.web_session_no_network
+                            } else {
+                                R.string.web_session_error
+                            },
+                        ),
+                    )
+                }
+
+                is WebSession.Result.Started -> Unit
+            }
+        }
+    }
+
+    fun stopWebSession() {
+        container.webSession.stop()
     }
 
     private fun action(block: suspend () -> Unit) {
@@ -258,10 +297,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         dueDate: LocalDate?,
         description: String = "",
         priority: Priority? = null,
+        location: String = "",
         onSaved: () -> Unit = {},
     ) {
         action {
-            repository.createTask(projectId, title, dueDate, description, priority)
+            repository.createTask(projectId, title, dueDate, description, priority, location)
             onSaved()
         }
     }
@@ -273,10 +313,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         description: String = "",
         priority: Priority? = null,
         newProjectId: String? = null,
+        location: String = "",
         onSaved: () -> Unit = {},
     ) {
         action {
-            repository.updateTask(id, title, dueDate, description, priority, newProjectId)
+            repository.updateTask(id, title, dueDate, description, priority, newProjectId, location)
             onSaved()
         }
     }

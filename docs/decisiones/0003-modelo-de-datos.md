@@ -37,6 +37,9 @@
 | `hecha` | booleano | Sí | |
 | `proyecto_id` | UUID | Sí | Debe existir; se puede cambiar desde el detalle de la tarea |
 | `fecha` | `YYYY-MM-DD` o `null` | No | Vencimiento, sin hora |
+| `descripcion` | texto | No | Hasta 2000 caracteres; vacío por defecto |
+| `prioridad` | enum o `null` | No | `Alta`, `Media`, `Baja`; ordena dentro del proyecto |
+| `ubicacion` | texto | No | Hasta 200 caracteres; lugar libre (“Ferretería”, “Casa de Ana”) |
 | `creado` | ISO-8601 UTC | Sí | Orden estable |
 | `actualizado` | ISO-8601 UTC | Sí | Último cambio |
 
@@ -148,6 +151,9 @@ La exclusión de subárboles cancelados está implementada en `ProgressCalculato
       "hecha": true,
       "proyecto_id": "550e8400-e29b-41d4-a716-446655440000",
       "fecha": "2026-11-05",
+      "descripcion": "Tonos tierra",
+      "prioridad": "Alta",
+      "ubicacion": "Estudio",
       "creado": "2026-10-21T09:00:00Z",
       "actualizado": "2026-10-29T17:30:00Z"
     }
@@ -227,7 +233,7 @@ La exclusión de subárboles cancelados está implementada en `ProgressCalculato
 - Esquema de Room exportado a `app/schemas/` y commiteado.
 - El progreso no tiene columna: se calcula en un caso de uso puro.
 - Los repositorios exponen `Flow`; la UI observa. Para el volumen de una app personal, se carga todo el árbol y se calcula en memoria. No hay paginación.
-- No hay sincronización, ni conflictos, ni relojes distribuidos. El único escritor es la app.
+- No hay sincronización en la nube, ni conflictos, ni relojes distribuidos. El único escritor es la app. La **Sesión Web** (ver `0004-sesion-web.md`) no cambia esto: el celular sigue siendo la base y el navegador solo lee y escribe a través suyo mientras la sesión está abierta.
 
 ## Decisiones adoptadas
 
@@ -250,7 +256,9 @@ La exclusión de subárboles cancelados está implementada en `ProgressCalculato
 | 8 | **Paquete** | `ar.matias.listmaster` |
 | 9 | **Icono de proyecto** | Icono fijo de carpeta/capas según profundidad; sin selector de iconos en el MVP |
 | 10 | **Árbol en la tarjeta** | Un nivel: primero las tareas del proyecto, después filas de subproyectos con su mini progreso. El detalle muestra el árbol completo |
-| 11 | **Prioridad en tareas** | No existe en el MVP; la prioridad es del proyecto |
+| 11 | **Prioridad en tareas** | Agregada en 1.5.0: `prioridad` opcional por tarea, además de la del proyecto; ordena dentro del proyecto y en Pendientes |
+| 22 | **Ubicación de la tarea** | Texto libre opcional (`ubicacion`), hasta 200 caracteres; se muestra en el detalle y viaja en el respaldo |
+| 23 | **Sesión Web** | El celular sirve la PWA y una API mínima por la red local; ver `0004-sesion-web.md` |
 | 12 | **Listas en subproyectos** | Se pueden vincular a cualquier nodo del árbol, no solo a raíces |
 | 13 | **Fechas** | Solo vencimiento (`YYYY-MM-DD`), sin hora, sin recordatorios |
 | 14 | **Tema** | Se guarda con SharedPreferences; claro/oscuro/sistema; sin color dinámico. Se usó SharedPreferences porque `androidx.datastore-preferences` no estaba en la caché local y la regla era no descargar dependencias nuevas |
@@ -266,7 +274,7 @@ La exclusión de subárboles cancelados está implementada en `ProgressCalculato
 
 - Notas de sesiones, volcado de ideas, finanzas, lectura, anillo de tiempo, calendario/agenda.
 - Login, cuenta, nube, sincronización, compartir, analytics.
-- Prioridad por tarea, etiquetas, adjuntos, subtareas de una tarea, dependencias, recordatorios.
+- Etiquetas, adjuntos, subtareas de una tarea, dependencias, recordatorios.
 - Búsqueda global, filtros avanzados, papelera, historial de cambios.
 - Integración con A.R.G.O.S. Solo se deja el formato listo: IDs, timestamps y JSON estable.
 

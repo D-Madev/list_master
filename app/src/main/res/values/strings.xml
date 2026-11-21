@@ -128,6 +128,9 @@
 
     <string name="task_description_label">Descripción</string>
     <string name="task_description_placeholder">Notas, links, lo que quieras recordar</string>
+    <string name="task_location_label">Ubicación</string>
+    <string name="task_location_placeholder">Casa, oficina, una dirección</string>
+    <string name="location_too_long">La ubicación no puede superar los 200 caracteres.</string>
     <string name="project_parent_change">Cambiar el Proyecto Padre</string>
     <string name="project_parent_pick_title">Nuevo Proyecto Padre</string>
     <string name="project_parent_pick_help">Elegí cualquier proyecto como padre.</string>
@@ -209,6 +212,23 @@
     <string name="settings_export_help">Guardá un archivo JSON con todos tus proyectos, tareas y listas.</string>
     <string name="settings_import_help">Reemplazá todo con un archivo exportado antes.</string>
     <string name="settings_about_body">List Master es tu espacio personal para proyectos, subproyectos, tareas y listas. Todo queda en este celular.</string>
+    <string name="settings_web_session">Sesión Web</string>
+    <string name="settings_web_session_help">Abrí la app en la computadora por un rato. Los datos siguen en el celular y se sincronizan en los dos sentidos.</string>
+    <string name="web_session_duration">Duración</string>
+    <string name="web_session_15">15 min</string>
+    <string name="web_session_30">30 min</string>
+    <string name="web_session_60">1 h</string>
+    <string name="web_session_120">2 h</string>
+    <string name="web_session_start">Abrir Sesión Web</string>
+    <string name="web_session_link_help">Abrí este enlace en el navegador y escribí el código. Tienen que estar en la misma red.</string>
+    <string name="web_session_code">Código %1$s</string>
+    <string name="web_session_remaining_minutes">Quedan %1$d min</string>
+    <string name="web_session_remaining_soon">Queda menos de un minuto</string>
+    <string name="web_session_copy">Copiar Enlace</string>
+    <string name="web_session_copied">Enlace Copiado</string>
+    <string name="web_session_stop">Cerrar</string>
+    <string name="web_session_no_network">Conectate a una red Wi-Fi o a la red local para abrir la sesión.</string>
+    <string name="web_session_error">No pudimos abrir la sesión web. Probá de nuevo.</string>
     <string name="action_add">Agregar</string>
 
     <string name="export_success">Listo, guardaste todo en «%1$s».</string>

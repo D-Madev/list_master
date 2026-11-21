@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Sin INTERNET ni permisos de almacenamiento: los datos quedan en el
-         celular y el export/import usa el selector de archivos del sistema. -->
+    <!-- INTERNET solo para servir la sesión web por la red local: la app no
+         habla con ningún servidor de internet. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Sin permisos de almacenamiento: los datos quedan en el celular y el
+         export/import usa el selector de archivos del sistema. -->
     <application
         android:name=".ListMasterApplication"
         android:allowBackup="false"

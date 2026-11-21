@@ -55,6 +55,9 @@ class BackupCodecTest {
                 dueDate = LocalDate.parse("2026-11-05"),
                 createdAt = base.plusSeconds(30),
                 updatedAt = base.plusSeconds(40),
+                description = "Tonos tierra",
+                priority = Priority.HIGH,
+                location = "Estudio",
             ),
         ),
         lists = listOf(
@@ -137,6 +140,7 @@ class BackupCodecTest {
         assertTrue(text.contains("\"proyectos\""))
         assertTrue(text.contains("\"proyecto_padre\""))
         assertTrue(text.contains("\"prioridad\": \"Alta\""))
+        assertTrue(text.contains("\"ubicacion\": \"Estudio\""))
         assertTrue(text.contains("\"tareas\""))
         assertTrue(text.contains("\"hecha\": true"))
         assertTrue(text.contains("\"listas\""))
